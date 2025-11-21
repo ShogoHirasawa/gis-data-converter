@@ -6,7 +6,7 @@ export type ConversionState =
   | 'error' 
   | 'upload-error';
 
-export type FileFormat = 'shapefile' | 'geojson' | 'kml' | 'csv' | 'gpx' | 'topojson' | 'pbf';
+export type FileFormat = 'shapefile' | 'geojson' | 'kml' | 'csv' | 'gpx' | 'pbf';
 
 export interface UploadedFile {
   file: File;

@@ -81,7 +81,6 @@ const HowToUsePage: React.FC<HowToUsePageProps> = ({ onBack }) => {
               <li>{t.howToUseSection2Kml}</li>
               <li>{t.howToUseSection2Gpx}</li>
               <li>{t.howToUseSection2Csv}</li>
-              <li>{t.howToUseSection2TopoJson}</li>
               <li>{t.howToUseSection2Pbf}</li>
             </ul>
           </section>

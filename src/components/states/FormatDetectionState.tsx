@@ -52,12 +52,6 @@ const FormatDetectionState: React.FC<FormatDetectionStateProps> = ({
       icon: 'table',
     },
     {
-      id: 'topojson',
-      name: t.topoJsonTitle,
-      description: t.topoJsonDesc,
-      icon: 'layers',
-    },
-    {
       id: 'pbf',
       name: t.pbfTitle,
       description: t.pbfDesc,
@@ -78,7 +72,6 @@ const FormatDetectionState: React.FC<FormatDetectionStateProps> = ({
       kml: 'KML',
       csv: 'CSV',
       gpx: 'GPX',
-      topojson: 'TopoJSON',
       pbf: 'PBF',
     };
     return formatMap[format.toLowerCase()] || format;

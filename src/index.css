@@ -21,7 +21,7 @@ body {
   min-height: 100vh;
 }
 
-/* Loading spinner animation */
+/* Loading spinner animation*/
 @keyframes spin {
   from {
     transform: rotate(0deg);
