@@ -7,7 +7,7 @@ body {
   line-height: 1.6;
 }
 
-/* ローディングスピナーのアニメーション */
+/* Loading spinner animation */
 @keyframes spin {
   from {
     transform: rotate(0deg);
