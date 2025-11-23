@@ -126,3 +126,90 @@ test.describe('UI State Transitions', () => {
   });
 });
 
+test.describe('Format Detection Display', () => {
+  test('should display correct detected format for GeoJSON', async ({ page }) => {
+    await page.goto('/');
+    
+    const filePath = await getFixtureFile('point', 'points.geojson');
+    await uploadFile(page, filePath);
+    
+    // Wait for format detection state
+    await page.waitForTimeout(500);
+    
+    // Check that the detected format message contains GeoJSON
+    // Support both English and Japanese (and other languages)
+    const detectedFormatMessage = page.locator('h2').filter({ 
+      hasText: /GeoJSON|geojson/i 
+    });
+    await expect(detectedFormatMessage).toBeVisible({ timeout: 5000 });
+    
+    // Verify it's not showing the wrong format
+    await expect(page.locator('h2:has-text("Shapefile")')).not.toBeVisible({ timeout: 1000 });
+    await expect(page.locator('h2:has-text("CSV")')).not.toBeVisible({ timeout: 1000 });
+    await expect(page.locator('h2:has-text("KML")')).not.toBeVisible({ timeout: 1000 });
+  });
+
+  test('should display correct detected format for CSV', async ({ page }) => {
+    await page.goto('/');
+    
+    const filePath = await getFixtureFile('point', 'points.csv');
+    await uploadFile(page, filePath);
+    
+    // Wait for format detection state
+    await page.waitForTimeout(500);
+    
+    // Check that the detected format message contains CSV
+    const detectedFormatMessage = page.locator('h2').filter({ 
+      hasText: /CSV|csv/i 
+    });
+    await expect(detectedFormatMessage).toBeVisible({ timeout: 5000 });
+    
+    // Verify it's not showing the wrong format
+    await expect(page.locator('h2:has-text("Shapefile")')).not.toBeVisible({ timeout: 1000 });
+    await expect(page.locator('h2:has-text("GeoJSON")')).not.toBeVisible({ timeout: 1000 });
+    await expect(page.locator('h2:has-text("KML")')).not.toBeVisible({ timeout: 1000 });
+  });
+
+  test('should display correct detected format for KML', async ({ page }) => {
+    await page.goto('/');
+    
+    const filePath = await getFixtureFile('point', 'points.kml');
+    await uploadFile(page, filePath);
+    
+    // Wait for format detection state
+    await page.waitForTimeout(500);
+    
+    // Check that the detected format message contains KML
+    const detectedFormatMessage = page.locator('h2').filter({ 
+      hasText: /KML|kml/i 
+    });
+    await expect(detectedFormatMessage).toBeVisible({ timeout: 5000 });
+    
+    // Verify it's not showing the wrong format
+    await expect(page.locator('h2:has-text("Shapefile")')).not.toBeVisible({ timeout: 1000 });
+    await expect(page.locator('h2:has-text("GeoJSON")')).not.toBeVisible({ timeout: 1000 });
+    await expect(page.locator('h2:has-text("CSV")')).not.toBeVisible({ timeout: 1000 });
+  });
+
+  test('should display correct detected format for Shapefile', async ({ page }) => {
+    await page.goto('/');
+    
+    const filePath = await getFixtureFile('point', 'points.shp.zip');
+    await uploadFile(page, filePath);
+    
+    // Wait for format detection state
+    await page.waitForTimeout(500);
+    
+    // Check that the detected format message contains Shapefile
+    const detectedFormatMessage = page.locator('h2').filter({ 
+      hasText: /Shapefile|shapefile/i 
+    });
+    await expect(detectedFormatMessage).toBeVisible({ timeout: 5000 });
+    
+    // Verify it's not showing the wrong format
+    await expect(page.locator('h2:has-text("GeoJSON")')).not.toBeVisible({ timeout: 1000 });
+    await expect(page.locator('h2:has-text("CSV")')).not.toBeVisible({ timeout: 1000 });
+    await expect(page.locator('h2:has-text("KML")')).not.toBeVisible({ timeout: 1000 });
+  });
+});
+
