@@ -212,8 +212,9 @@ function App() {
     }
   }, [currentPage]);
 
-  const handleDownload = () => {
-    if (conversionResult && conversionResult.blob) {
+  // Auto-download when conversion is completed
+  useEffect(() => {
+    if (state === 'completed' && conversionResult && conversionResult.blob) {
       const url = URL.createObjectURL(conversionResult.blob);
       const a = document.createElement('a');
       a.href = url;
@@ -223,7 +224,7 @@ function App() {
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
     }
-  };
+  }, [state, conversionResult]);
 
   return (
     <LanguageProvider>
@@ -247,7 +248,6 @@ function App() {
             onFileUpload={handleFileUpload}
             onFormatSelect={handleFormatSelect}
             onReset={handleReset}
-            onDownload={handleDownload}
           />
         )}
         <Footer onPageChange={handlePageChange} />
