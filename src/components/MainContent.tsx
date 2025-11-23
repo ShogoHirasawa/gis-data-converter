@@ -17,7 +17,6 @@ interface MainContentProps {
   onFileUpload: (file: File) => void;
   onFormatSelect: (formatId: string) => void;
   onReset: () => void;
-  onDownload: () => void;
 }
 
 const MainContent: React.FC<MainContentProps> = ({
@@ -29,7 +28,6 @@ const MainContent: React.FC<MainContentProps> = ({
   onFileUpload,
   onFormatSelect,
   onReset,
-  onDownload,
 }) => {
   return (
     <main className="flex-1 overflow-x-hidden flex flex-col px-8 py-12">
@@ -52,7 +50,6 @@ const MainContent: React.FC<MainContentProps> = ({
       {state === 'completed' && conversionResult && (
         <CompletedState
           result={conversionResult}
-          onDownload={onDownload}
           onReset={onReset}
         />
       )}
