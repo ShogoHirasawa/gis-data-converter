@@ -89,13 +89,40 @@ const FormatDetectionState: React.FC<FormatDetectionStateProps> = ({
     return formatMap[format.toLowerCase()] || format;
   };
 
-  // Replace "Shapefile format" in detectedFormat message with the actual format name
+  // Generate detected format message dynamically based on the actual format
   const getDetectedFormatMessage = (): string => {
     if (!uploadedFile.format) {
       return t.detectedFormat;
     }
+    
     const formatName = getFormatDisplayName(uploadedFile.format);
-    return t.detectedFormat.replace(/Shapefile format/i, `${formatName} format`);
+    
+    // Try to replace "Shapefile" in the message with the actual format name
+    // This works for both English and Japanese (and other languages)
+    let message = t.detectedFormat;
+    
+    // Replace "Shapefile" or "Shapefile形式" or "Shapefile format" with the actual format
+    message = message.replace(/Shapefile形式/g, `${formatName}形式`);
+    message = message.replace(/Shapefile format/gi, `${formatName} format`);
+    message = message.replace(/Shapefile/gi, formatName);
+    
+    // If no replacement occurred, construct a new message
+    // Check if the message still contains "Shapefile" (case-insensitive)
+    if (message.toLowerCase().includes('shapefile')) {
+      // For Japanese: "あなたのファイルは{format}形式です"
+      if (t.detectedFormat.includes('あなたのファイルは')) {
+        return `✓ あなたのファイルは${formatName}形式です`;
+      }
+      // For English: "Your file is detected as {format} format"
+      if (t.detectedFormat.includes('Your file is detected as')) {
+        return `✓ Your file is detected as ${formatName} format`;
+      }
+      // Fallback: try to construct from the base message
+      const baseMessage = t.detectedFormat.replace(/Shapefile/gi, formatName);
+      return baseMessage;
+    }
+    
+    return message;
   };
 
   return (

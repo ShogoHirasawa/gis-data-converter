@@ -103,3 +103,11 @@ declare module '@tmcw/togeojson' {
     gpx: (doc: Document) => any;
   };
 }
+
+// Worker type definition for Vite
+declare module '*?worker' {
+  const WorkerConstructor: {
+    new (): Worker;
+  };
+  export default WorkerConstructor;
+}

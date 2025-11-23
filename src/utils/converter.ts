@@ -9,6 +9,7 @@ import {
   ConvertResponse, 
   OutputFormat as WorkerOutputFormat 
 } from '../workers/convert.worker';
+import ConvertWorker from '../workers/convert.worker.ts?worker';
 
 // Re-export OutputFormat for convenience
 export type OutputFormat = WorkerOutputFormat;
@@ -17,10 +18,9 @@ export type OutputFormat = WorkerOutputFormat;
  * Create a WebWorker instance for conversion
  */
 function createWorker(): Worker {
-  // Use Vite's worker import - worker files are handled automatically by Vite
-  // Worker will be bundled and loaded as a separate chunk
-  const workerUrl = new URL('../workers/convert.worker.ts', import.meta.url);
-  return new Worker(workerUrl, { type: 'module' });
+  // Use Vite's worker import with ?worker query parameter
+  // This ensures the worker is properly bundled and served with correct MIME type
+  return new ConvertWorker();
 }
 
 /**
