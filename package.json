@@ -10,9 +10,6 @@
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "build:wasm": "./scripts/build-wasm.sh",
     "build:all": "npm run build:wasm && npm run build",
-    "test": "vitest",
-    "test:ui": "vitest --ui",
-    "test:run": "vitest run",
     "test:e2e": "playwright test",
     "test:e2e:ui": "playwright test --ui",
     "test:e2e:headed": "playwright test --headed"
