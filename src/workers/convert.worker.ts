@@ -4,7 +4,7 @@
 
 import { InputFormat } from "../utils/detectFormat";
 import { shapefileToGeoJSON, geoJSONToShapefile, reformatShapefile } from "../utils/conversions/shapefile";
-import { geoJSONToKML, shapefileToKML, geoJSONToCSVExport, reformatGeoJSON } from "../utils/conversions/geojson";
+import { geoJSONToKML, geoJSONToCSVExport, reformatGeoJSON } from "../utils/conversions/geojson";
 import { csvToGeoJSON, reformatCSV } from "../utils/conversions/csv";
 import { kmlToGeoJSON, reformatKML } from "../utils/conversions/kml";
 import { tilesToZip } from "../utils/conversions/pbf";
@@ -39,26 +39,6 @@ export interface ConvertResponse {
 async function handleCSVToGeoJSON(csvText: string): Promise<ConvertResponse> {
   try {
     const geojson = await csvToGeoJSON(csvText);
-    return {
-      success: true,
-      data: geojson,
-      filename: "converted.geojson",
-      mimeType: "application/geo+json",
-    };
-  } catch (error) {
-    return {
-      success: false,
-      error:
-        error instanceof Error ? error.message : String(error),
-    };
-  }
-}
-
-async function handleShapefileToGeoJSON(
-  zipBuffer: ArrayBuffer
-): Promise<ConvertResponse> {
-  try {
-    const geojson = await shapefileToGeoJSON(zipBuffer);
     return {
       success: true,
       data: geojson,
@@ -111,27 +91,6 @@ async function handleGeoJSONToKML(geojson: string): Promise<ConvertResponse> {
     };
   }
 }
-
-async function handleShapefileToKML(
-  zipBuffer: ArrayBuffer
-): Promise<ConvertResponse> {
-  try {
-    const kml = await shapefileToKML(zipBuffer);
-    return {
-      success: true,
-      data: kml,
-      filename: "converted.kml",
-      mimeType: "application/vnd.google-earth.kml+xml",
-    };
-  } catch (error) {
-    return {
-      success: false,
-      error:
-        error instanceof Error ? error.message : String(error),
-    };
-  }
-}
-
 
 let wasmModule: any = null;
 let wasmInitialized = false;
