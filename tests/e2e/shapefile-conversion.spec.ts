@@ -82,23 +82,26 @@ test.describe('Shapefile Conversion E2E', () => {
         });
       }
 
-      test('should convert to Shapefile and be displayable in MapLibre', async ({ page }) => {
-        await page.goto('/');
+      // Shapefile conversion is only available for point data
+      if (geometry === 'point') {
+        test('should convert to Shapefile and be displayable in MapLibre', async ({ page }) => {
+          await page.goto('/');
 
-        const filePath = await getFixtureFile(geometry, `${geometry}s.shp.zip`);
-        await uploadFile(page, filePath);
-        await selectFormat(page, 'Shapefile');
-        await waitForConversion(page);
+          const filePath = await getFixtureFile(geometry, `${geometry}s.shp.zip`);
+          await uploadFile(page, filePath);
+          await selectFormat(page, 'Shapefile');
+          await waitForConversion(page);
 
-        const downloadedPath = await downloadFile(page);
-        const zipBuffer = await getDownloadedFileBuffer(downloadedPath);
+          const downloadedPath = await downloadFile(page);
+          const zipBuffer = await getDownloadedFileBuffer(downloadedPath);
 
-        const geojson = await shapefileToGeoJSON(zipBuffer);
-        const geojsonString = typeof geojson === 'string' ? geojson : JSON.stringify(geojson);
+          const geojson = await shapefileToGeoJSON(zipBuffer);
+          const geojsonString = typeof geojson === 'string' ? geojson : JSON.stringify(geojson);
 
-        const mapLibreValidation = await validateGeoJSONInMapLibre(page, geojsonString);
-        expect(mapLibreValidation.valid).toBe(true);
-      });
+          const mapLibreValidation = await validateGeoJSONInMapLibre(page, geojsonString);
+          expect(mapLibreValidation.valid).toBe(true);
+        });
+      }
 
       test('should convert to PBF and have valid structure', async ({ page }) => {
         await page.goto('/');

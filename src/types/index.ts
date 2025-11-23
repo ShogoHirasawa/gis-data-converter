@@ -8,11 +8,14 @@ export type ConversionState =
 
 export type FileFormat = 'shapefile' | 'geojson' | 'kml' | 'csv' | 'gpx' | 'pbf';
 
+export type GeometryType = 'point' | 'line' | 'polygon' | 'mixed' | 'unknown';
+
 export interface UploadedFile {
   file: File;
   format: FileFormat | null;
   size: number;
   name: string;
+  geometryType?: GeometryType;
 }
 
 export interface ConversionFormat {

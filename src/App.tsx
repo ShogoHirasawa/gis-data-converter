@@ -8,6 +8,7 @@ import SupportedFormatsPage from './components/pages/SupportedFormatsPage';
 import PbfOptionsDialog, { PbfOptions } from './components/PbfOptionsDialog';
 import { ConversionState, UploadedFile, ConversionResult } from './types';
 import { detectInputFormat } from './utils/detectFormat';
+import { detectGeometryType } from './utils/detectGeometryType';
 import { convertFile, getOutputFilename, getOutputMimeType, OutputFormat } from './utils/converter';
 import { initGA } from './utils/analytics';
 import './App.css';
@@ -34,11 +35,23 @@ function App() {
     try {
       const format = await detectInputFormat(file);
       
+      // Detect geometry type if format is known
+      let geometryType: UploadedFile['geometryType'] = undefined;
+      if (format !== 'unknown') {
+        try {
+          geometryType = await detectGeometryType(file, format);
+        } catch (error) {
+          console.warn('Failed to detect geometry type:', error);
+          // Continue without geometry type if detection fails
+        }
+      }
+      
       const uploaded: UploadedFile = {
         file,
         format: format === 'unknown' ? null : format,
         size: file.size,
         name: file.name,
+        geometryType,
       };
 
       setUploadedFile(uploaded);
