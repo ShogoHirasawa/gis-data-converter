@@ -42,7 +42,7 @@ if (!('encodeInto' in cachedTextEncoder)) {
             read: arg.length,
             written: buf.length
         };
-    }
+    };
 }
 
 function passStringToWasm0(arg, malloc, realloc) {
