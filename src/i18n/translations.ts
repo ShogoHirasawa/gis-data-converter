@@ -114,6 +114,11 @@ export interface Translations {
   supportedFormatsLimitations2: string;
   supportedFormatsLimitations3: string;
   supportedFormatsLimitations4: string;
+  // Contact page
+  contact: string;
+  contactTitle: string;
+  contactDescription: string;
+  contactEmailTitle: string;
 }
 
 // English translations
@@ -231,6 +236,11 @@ const enTranslations: Translations = {
     supportedFormatsLimitations2: 'Shapefile only supports files compressed in .zip format',
     supportedFormatsLimitations3: 'Some complex data structures may not be supported',
     supportedFormatsLimitations4: 'Coordinate system conversion is currently not supported',
+    // Contact page
+    contact: 'Contact',
+    contactTitle: 'Contact',
+    contactDescription: 'If you have any questions, comments, or requests regarding this service, please feel free to contact us.',
+    contactEmailTitle: 'Email Address',
   };
 
 const jaTranslations: Translations = {
@@ -347,6 +357,11 @@ const jaTranslations: Translations = {
     supportedFormatsLimitations2: 'Shapefileは.zip形式で圧縮されたファイルのみ対応',
     supportedFormatsLimitations3: '一部の複雑なデータ構造には対応していない場合があります',
     supportedFormatsLimitations4: '座標系の変換は現在対応していません',
+    // Contact page
+    contact: 'お問い合わせ',
+    contactTitle: 'お問い合わせ',
+    contactDescription: '本サービスに関するご質問、ご意見、ご要望がございましたら、お気軽にお問い合わせください。',
+    contactEmailTitle: 'メールアドレス',
   };
 
 const zhHantTranslations: Translations = {
@@ -463,6 +478,11 @@ const zhHantTranslations: Translations = {
     supportedFormatsLimitations2: 'Shapefile僅支持.zip格式壓縮的文件',
     supportedFormatsLimitations3: '某些複雜的數據結構可能不受支持',
     supportedFormatsLimitations4: '目前不支持坐標系統轉換',
+    // Contact page
+    contact: '聯絡',
+    contactTitle: '聯絡',
+    contactDescription: '如果您對本服務有任何問題、意見或建議，歡迎隨時與我們聯繫。',
+    contactEmailTitle: '電子郵件地址',
   };
 
 const zhHansTranslations: Translations = {
@@ -579,6 +599,11 @@ const zhHansTranslations: Translations = {
     supportedFormatsLimitations2: 'Shapefile仅支持.zip格式压缩的文件',
     supportedFormatsLimitations3: '某些复杂的数据结构可能不受支持',
     supportedFormatsLimitations4: '目前不支持坐标系统转换',
+    // Contact page
+    contact: '联系',
+    contactTitle: '联系',
+    contactDescription: '如果您对本服务有任何问题、意见或建议，欢迎随时与我们联系。',
+    contactEmailTitle: '电子邮件地址',
   };
 
 // Polish translations
@@ -696,6 +721,11 @@ const plTranslations: Translations = {
     supportedFormatsLimitations2: 'Shapefile obsługuje tylko pliki skompresowane w formacie .zip',
     supportedFormatsLimitations3: 'Niektóre złożone struktury danych mogą nie być obsługiwane',
     supportedFormatsLimitations4: 'Konwersja układu współrzędnych nie jest obecnie obsługiwana',
+    // Contact page
+    contact: 'Kontakt',
+    contactTitle: 'Kontakt',
+    contactDescription: 'Jeśli masz pytania, uwagi lub prośby dotyczące tej usługi, prosimy o kontakt.',
+    contactEmailTitle: 'Adres e-mail',
   };
 
 // Spanish translations
@@ -813,6 +843,11 @@ const esTranslations: Translations = {
     supportedFormatsLimitations2: 'Shapefile solo admite archivos comprimidos en formato .zip',
     supportedFormatsLimitations3: 'Algunas estructuras de datos complejas pueden no ser compatibles',
     supportedFormatsLimitations4: 'La conversión del sistema de coordenadas actualmente no está soportada',
+    // Contact page
+    contact: 'Contacto',
+    contactTitle: 'Contacto',
+    contactDescription: 'Si tiene alguna pregunta, comentario o solicitud sobre este servicio, no dude en contactarnos.',
+    contactEmailTitle: 'Dirección de correo electrónico',
   };
 
 // Arabic translations
@@ -930,6 +965,11 @@ const arTranslations: Translations = {
     supportedFormatsLimitations2: 'Shapefile يدعم فقط الملفات المضغوطة بصيغة .zip',
     supportedFormatsLimitations3: 'قد لا يتم دعم بعض هياكل البيانات المعقدة',
     supportedFormatsLimitations4: 'تحويل نظام الإحداثيات غير مدعوم حالياً',
+    // Contact page
+    contact: 'اتصل',
+    contactTitle: 'اتصل',
+    contactDescription: 'إذا كان لديك أي أسئلة أو تعليقات أو طلبات بخصوص هذه الخدمة، يرجى عدم التردد في الاتصال بنا.',
+    contactEmailTitle: 'عنوان البريد الإلكتروني',
   };
 
 // Swedish translations
@@ -1047,6 +1087,11 @@ const svTranslations: Translations = {
     supportedFormatsLimitations2: 'Shapefile only supports files compressed in .zip format',
     supportedFormatsLimitations3: 'Some complex data structures may not be supported',
     supportedFormatsLimitations4: 'Coordinate system conversion is currently not supported',
+    // Contact page
+    contact: 'Kontakt',
+    contactTitle: 'Kontakt',
+    contactDescription: 'Om du har några frågor, kommentarer eller önskemål angående denna tjänst, tveka inte att kontakta oss.',
+    contactEmailTitle: 'E-postadress',
   };
 
 // French translations
@@ -1164,6 +1209,11 @@ const frTranslations: Translations = {
     supportedFormatsLimitations2: 'Shapefile only supports files compressed in .zip format',
     supportedFormatsLimitations3: 'Some complex data structures may not be supported',
     supportedFormatsLimitations4: 'Coordinate system conversion is currently not supported',
+    // Contact page
+    contact: 'Kontakt',
+    contactTitle: 'Kontakt',
+    contactDescription: 'Om du har några frågor, kommentarer eller önskemål angående denna tjänst, tveka inte att kontakta oss.',
+    contactEmailTitle: 'E-postadress',
   };
 
 // Bulgarian translations
@@ -1281,6 +1331,11 @@ const bgTranslations: Translations = {
     supportedFormatsLimitations2: 'Shapefile поддържа само файлове, компресирани в .zip формат',
     supportedFormatsLimitations3: 'Някои сложни структури от данни може да не се поддържат',
     supportedFormatsLimitations4: 'Конвертиране на координатна система в момента не се поддържа',
+    // Contact page
+    contact: 'Контакт',
+    contactTitle: 'Контакт',
+    contactDescription: 'Ако имате въпроси, коментари или заявки относно тази услуга, моля не се колебайте да се свържете с нас.',
+    contactEmailTitle: 'Имейл адрес',
   };
 
 // Thai translations
@@ -1398,6 +1453,11 @@ const thTranslations: Translations = {
     supportedFormatsLimitations2: 'Shapefile รองรับเฉพาะไฟล์ที่บีบอัดในรูปแบบ .zip',
     supportedFormatsLimitations3: 'โครงสร้างข้อมูลที่ซับซ้อนบางอย่างอาจไม่ได้รับการรองรับ',
     supportedFormatsLimitations4: 'การแปลงระบบพิกัดไม่ได้รับการรองรับในขณะนี้',
+    // Contact page
+    contact: 'ติดต่อ',
+    contactTitle: 'ติดต่อ',
+    contactDescription: 'หากคุณมีคำถาม ข้อคิดเห็น หรือคำขอเกี่ยวกับบริการนี้ กรุณาติดต่อเราได้ตามสะดวก',
+    contactEmailTitle: 'ที่อยู่อีเมล',
   };
 
 // German translations
@@ -1515,6 +1575,11 @@ const deTranslations: Translations = {
     supportedFormatsLimitations2: 'Shapefile unterstützt nur Dateien, die im .zip-Format komprimiert sind',
     supportedFormatsLimitations3: 'Einige komplexe Datenstrukturen werden möglicherweise nicht unterstützt',
     supportedFormatsLimitations4: 'Koordinatensystem-Konvertierung wird derzeit nicht unterstützt',
+    // Contact page
+    contact: 'Kontakt',
+    contactTitle: 'Kontakt',
+    contactDescription: 'Wenn Sie Fragen, Kommentare oder Anfragen zu diesem Service haben, zögern Sie bitte nicht, uns zu kontaktieren.',
+    contactEmailTitle: 'E-Mail-Adresse',
   };
 
 // Catalan translations
@@ -1632,6 +1697,11 @@ const caTranslations: Translations = {
     supportedFormatsLimitations2: 'Shapefile només admet fitxers comprimits en format .zip',
     supportedFormatsLimitations3: 'Algunes estructures de dades complexes poden no ser compatibles',
     supportedFormatsLimitations4: 'La conversió del sistema de coordenades actualment no està suportada',
+    // Contact page
+    contact: 'Contacte',
+    contactTitle: 'Contacte',
+    contactDescription: 'Si teniu preguntes, comentaris o sol·licituds sobre aquest servei, no dubteu a contactar-nos.',
+    contactEmailTitle: 'Adreça de correu electrònic',
   };
 
 // Turkish translations
@@ -1749,6 +1819,11 @@ const trTranslations: Translations = {
     supportedFormatsLimitations2: 'Shapefile yalnızca .zip formatında sıkıştırılmış dosyaları destekler',
     supportedFormatsLimitations3: 'Bazı karmaşık veri yapıları desteklenmeyebilir',
     supportedFormatsLimitations4: 'Koordinat sistemi dönüştürme şu anda desteklenmemektedir',
+    // Contact page
+    contact: 'İletişim',
+    contactTitle: 'İletişim',
+    contactDescription: 'Bu hizmet hakkında sorularınız, yorumlarınız veya istekleriniz varsa, lütfen bizimle iletişime geçmekten çekinmeyin.',
+    contactEmailTitle: 'E-posta adresi',
   };
 
 // Italian translations
@@ -1866,6 +1941,11 @@ const itTranslations: Translations = {
     supportedFormatsLimitations2: 'Shapefile supporta solo file compressi in formato .zip',
     supportedFormatsLimitations3: 'Alcune strutture dati complesse potrebbero non essere supportate',
     supportedFormatsLimitations4: 'La conversione del sistema di coordinate non è attualmente supportata',
+    // Contact page
+    contact: 'Contact',
+    contactTitle: 'Contact',
+    contactDescription: 'If you have any questions, comments, or requests regarding this service, please feel free to contact us.',
+    contactEmailTitle: 'Email Address',
   };
 
 // Dutch translations
@@ -1983,6 +2063,11 @@ const nlTranslations: Translations = {
     supportedFormatsLimitations2: 'Shapefile ondersteunt alleen bestanden die zijn gecomprimeerd in .zip-formaat',
     supportedFormatsLimitations3: 'Sommige complexe gegevensstructuren worden mogelijk niet ondersteund',
     supportedFormatsLimitations4: 'Coördinatensysteemconversie wordt momenteel niet ondersteund',
+    // Contact page
+    contact: 'Contact',
+    contactTitle: 'Contact',
+    contactDescription: 'Als u vragen, opmerkingen of verzoeken heeft met betrekking tot deze service, aarzel dan niet om contact met ons op te nemen.',
+    contactEmailTitle: 'E-mailadres',
   };
 
 // Ukrainian translations
@@ -2100,6 +2185,11 @@ const ukTranslations: Translations = {
     supportedFormatsLimitations2: 'Shapefile підтримує лише файли, стиснуті в .zip форматі',
     supportedFormatsLimitations3: 'Деякі складні структури даних можуть не підтримуватися',
     supportedFormatsLimitations4: 'Конвертація системи координат наразі не підтримується',
+    // Contact page
+    contact: 'Contact',
+    contactTitle: 'Contact',
+    contactDescription: 'If you have any questions, comments, or requests regarding this service, please feel free to contact us.',
+    contactEmailTitle: 'Email Address',
   };
 
 // Portuguese translations
@@ -2217,6 +2307,11 @@ const ptTranslations: Translations = {
     supportedFormatsLimitations2: 'Shapefile suporta apenas arquivos compactados em formato .zip',
     supportedFormatsLimitations3: 'Algumas estruturas de dados complexas podem não ser suportadas',
     supportedFormatsLimitations4: 'A conversão do sistema de coordenadas não é suportada atualmente',
+    // Contact page
+    contact: 'Contact',
+    contactTitle: 'Contact',
+    contactDescription: 'If you have any questions, comments, or requests regarding this service, please feel free to contact us.',
+    contactEmailTitle: 'Email Address',
   };
 
 // Greek translations
@@ -2334,6 +2429,11 @@ const elTranslations: Translations = {
     supportedFormatsLimitations2: 'Το Shapefile υποστηρίζει μόνο αρχεία συμπιεσμένα σε μορφή .zip',
     supportedFormatsLimitations3: 'Ορισμένες πολύπλοκες δομές δεδομένων ενδέχεται να μην υποστηρίζονται',
     supportedFormatsLimitations4: 'Η μετατροπή συστήματος συντεταγμένων δεν υποστηρίζεται προς το παρόν',
+    // Contact page
+    contact: 'Contact',
+    contactTitle: 'Contact',
+    contactDescription: 'If you have any questions, comments, or requests regarding this service, please feel free to contact us.',
+    contactEmailTitle: 'Email Address',
   };
 
 // Vietnamese translations
@@ -2451,6 +2551,11 @@ const viTranslations: Translations = {
     supportedFormatsLimitations2: 'Shapefile chỉ hỗ trợ các tệp được nén ở định dạng .zip',
     supportedFormatsLimitations3: 'Một số cấu trúc dữ liệu phức tạp có thể không được hỗ trợ',
     supportedFormatsLimitations4: 'Chuyển đổi hệ thống tọa độ hiện không được hỗ trợ',
+    // Contact page
+    contact: 'Liên hệ',
+    contactTitle: 'Liên hệ',
+    contactDescription: 'Nếu bạn có bất kỳ câu hỏi, ý kiến hoặc yêu cầu nào về dịch vụ này, vui lòng liên hệ với chúng tôi.',
+    contactEmailTitle: 'Địa chỉ email',
   };
 
 // Hindi translations
@@ -2568,6 +2673,11 @@ const hiTranslations: Translations = {
     supportedFormatsLimitations2: 'Shapefile केवल .zip प्रारूप में संपीड़ित फ़ाइलों का समर्थन करता है',
     supportedFormatsLimitations3: 'कुछ जटिल डेटा संरचनाएं समर्थित नहीं हो सकती हैं',
     supportedFormatsLimitations4: 'निर्देशांक प्रणाली रूपांतरण वर्तमान में समर्थित नहीं है',
+    // Contact page
+    contact: 'Contact',
+    contactTitle: 'Contact',
+    contactDescription: 'If you have any questions, comments, or requests regarding this service, please feel free to contact us.',
+    contactEmailTitle: 'Email Address',
   };
 
 // Russian translations
@@ -2685,6 +2795,11 @@ const ruTranslations: Translations = {
     supportedFormatsLimitations2: 'Shapefile поддерживает только файлы, сжатые в .zip формате',
     supportedFormatsLimitations3: 'Некоторые сложные структуры данных могут не поддерживаться',
     supportedFormatsLimitations4: 'Конвертация системы координат в настоящее время не поддерживается',
+    // Contact page
+    contact: 'Contact',
+    contactTitle: 'Contact',
+    contactDescription: 'If you have any questions, comments, or requests regarding this service, please feel free to contact us.',
+    contactEmailTitle: 'Email Address',
   };
 
 // Korean translations
@@ -2802,6 +2917,11 @@ const koTranslations: Translations = {
     supportedFormatsLimitations2: 'Shapefile은 .zip 형식으로 압축된 파일만 지원합니다',
     supportedFormatsLimitations3: '일부 복잡한 데이터 구조는 지원되지 않을 수 있습니다',
     supportedFormatsLimitations4: '좌표계 변환은 현재 지원되지 않습니다',
+    // Contact page
+    contact: 'Contact',
+    contactTitle: 'Contact',
+    contactDescription: 'If you have any questions, comments, or requests regarding this service, please feel free to contact us.',
+    contactEmailTitle: 'Email Address',
   };
 
 // Indonesian translations
@@ -2919,6 +3039,11 @@ const idTranslations: Translations = {
     supportedFormatsLimitations2: 'Shapefile hanya mendukung file yang dikompres dalam format .zip',
     supportedFormatsLimitations3: 'Beberapa struktur data kompleks mungkin tidak didukung',
     supportedFormatsLimitations4: 'Konversi sistem koordinat saat ini tidak didukung',
+    // Contact page
+    contact: 'Kontak',
+    contactTitle: 'Kontak',
+    contactDescription: 'Jika Anda memiliki pertanyaan, komentar, atau permintaan terkait layanan ini, jangan ragu untuk menghubungi kami.',
+    contactEmailTitle: 'Alamat email',
   };
 
 // Malay translations
@@ -3036,6 +3161,11 @@ const msTranslations: Translations = {
     supportedFormatsLimitations2: 'Shapefile hanya menyokong fail yang dimampatkan dalam format .zip',
     supportedFormatsLimitations3: 'Beberapa struktur data kompleks mungkin tidak disokong',
     supportedFormatsLimitations4: 'Penukaran sistem koordinat pada masa ini tidak disokong',
+    // Contact page
+    contact: 'Contact',
+    contactTitle: 'Contact',
+    contactDescription: 'If you have any questions, comments, or requests regarding this service, please feel free to contact us.',
+    contactEmailTitle: 'Email Address',
   };
 
 export const translations: Record<Language, Translations> = {

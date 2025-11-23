@@ -5,6 +5,7 @@ import MainContent from './components/MainContent';
 import Footer from './components/Footer';
 import HowToUsePage from './components/pages/HowToUsePage';
 import SupportedFormatsPage from './components/pages/SupportedFormatsPage';
+import ContactPage from './components/pages/ContactPage';
 import PbfOptionsDialog, { PbfOptions } from './components/PbfOptionsDialog';
 import { ConversionState, UploadedFile, ConversionResult } from './types';
 import { detectInputFormat } from './utils/detectFormat';
@@ -13,7 +14,7 @@ import { convertFile, getOutputFilename, getOutputMimeType, OutputFormat } from 
 import { initGA } from './utils/analytics';
 import './App.css';
 
-type PageType = null | 'how-to-use' | 'supported-formats';
+type PageType = null | 'how-to-use' | 'supported-formats' | 'contact';
 
 function App() {
   const [state, setState] = useState<ConversionState>('upload');
@@ -237,6 +238,9 @@ function App() {
         )}
         {currentPage === 'supported-formats' && (
           <SupportedFormatsPage onBack={() => setCurrentPage(null)} />
+        )}
+        {currentPage === 'contact' && (
+          <ContactPage onBack={() => setCurrentPage(null)} />
         )}
         {currentPage === null && (
           <MainContent
