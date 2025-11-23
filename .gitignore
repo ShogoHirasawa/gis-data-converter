@@ -23,3 +23,12 @@ dist-ssr
 *.sln
 *.sw?
 
+# Rust / WASM
+wasm-core/target/
+wasm-core/pkg/
+Cargo.lock
+*.orig
+
+# WASM build output (optional - uncomment if you want to track built files in git)
+# src/wasm/
+

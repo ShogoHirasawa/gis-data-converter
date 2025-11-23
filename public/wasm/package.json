@@ -1,0 +1,15 @@
+{
+  "name": "vector-tile-core",
+  "type": "module",
+  "version": "0.1.0",
+  "files": [
+    "vector_tile_core_bg.wasm",
+    "vector_tile_core.js",
+    "vector_tile_core.d.ts"
+  ],
+  "main": "vector_tile_core.js",
+  "types": "vector_tile_core.d.ts",
+  "sideEffects": [
+    "./snippets/*"
+  ]
+}

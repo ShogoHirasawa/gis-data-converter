@@ -7,27 +7,52 @@
     "dev": "vite",
     "build": "tsc && vite build",
     "preview": "vite preview",
-    "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0"
+    "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
+    "build:wasm": "./scripts/build-wasm.sh",
+    "build:all": "npm run build:wasm && npm run build",
+    "test": "vitest",
+    "test:ui": "vitest --ui",
+    "test:run": "vitest run"
   },
   "dependencies": {
+    "@tmcw/togeojson": "^7.1.2",
+    "@types/jszip": "^3.4.0",
+    "@types/papaparse": "^5.5.0",
+    "@types/xmldom": "^0.1.34",
+    "@xmldom/xmldom": "^0.8.11",
+    "csv2geojson": "^5.1.2",
+    "jszip": "^3.10.1",
     "lucide-react": "^0.554.0",
+    "papaparse": "^5.5.3",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "react-icons": "^5.5.0"
+    "react-icons": "^5.5.0",
+    "shapefile": "^0.6.6",
+    "shp-write": "^0.3.2",
+    "shpjs": "^6.2.0",
+    "togpx": "^0.5.4",
+    "tokml": "^0.4.0"
   },
   "devDependencies": {
+    "@mapbox/togeojson": "^0.16.2",
+    "@types/maplibre-gl": "^1.13.2",
     "@types/react": "^18.2.43",
     "@types/react-dom": "^18.2.17",
     "@typescript-eslint/eslint-plugin": "^7.18.0",
     "@typescript-eslint/parser": "^7.18.0",
     "@vitejs/plugin-react": "^4.3.1",
+    "@vitest/ui": "^4.0.13",
     "autoprefixer": "^10.4.20",
     "eslint": "^8.57.1",
     "eslint-plugin-react-hooks": "^4.6.2",
     "eslint-plugin-react-refresh": "^0.4.14",
+    "happy-dom": "^20.0.10",
+    "maplibre-gl": "^5.13.0",
     "postcss": "^8.4.47",
     "tailwindcss": "^3.4.14",
     "typescript": "^5.6.3",
-    "vite": "^6.0.1"
+    "vite": "^6.0.1",
+    "vite-plugin-wasm": "^3.5.0",
+    "vitest": "^4.0.13"
   }
 }

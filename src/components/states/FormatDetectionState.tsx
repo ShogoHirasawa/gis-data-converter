@@ -25,39 +25,51 @@ const FormatDetectionState: React.FC<FormatDetectionStateProps> = ({
     'archive': Archive,
   };
 
-  const formatOptions = [
-    {
-      id: 'geojson',
-      name: t.geoJsonTitle,
-      description: t.geoJsonDesc,
-      icon: 'braces',
-      recommended: true,
-    },
-    {
-      id: 'kml',
-      name: t.kmlTitle,
-      description: t.kmlDesc,
-      icon: 'map-pin',
-    },
-    {
-      id: 'gpx',
-      name: t.gpxTitle,
-      description: t.gpxDesc,
-      icon: 'route',
-    },
-    {
-      id: 'csv',
-      name: t.csvTitle,
-      description: t.csvDesc,
-      icon: 'table',
-    },
-    {
-      id: 'pbf',
-      name: t.pbfTitle,
-      description: t.pbfDesc,
-      icon: 'archive',
-    },
-  ];
+  // Get all available format options
+  // Note: GPX is supported as input but not as output
+  const getAllFormatOptions = () => {
+    const baseOptions = [
+      {
+        id: 'geojson',
+        name: t.geoJsonTitle,
+        description: t.geoJsonDesc,
+        icon: 'braces',
+        recommended: true,
+      },
+      {
+        id: 'kml',
+        name: t.kmlTitle,
+        description: t.kmlDesc,
+        icon: 'map-pin',
+      },
+      {
+        id: 'csv',
+        name: t.csvTitle,
+        description: t.csvDesc,
+        icon: 'table',
+      },
+      {
+        id: 'pbf',
+        name: t.pbfTitle,
+        description: t.pbfDesc,
+        icon: 'archive',
+      },
+    ];
+
+    // Add Shapefile option if input is Shapefile
+    if (uploadedFile.format === 'shapefile') {
+      baseOptions.unshift({
+        id: 'shapefile',
+        name: 'Shapefile',
+        description: 'Standard GIS format with multiple files (ZIP)',
+        icon: 'archive',
+      });
+    }
+
+    return baseOptions;
+  };
+
+  const formatOptions = getAllFormatOptions();
 
   const formatFileSize = (bytes: number): string => {
     if (bytes < 1024) return bytes + ' B';
