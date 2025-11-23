@@ -1,0 +1,48 @@
+declare global {
+  interface Window {
+    dataLayer?: any[];
+    gtag?: (...args: any[]) => void;
+  }
+}
+
+export const initGA = () => {
+  const measurementId = import.meta.env.VITE_GA_MEASUREMENT_ID;
+  
+  if (!measurementId) return;
+  if (import.meta.env.MODE !== 'production') return;
+  if (typeof window === 'undefined') return;
+  if (window.gtag) return;
+
+  const script = document.createElement('script');
+  script.async = true;
+  script.src = `https://www.googletagmanager.com/gtag/js?id=${measurementId}`;
+  document.head.appendChild(script);
+
+  window.dataLayer = window.dataLayer ?? [];
+  function gtag(...args: any[]) {
+    window.dataLayer.push(args);
+  }
+  window.gtag = gtag;
+  gtag('js', new Date());
+  gtag('config', measurementId);
+};
+
+export const trackEvent = (
+  eventName: string,
+  params?: Record<string, any>
+) => {
+  if (!import.meta.env.VITE_GA_MEASUREMENT_ID) return;
+  if (typeof window === 'undefined' || !window.gtag) return;
+  
+  window.gtag('event', eventName, params);
+};
+
+export const trackPageView = (path: string) => {
+  if (!import.meta.env.VITE_GA_MEASUREMENT_ID) return;
+  if (typeof window === 'undefined' || !window.gtag) return;
+  
+  window.gtag('config', import.meta.env.VITE_GA_MEASUREMENT_ID, {
+    page_path: path,
+  });
+};
+

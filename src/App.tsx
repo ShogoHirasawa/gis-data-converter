@@ -9,6 +9,7 @@ import PbfOptionsDialog, { PbfOptions } from './components/PbfOptionsDialog';
 import { ConversionState, UploadedFile, ConversionResult } from './types';
 import { detectInputFormat } from './utils/detectFormat';
 import { convertFile, getOutputFilename, getOutputMimeType, OutputFormat } from './utils/converter';
+import { initGA } from './utils/analytics';
 import './App.css';
 
 type PageType = null | 'how-to-use' | 'supported-formats';
@@ -171,6 +172,10 @@ function App() {
     setCurrentPage(page);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
+
+  useEffect(() => {
+    initGA();
+  }, []);
 
   useEffect(() => {
     if (currentPage !== null) {

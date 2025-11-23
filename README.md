@@ -123,6 +123,10 @@ src/
 
 All processing happens in your browser using Web Workers and WebAssembly. Your data is never sent to external servers.
 
+## Analytics
+
+The hosted web app can use Google Analytics (GA4) when `VITE_GA_MEASUREMENT_ID` is set via environment variables. By default (no env set), analytics is disabled.
+
 ## Limitations
 
 - Maximum file size: 50MB
