@@ -238,13 +238,13 @@ async function handleGeoJSONToPBFZip(
 // Normalize GeoJSON: Expand MultiLineString/MultiPolygon for WASM compatibility
 function normalizeGeoJSONForPBF(geojson: string): string {
   try {
-    const geojsonObj = JSON.parse(geojson);
+    const geojsonObj = JSON.parse(geojson) as GeoJSON.FeatureCollection;
     
     if (geojsonObj.type !== 'FeatureCollection' || !Array.isArray(geojsonObj.features)) {
       return geojson;
     }
     
-    const normalizedFeatures: any[] = [];
+    const normalizedFeatures: GeoJSON.Feature[] = [];
     
     for (const feature of geojsonObj.features) {
       if (!feature.geometry) continue;
@@ -252,7 +252,7 @@ function normalizeGeoJSONForPBF(geojson: string): string {
       const geometryType = feature.geometry.type;
       
       if (geometryType === 'MultiLineString') {
-        const coordinates = feature.geometry.coordinates;
+        const coordinates = (feature.geometry as GeoJSON.MultiLineString).coordinates;
         for (const lineCoords of coordinates) {
           normalizedFeatures.push({
             type: 'Feature',
@@ -264,7 +264,7 @@ function normalizeGeoJSONForPBF(geojson: string): string {
           });
         }
       } else if (geometryType === 'MultiPolygon') {
-        const coordinates = feature.geometry.coordinates;
+        const coordinates = (feature.geometry as GeoJSON.MultiPolygon).coordinates;
         for (const polygonCoords of coordinates) {
           normalizedFeatures.push({
             type: 'Feature',
@@ -280,7 +280,7 @@ function normalizeGeoJSONForPBF(geojson: string): string {
       }
     }
     
-    const normalized: any = {
+    const normalized: GeoJSON.FeatureCollection = {
       type: 'FeatureCollection',
       features: normalizedFeatures,
     };
@@ -547,10 +547,18 @@ self.onmessage = async (event: MessageEvent<ConvertRequest>) => {
   }
 };
 
-self.onerror = (error: ErrorEvent) => {
+self.onerror = (event: ErrorEvent | Event | string) => {
+  let errorMessage = 'Unknown error';
+  if (typeof event === 'string') {
+    errorMessage = event;
+  } else if (event instanceof ErrorEvent) {
+    errorMessage = event.message;
+  } else if (event instanceof Error) {
+    errorMessage = event.message;
+  }
   self.postMessage({
     success: false,
-    error: `Unhandled worker error: ${error.message}`,
+    error: `Unhandled worker error: ${errorMessage}`,
   } as ConvertResponse);
 };
 

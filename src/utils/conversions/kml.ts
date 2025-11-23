@@ -6,6 +6,7 @@ import * as toGeoJSON from "@tmcw/togeojson";
 import { DOMParser } from "@xmldom/xmldom";
 import { shapefileToGeoJSON } from "./shapefile";
 import { geoJSONToKML } from "./geojson";
+import type { FeatureCollection } from "geojson";
 
 /**
  * Convert KML to GeoJSON
@@ -23,7 +24,7 @@ export function kmlToGeoJSON(kmlText: string): string {
     }
 
     // Convert to GeoJSON
-    const geojson = toGeoJSON.kml(kmlDoc);
+    const geojson = (toGeoJSON as unknown as { kml: (doc: Document) => FeatureCollection }).kml(kmlDoc);
 
     return JSON.stringify(geojson, null, 2);
   } catch (error) {

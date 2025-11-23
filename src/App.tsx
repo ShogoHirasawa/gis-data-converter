@@ -93,53 +93,66 @@ function App() {
 
       const outputFormat = outputFormatMap[formatId] || 'geojson';
 
-      const progressInterval = setInterval(() => {
-        setProgress((prev) => {
-          if (prev >= 90) {
-            clearInterval(progressInterval);
-            return 90;
-          }
-          return prev + 5;
-        });
-      }, 200);
-
-      const response = await convertFile(
-        uploadedFile.file,
-        outputFormat,
-        pbfOptions
-      );
-
-      clearInterval(progressInterval);
-      setProgress(100);
-
-      if (response.success && response.data) {
-        let blob: Blob;
-        if (response.data instanceof ArrayBuffer) {
-          blob = new Blob([response.data], { 
-            type: response.mimeType || getOutputMimeType(outputFormat) 
+      let progressInterval: ReturnType<typeof setInterval> | null = null;
+      
+      try {
+        progressInterval = setInterval(() => {
+          setProgress((prev) => {
+            if (prev >= 90) {
+              if (progressInterval) {
+                clearInterval(progressInterval);
+              }
+              return 90;
+            }
+            return prev + 5;
           });
-        } else {
-          blob = new Blob([response.data], { 
-            type: response.mimeType || getOutputMimeType(outputFormat) 
-          });
+        }, 200);
+
+        const response = await convertFile(
+          uploadedFile.file,
+          outputFormat,
+          pbfOptions
+        );
+
+        if (progressInterval) {
+          clearInterval(progressInterval);
         }
+        setProgress(100);
 
-        const result: ConversionResult = {
-          fileName: response.filename || getOutputFilename(uploadedFile.name, outputFormat),
-          format: formatId as any,
-          size: blob.size,
-          blob,
-        };
+        if (response.success && response.data) {
+          let blob: Blob;
+          if (response.data instanceof ArrayBuffer) {
+            blob = new Blob([response.data], { 
+              type: response.mimeType || getOutputMimeType(outputFormat) 
+            });
+          } else {
+            blob = new Blob([response.data], { 
+              type: response.mimeType || getOutputMimeType(outputFormat) 
+            });
+          }
 
-        setTimeout(() => {
-          setConversionResult(result);
-          setState('completed');
-        }, 300);
-      } else {
-        throw new Error(response.error || 'Conversion failed');
+          const result: ConversionResult = {
+            fileName: response.filename || getOutputFilename(uploadedFile.name, outputFormat),
+            format: formatId as ConversionResult['format'],
+            size: blob.size,
+            blob,
+          };
+
+          setTimeout(() => {
+            setConversionResult(result);
+            setState('completed');
+          }, 300);
+        } else {
+          throw new Error(response.error || 'Conversion failed');
+        }
+      } catch (error) {
+        if (progressInterval) {
+          clearInterval(progressInterval);
+        }
+        setProgress(0);
+        setState('error');
       }
     } catch (error) {
-      clearInterval(progressInterval);
       setProgress(0);
       setState('error');
     }
