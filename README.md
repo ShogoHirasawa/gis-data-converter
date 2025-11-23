@@ -125,7 +125,7 @@ All processing happens in your browser using Web Workers and WebAssembly. Your d
 
 ## Analytics
 
-The hosted web app can use Google Analytics (GA4) when `VITE_GA_MEASUREMENT_ID` is set via environment variables. By default (no env set), analytics is disabled.
+The hosted web app can use Google Analytics (GA4). By default (no env set), analytics is disabled.
 
 ## Limitations
 
