@@ -2,31 +2,124 @@
  * CSV conversion utilities
  */
 
-import * as csv2geojson from "csv2geojson";
 import Papa from "papaparse";
+
+function guessLatLonColumns(headers: string[]): { lat: string | null; lon: string | null } {
+  const latRegex = /(Lat)(itude)?/i;
+  const lonRegex = /(L)(on|ng)(gitude)?/i;
+  
+  let latCol: string | null = null;
+  let lonCol: string | null = null;
+  
+  for (const header of headers) {
+    const normalizedHeader = header.trim();
+    if (!latCol && latRegex.test(normalizedHeader)) {
+      latCol = header;
+    }
+    if (!lonCol && lonRegex.test(normalizedHeader)) {
+      lonCol = header;
+    }
+  }
+  
+  // If not found, try common variations
+  if (!latCol) {
+    const latVariations = ['lat', 'latitude', 'y', '緯度'];
+    for (const header of headers) {
+      if (latVariations.includes(header.toLowerCase().trim())) {
+        latCol = header;
+        break;
+      }
+    }
+  }
+  
+  if (!lonCol) {
+    const lonVariations = ['lon', 'lng', 'longitude', 'long', 'x', '経度'];
+    for (const header of headers) {
+      if (lonVariations.includes(header.toLowerCase().trim())) {
+        lonCol = header;
+        break;
+      }
+    }
+  }
+  
+  return { lat: latCol, lon: lonCol };
+}
 
 /**
  * Convert CSV to GeoJSON
  */
 export async function csvToGeoJSON(csvText: string): Promise<string> {
   try {
-    return new Promise((resolve, reject) => {
-      csv2geojson.csv2geojson(csvText, (err: Error | null, data: any) => {
-        if (err) {
-          reject(
-            new Error(`Failed to convert CSV to GeoJSON: ${err.message}`)
-          );
-          return;
-        }
-
-        if (!data) {
-          reject(new Error("CSV conversion returned empty data"));
-          return;
-        }
-
-        resolve(JSON.stringify(data, null, 2));
-      });
+    // Parse CSV with headers
+    const parsed = Papa.parse(csvText, {
+      header: true,
+      skipEmptyLines: true,
+      transformHeader: (header) => header.trim(),
     });
+
+    if (!parsed.data || parsed.data.length === 0) {
+      throw new Error("CSV file is empty or has no valid data");
+    }
+
+    // Get headers
+    const headers = parsed.meta.fields || [];
+    if (headers.length === 0) {
+      throw new Error("CSV file has no headers");
+    }
+
+    // Guess latitude and longitude columns
+    const { lat: latCol, lon: lonCol } = guessLatLonColumns(headers);
+
+    if (!latCol || !lonCol) {
+      throw new Error(
+        `Could not find latitude/longitude columns. Found columns: ${headers.join(", ")}. ` +
+        `Please ensure your CSV has columns named 'lat'/'latitude' and 'lon'/'lng'/'longitude'.`
+      );
+    }
+
+    // Convert rows to GeoJSON features
+    const features: any[] = [];
+    
+    for (let i = 0; i < parsed.data.length; i++) {
+      const row = parsed.data[i] as any;
+      const lat = parseFloat(row[latCol]);
+      const lon = parseFloat(row[lonCol]);
+
+      if (isNaN(lat) || isNaN(lon)) {
+        continue;
+      }
+
+      if (lat < -90 || lat > 90 || lon < -180 || lon > 180) {
+        continue;
+      }
+
+      const properties: any = {};
+      for (const key of headers) {
+        if (key !== latCol && key !== lonCol) {
+          properties[key] = row[key];
+        }
+      }
+
+      features.push({
+        type: "Feature",
+        geometry: {
+        type: "Point",
+        coordinates: [lon, lat],
+        },
+        properties,
+      });
+    }
+
+    if (features.length === 0) {
+      throw new Error("No valid features could be created from CSV data");
+    }
+
+    const geojson = {
+      type: "FeatureCollection",
+      features,
+    };
+
+    return JSON.stringify(geojson, null, 2);
   } catch (error) {
     throw new Error(
       `Failed to convert CSV to GeoJSON: ${
@@ -36,25 +129,19 @@ export async function csvToGeoJSON(csvText: string): Promise<string> {
   }
 }
 
-/**
- * Convert GeoJSON to CSV
- */
 export function geoJSONToCSV(geojson: string | any): string {
   try {
-    // Parse GeoJSON if string
     const geojsonObj: any =
       typeof geojson === "string"
         ? JSON.parse(geojson)
         : geojson;
 
-    // Extract features
     const features = geojsonObj.features || (geojsonObj.type === "Feature" ? [geojsonObj] : []);
 
     if (features.length === 0) {
       throw new Error("No features found in GeoJSON");
     }
 
-    // Collect all property keys
     const allKeys = new Set<string>();
     features.forEach((feature: any) => {
       if (feature.properties) {
@@ -62,22 +149,19 @@ export function geoJSONToCSV(geojson: string | any): string {
       }
     });
 
-    // Add geometry columns
     allKeys.add("longitude");
     allKeys.add("latitude");
     if (features.some((f: any) => f.geometry?.type === "LineString" || f.geometry?.type === "Polygon")) {
       allKeys.add("geometry_type");
     }
 
-    // Create CSV rows
     const keys = Array.from(allKeys);
-    const rows: string[][] = [keys]; // Header row
+    const rows: string[][] = [keys];
 
     features.forEach((feature: any) => {
       const row: string[] = [];
       keys.forEach((key) => {
         if (key === "longitude" || key === "latitude") {
-          // Extract coordinates from geometry
           if (feature.geometry?.type === "Point" && feature.geometry.coordinates) {
             const [lon, lat] = feature.geometry.coordinates;
             row.push(key === "longitude" ? String(lon) : String(lat));
@@ -100,7 +184,6 @@ export function geoJSONToCSV(geojson: string | any): string {
       rows.push(row);
     });
 
-    // Convert to CSV string using PapaParse
     return Papa.unparse(rows);
   } catch (error) {
     throw new Error(
@@ -111,22 +194,13 @@ export function geoJSONToCSV(geojson: string | any): string {
   }
 }
 
-/**
- * Reformat CSV (parse and re-serialize)
- */
 export function reformatCSV(csvText: string): string {
   try {
-    // Parse CSV
     const parsed = Papa.parse(csvText, {
       header: true,
       skipEmptyLines: true,
     });
 
-    if (parsed.errors.length > 0) {
-      console.warn("CSV parsing warnings:", parsed.errors);
-    }
-
-    // Re-serialize
     return Papa.unparse(parsed.data);
   } catch (error) {
     throw new Error(

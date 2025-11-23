@@ -32,3 +32,8 @@ Cargo.lock
 # WASM build output (optional - uncomment if you want to track built files in git)
 # src/wasm/
 
+# Test results (Playwright)
+test-results/
+playwright-report/
+playwright/.cache/
+

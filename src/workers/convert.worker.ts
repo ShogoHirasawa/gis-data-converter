@@ -1,6 +1,5 @@
 /**
- * Conversion Worker
- * Handles file format conversion in a WebWorker
+ * Conversion Worker - Handles file format conversion in a WebWorker
  */
 
 import { InputFormat } from "../utils/detectFormat";
@@ -36,9 +35,6 @@ export interface ConvertResponse {
   error?: string;
 }
 
-/**
- * Convert CSV text to GeoJSON string
- */
 async function handleCSVToGeoJSON(csvText: string): Promise<ConvertResponse> {
   try {
     const geojson = await csvToGeoJSON(csvText);
@@ -57,9 +53,6 @@ async function handleCSVToGeoJSON(csvText: string): Promise<ConvertResponse> {
   }
 }
 
-/**
- * Convert Shapefile ZIP to GeoJSON
- */
 async function handleShapefileToGeoJSON(
   zipBuffer: ArrayBuffer
 ): Promise<ConvertResponse> {
@@ -80,9 +73,6 @@ async function handleShapefileToGeoJSON(
   }
 }
 
-/**
- * Convert GeoJSON to Shapefile ZIP
- */
 async function handleGeoJSONToShapefile(
   geojson: string
 ): Promise<ConvertResponse> {
@@ -103,9 +93,6 @@ async function handleGeoJSONToShapefile(
   }
 }
 
-/**
- * Convert GeoJSON to KML
- */
 async function handleGeoJSONToKML(geojson: string): Promise<ConvertResponse> {
   try {
     const kml = geoJSONToKML(geojson);
@@ -124,9 +111,6 @@ async function handleGeoJSONToKML(geojson: string): Promise<ConvertResponse> {
   }
 }
 
-/**
- * Convert Shapefile to KML
- */
 async function handleShapefileToKML(
   zipBuffer: ArrayBuffer
 ): Promise<ConvertResponse> {
@@ -148,9 +132,6 @@ async function handleShapefileToKML(
 }
 
 
-/**
- * Initialize WASM module for PBF conversion
- */
 let wasmModule: any = null;
 let wasmInitialized = false;
 
@@ -158,17 +139,12 @@ async function initializeWasm(): Promise<void> {
   if (wasmInitialized && wasmModule) return;
 
   try {
-    // Import WASM module from local src/wasm directory
-    // This ensures the module is bundled with the application
     wasmModule = await import("../wasm/vector_tile_core.js");
     
     if (!wasmModule || !wasmModule.default) {
       throw new Error("WASM module default export not found");
     }
     
-    // Initialize WASM module
-    // web-vector-tile-makerと同じ方法：引数なしで呼び出す
-    // vite-plugin-wasmがWASMファイルのパスを自動的に解決する
     await wasmModule.default();
     wasmInitialized = true;
   } catch (error) {
@@ -180,9 +156,6 @@ async function initializeWasm(): Promise<void> {
   }
 }
 
-/**
- * Convert GeoJSON to PBF ZIP
- */
 async function handleGeoJSONToPBFZip(
   geojson: string,
   options: { minZoom: number; maxZoom: number; layerName: string }
@@ -195,7 +168,6 @@ async function handleGeoJSONToPBFZip(
       throw new Error("WASM module not properly initialized");
     }
 
-    // Convert GeoJSON string to Uint8Array
     const geojsonBytes = new TextEncoder().encode(geojson);
 
     // Validate zoom levels
@@ -207,7 +179,6 @@ async function handleGeoJSONToPBFZip(
       throw new Error("Minimum zoom must be less than or equal to maximum zoom");
     }
 
-    // Generate PBF tiles using WASM
     const result = wasmModule.generate_pbf_tiles(
       geojsonBytes,
       options.minZoom,
@@ -215,7 +186,6 @@ async function handleGeoJSONToPBFZip(
       options.layerName
     );
 
-    // Collect tiles
     const tiles: Array<{ path: string; data: Uint8Array }> = [];
     const tileCount = result.count();
 
@@ -228,7 +198,6 @@ async function handleGeoJSONToPBFZip(
       }
     }
 
-    // Get metadata for tiles.json
     const metadata = result.get_metadata();
     let bounds: [number, number, number, number] | undefined;
     let center: [number, number] | undefined;
@@ -240,12 +209,9 @@ async function handleGeoJSONToPBFZip(
       center = metadata.center;
     }
 
-    // Clean up WASM resources
     if (result.free) {
       result.free();
     }
-
-    // Convert tiles to ZIP with metadata
     const zipBuffer = await tilesToZip(tiles, {
       minZoom: options.minZoom,
       maxZoom: options.maxZoom,
@@ -269,19 +235,13 @@ async function handleGeoJSONToPBFZip(
   }
 }
 
-/**
- * Convert Shapefile to PBF ZIP
- */
-/**
- * Normalize GeoJSON: Convert MultiLineString to LineString, MultiPolygon to Polygon
- * WASM module doesn't support MultiLineString/MultiPolygon, so we need to expand them
- */
+// Normalize GeoJSON: Expand MultiLineString/MultiPolygon for WASM compatibility
 function normalizeGeoJSONForPBF(geojson: string): string {
   try {
     const geojsonObj = JSON.parse(geojson);
     
     if (geojsonObj.type !== 'FeatureCollection' || !Array.isArray(geojsonObj.features)) {
-      return geojson; // Return as-is if not a FeatureCollection
+      return geojson;
     }
     
     const normalizedFeatures: any[] = [];
@@ -292,7 +252,6 @@ function normalizeGeoJSONForPBF(geojson: string): string {
       const geometryType = feature.geometry.type;
       
       if (geometryType === 'MultiLineString') {
-        // Expand MultiLineString to multiple LineString features
         const coordinates = feature.geometry.coordinates;
         for (const lineCoords of coordinates) {
           normalizedFeatures.push({
@@ -305,7 +264,6 @@ function normalizeGeoJSONForPBF(geojson: string): string {
           });
         }
       } else if (geometryType === 'MultiPolygon') {
-        // Expand MultiPolygon to multiple Polygon features
         const coordinates = feature.geometry.coordinates;
         for (const polygonCoords of coordinates) {
           normalizedFeatures.push({
@@ -318,24 +276,17 @@ function normalizeGeoJSONForPBF(geojson: string): string {
           });
         }
       } else {
-        // Keep other geometry types as-is
         normalizedFeatures.push(feature);
       }
     }
     
-    // Remove fileName property if it exists (shpjs adds this)
     const normalized: any = {
       type: 'FeatureCollection',
       features: normalizedFeatures,
     };
-    if ('fileName' in geojsonObj) {
-      // fileName is not part of GeoJSON spec, but we keep it for reference if needed
-    }
     
     return JSON.stringify(normalized);
   } catch (error) {
-    // If normalization fails, return original GeoJSON
-    console.warn('[normalizeGeoJSONForPBF] Failed to normalize, using original:', error);
     return geojson;
   }
 }
@@ -345,21 +296,11 @@ async function handleShapefileToPBFZip(
   options: { minZoom: number; maxZoom: number; layerName: string }
 ): Promise<ConvertResponse> {
   try {
-    // First convert to GeoJSON
     const geojson = await shapefileToGeoJSON(zipBuffer);
-    
-    // Normalize GeoJSON: Convert MultiLineString/MultiPolygon to LineString/Polygon
-    // WASM module doesn't support MultiLineString/MultiPolygon
     const normalizedGeoJSON = normalizeGeoJSONForPBF(geojson);
-    
-    // Then convert to PBF
     return handleGeoJSONToPBFZip(normalizedGeoJSON, options);
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error);
-    console.error('[ShapefileToPBF] Error:', errorMessage);
-    if (error instanceof Error && error.stack) {
-      console.error('[ShapefileToPBF] Stack:', error.stack);
-    }
     return {
       success: false,
       error: errorMessage,
@@ -368,14 +309,10 @@ async function handleShapefileToPBFZip(
 }
 
 
-/**
- * Main conversion handler
- */
 export async function handleConvert(request: ConvertRequest): Promise<ConvertResponse> {
   const { inputFormat, outputFormat, file, pbfOptions } = request;
 
   try {
-    // Handle same format conversion (reformat)
     if (
       (inputFormat === "geojson" && outputFormat === "geojson") ||
       (inputFormat === "csv" && outputFormat === "csv") ||
@@ -420,7 +357,6 @@ export async function handleConvert(request: ConvertRequest): Promise<ConvertRes
       }
     }
 
-    // Handle CSV input
     if (inputFormat === "csv") {
       const csvText = new TextDecoder("utf-8", { fatal: false }).decode(file);
 
@@ -428,17 +364,14 @@ export async function handleConvert(request: ConvertRequest): Promise<ConvertRes
         case "geojson":
           return handleCSVToGeoJSON(csvText);
         case "kml": {
-          // CSV → GeoJSON → KML
           const geojson = await csvToGeoJSON(csvText);
           return handleGeoJSONToKML(geojson);
         }
         case "shapefile": {
-          // CSV → GeoJSON → Shapefile
           const geojson = await csvToGeoJSON(csvText);
           return handleGeoJSONToShapefile(geojson);
         }
         case "pbf-zip": {
-          // CSV → GeoJSON → PBF
           if (!pbfOptions) {
             return {
               success: false,
@@ -456,7 +389,6 @@ export async function handleConvert(request: ConvertRequest): Promise<ConvertRes
       }
     }
 
-    // Handle GeoJSON input
     if (inputFormat === "geojson") {
       const geojsonText = new TextDecoder("utf-8", { fatal: false }).decode(file);
 
@@ -490,7 +422,6 @@ export async function handleConvert(request: ConvertRequest): Promise<ConvertRes
       }
     }
 
-    // Handle Shapefile input
     if (inputFormat === "shapefile") {
       switch (outputFormat) {
         case "geojson":
@@ -498,7 +429,6 @@ export async function handleConvert(request: ConvertRequest): Promise<ConvertRes
         case "kml":
           return handleShapefileToKML(file);
         case "csv": {
-          // Shapefile → GeoJSON → CSV
           const geojson = await shapefileToGeoJSON(file);
           const csv = geoJSONToCSVExport(geojson);
           return {
@@ -524,7 +454,6 @@ export async function handleConvert(request: ConvertRequest): Promise<ConvertRes
       }
     }
 
-    // Handle KML input
     if (inputFormat === "kml") {
       const kmlText = new TextDecoder("utf-8", { fatal: false }).decode(file);
 
@@ -539,7 +468,6 @@ export async function handleConvert(request: ConvertRequest): Promise<ConvertRes
           };
         }
         case "kml":
-          // Same format - reformat
           const reformatted = reformatKML(kmlText);
           return {
             success: true,
@@ -548,7 +476,6 @@ export async function handleConvert(request: ConvertRequest): Promise<ConvertRes
             mimeType: "application/vnd.google-earth.kml+xml",
           };
         case "csv": {
-          // KML → GeoJSON → CSV
           const geojson = kmlToGeoJSON(kmlText);
           const csv = geoJSONToCSVExport(geojson);
           return {
@@ -559,12 +486,10 @@ export async function handleConvert(request: ConvertRequest): Promise<ConvertRes
           };
         }
         case "shapefile": {
-          // KML → GeoJSON → Shapefile
           const geojson = kmlToGeoJSON(kmlText);
           return handleGeoJSONToShapefile(geojson);
         }
         case "pbf-zip": {
-          // KML → GeoJSON → PBF
           if (!pbfOptions) {
             return {
               success: false,
@@ -582,7 +507,6 @@ export async function handleConvert(request: ConvertRequest): Promise<ConvertRes
       }
     }
 
-    // Handle GPX input (not fully supported yet, but allow basic conversion)
     if (inputFormat === "gpx") {
       return {
         success: false,
@@ -605,7 +529,6 @@ export async function handleConvert(request: ConvertRequest): Promise<ConvertRes
   }
 }
 
-// Worker message handler
 self.onmessage = async (event: MessageEvent<ConvertRequest>) => {
   const request = event.data;
 
@@ -613,16 +536,21 @@ self.onmessage = async (event: MessageEvent<ConvertRequest>) => {
     const response = await handleConvert(request);
     self.postMessage(response);
   } catch (error) {
+    const errorMessage = error instanceof Error
+      ? error.message
+      : `Worker error: ${String(error)}`;
+    
     self.postMessage({
       success: false,
-      error:
-        error instanceof Error
-          ? error.message
-          : `Worker error: ${String(error)}`,
+      error: errorMessage,
     } as ConvertResponse);
   }
 };
 
-// Worker ready notification
-console.log("[Convert Worker] Ready");
+self.onerror = (error: ErrorEvent) => {
+  self.postMessage({
+    success: false,
+    error: `Unhandled worker error: ${error.message}`,
+  } as ConvertResponse);
+};
 

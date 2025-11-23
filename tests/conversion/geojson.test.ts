@@ -40,38 +40,26 @@ describe('GeoJSON Conversion', () => {
         );
 
         if (!result.success) {
-          console.error(`Conversion failed for ${geometry} GeoJSON to ${format}:`, result.error);
           throw new Error(result.error || 'Conversion failed');
         }
         
         expect(result.success).toBe(true);
         expect(result.data).toBeDefined();
 
-        // 3. データ整合性チェック（重要！）
-        // PBFは直接GeoJSONに変換できないためスキップ
         if (format !== 'pbf-zip') {
           const integrityCheck = await validateDataIntegrity(
             inputGeoJSON,
             result.data,
             format
           );
-          
-          if (!integrityCheck.valid) {
-            console.error('Data integrity errors:', integrityCheck.errors);
-          }
           expect(integrityCheck.valid).toBe(true);
         }
 
-        // 4. MapLibre GL JS検証
-        // 出力をGeoJSONに変換して検証（可能な場合）
         if (format === 'geojson') {
           const mapboxCheck = await validateGeoJSONForMapLibre(result.data);
           expect(mapboxCheck.valid).toBe(true);
-          if (!mapboxCheck.valid) {
-            console.error('MapLibre GL JS validation errors:', mapboxCheck.errors);
-          }
         }
-      }, 30000); // タイムアウト30秒
+      }, 30000);
     });
   });
 });

@@ -24,14 +24,12 @@ function App() {
   const [pendingFormatId, setPendingFormatId] = useState<string | null>(null);
 
   const handleFileUpload = async (file: File) => {
-    // Check file size (50MB limit)
-    const maxSize = 50 * 1024 * 1024; // 50MB
+    const maxSize = 50 * 1024 * 1024;
     if (file.size > maxSize) {
       setState('upload-error');
       return;
     }
 
-    // Detect file format using detection utility
     try {
       const format = await detectInputFormat(file);
       
@@ -50,20 +48,17 @@ function App() {
         setState('upload-error');
       }
     } catch (error) {
-      console.error('Format detection error:', error);
       setState('upload-error');
     }
   };
 
   const handleFormatSelect = (formatId: string) => {
-    // If PBF format, show options dialog first
     if (formatId === 'pbf') {
       setPendingFormatId(formatId);
       setPbfOptionsDialogOpen(true);
       return;
     }
 
-    // For other formats, start conversion immediately
     startConversion(formatId);
   };
 
@@ -88,8 +83,6 @@ function App() {
     setProgress(0);
 
     try {
-      // Map formatId to OutputFormat
-      // Note: GPX is supported as input but not as output
       const outputFormatMap: Record<string, OutputFormat> = {
         'geojson': 'geojson',
         'shapefile': 'shapefile',
@@ -100,7 +93,6 @@ function App() {
 
       const outputFormat = outputFormatMap[formatId] || 'geojson';
 
-      // Simulate progress updates
       const progressInterval = setInterval(() => {
         setProgress((prev) => {
           if (prev >= 90) {
@@ -111,7 +103,6 @@ function App() {
         });
       }, 200);
 
-      // Convert file using WebWorker
       const response = await convertFile(
         uploadedFile.file,
         outputFormat,
@@ -122,14 +113,12 @@ function App() {
       setProgress(100);
 
       if (response.success && response.data) {
-        // Create Blob from response data
         let blob: Blob;
         if (response.data instanceof ArrayBuffer) {
           blob = new Blob([response.data], { 
             type: response.mimeType || getOutputMimeType(outputFormat) 
           });
         } else {
-          // String data (e.g., KML, GPX, GeoJSON)
           blob = new Blob([response.data], { 
             type: response.mimeType || getOutputMimeType(outputFormat) 
           });
@@ -150,7 +139,8 @@ function App() {
         throw new Error(response.error || 'Conversion failed');
       }
     } catch (error) {
-      console.error('Conversion error:', error);
+      clearInterval(progressInterval);
+      setProgress(0);
       setState('error');
     }
   };
@@ -166,11 +156,9 @@ function App() {
 
   const handlePageChange = (page: PageType) => {
     setCurrentPage(page);
-    // Scroll to top on page change
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  // Scroll to top when page changes
   useEffect(() => {
     if (currentPage !== null) {
       window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -192,7 +180,7 @@ function App() {
 
   return (
     <LanguageProvider>
-      <div className="min-h-screen flex flex-col" style={{ 
+      <div className="min-h-screen flex flex-col" style={{
         background: 'radial-gradient(ellipse at 15% 20%, rgba(210, 230, 205, 0.15) 0%, transparent 50%), radial-gradient(ellipse at 85% 70%, rgba(235, 220, 205, 0.12) 0%, transparent 50%), #FEFEFE'
       }}>
         <Header onHomeClick={handleReset} />

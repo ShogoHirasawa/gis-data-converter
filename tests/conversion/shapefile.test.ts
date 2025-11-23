@@ -43,9 +43,6 @@ describe('Shapefile Conversion', () => {
         );
 
         if (!result.success) {
-          console.error(`Conversion failed for ${geometry} Shapefile to ${format}:`);
-          console.error('Error message:', result.error);
-          console.error('Full result:', JSON.stringify(result, null, 2));
           throw new Error(result.error || 'Conversion failed');
         }
 
@@ -56,18 +53,12 @@ describe('Shapefile Conversion', () => {
           throw new Error(result.error || 'Conversion failed');
         }
 
-        // 3. データ整合性チェック
-        // 元のGeoJSONと比較（Shapefileは元々GeoJSONから作成されている想定）
         if (format !== 'pbf-zip') {
           const integrityCheck = await validateDataIntegrity(
             inputGeoJSON,
             result.data,
             format
           );
-          
-          if (!integrityCheck.valid) {
-            console.error('Data integrity errors:', integrityCheck.errors);
-          }
           expect(integrityCheck.valid).toBe(true);
         }
       }, 30000);

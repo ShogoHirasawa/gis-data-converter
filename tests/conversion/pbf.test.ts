@@ -50,20 +50,12 @@ describe('PBF Conversion', () => {
             if (tilesJsonFile) {
               const tilesJsonContent = await tilesJsonFile.async('string');
               const tilesJson = JSON.parse(tilesJsonContent);
-              console.log(`[PBF Test] tiles.json for ${geometry} ${format}:`, JSON.stringify(tilesJson, null, 2));
-            } else {
-              console.error(`[PBF Test] tiles.json not found in ZIP for ${geometry} ${format}`);
             }
           } catch (e) {
-            console.error(`[PBF Test] Error reading tiles.json:`, e);
+            // Error reading tiles.json
           }
           
           const pbfCheck = await validatePBFForMapLibre(result.data);
-          if (!pbfCheck.valid) {
-            console.error(`PBF validation failed for ${geometry} ${format} to PBF:`);
-            console.error('PBF validation errors:', pbfCheck.errors);
-            console.error('Full validation result:', JSON.stringify(pbfCheck, null, 2));
-          }
           expect(pbfCheck.valid).toBe(true);
         } else {
           throw new Error('PBF output must be ArrayBuffer');

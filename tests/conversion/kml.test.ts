@@ -56,9 +56,6 @@ describe('KML Conversion', () => {
             format
           );
           
-          if (!integrityCheck.valid) {
-            console.error('Data integrity errors:', integrityCheck.errors);
-          }
           expect(integrityCheck.valid).toBe(true);
         }
       }, 30000);

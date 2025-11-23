@@ -12,7 +12,10 @@
     "build:all": "npm run build:wasm && npm run build",
     "test": "vitest",
     "test:ui": "vitest --ui",
-    "test:run": "vitest run"
+    "test:run": "vitest run",
+    "test:e2e": "playwright test",
+    "test:e2e:ui": "playwright test --ui",
+    "test:e2e:headed": "playwright test --headed"
   },
   "dependencies": {
     "@tmcw/togeojson": "^7.1.2",
@@ -35,6 +38,7 @@
   },
   "devDependencies": {
     "@mapbox/togeojson": "^0.16.2",
+    "@playwright/test": "^1.56.1",
     "@types/maplibre-gl": "^1.13.2",
     "@types/react": "^18.2.43",
     "@types/react-dom": "^18.2.17",
@@ -48,6 +52,7 @@
     "eslint-plugin-react-refresh": "^0.4.14",
     "happy-dom": "^20.0.10",
     "maplibre-gl": "^5.13.0",
+    "playwright": "^1.56.1",
     "postcss": "^8.4.47",
     "tailwindcss": "^3.4.14",
     "typescript": "^5.6.3",

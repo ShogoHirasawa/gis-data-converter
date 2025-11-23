@@ -10,6 +10,11 @@ export default defineConfig({
     globals: true,
     setupFiles: ['./tests/setup.ts'],
     testTimeout: 30000, // 30秒タイムアウト（変換処理に時間がかかる場合があるため）
+    exclude: [
+      '**/node_modules/**',
+      '**/dist/**',
+      '**/tests/e2e/**', // E2EテストはPlaywrightで実行するため除外
+    ],
   },
   resolve: {
     alias: {
