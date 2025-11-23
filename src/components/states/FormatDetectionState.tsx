@@ -57,7 +57,8 @@ const FormatDetectionState: React.FC<FormatDetectionStateProps> = ({
     ];
 
     // Add Shapefile option only if geometry type is point
-    // Shapefile format is primarily designed for point data
+    // Note: While the Shapefile format supports points, lines, and polygons,
+    // we currently only support exporting point data as Shapefile (see src/utils/conversions/shapefile.ts).
     if (uploadedFile.geometryType === 'point') {
       baseOptions.unshift({
         id: 'shapefile',
