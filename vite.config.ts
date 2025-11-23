@@ -5,10 +5,10 @@ import wasm from 'vite-plugin-wasm'
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [react(), wasm()],
-  base: '/gis-data-converter/',
+  base: '/',
   worker: {
     format: 'es',
-    plugins: () => [wasm()], // WorkerでもWASMプラグインを使用
+    plugins: () => [wasm()],
   },
 })
 
