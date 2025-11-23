@@ -35,32 +35,47 @@ function App() {
     try {
       const format = await detectInputFormat(file);
       
+      if (format === 'unknown') {
+        setState('upload-error');
+        return;
+      }
+
+      // Show analyzing state for formats that require conversion (Shapefile, KML)
+      // This provides user feedback during geometry type detection
+      const needsAnalysis = format === 'shapefile' || format === 'kml';
+      if (needsAnalysis) {
+        setUploadedFile({
+          file,
+          format,
+          size: file.size,
+          name: file.name,
+        });
+        setState('analyzing');
+      }
+      
       // Detect geometry type if format is known
       let geometryType: UploadedFile['geometryType'] = undefined;
-      if (format !== 'unknown') {
-        try {
-          geometryType = await detectGeometryType(file, format);
-        } catch (error) {
-          console.warn('Failed to detect geometry type:', error);
-          // Continue without geometry type if detection fails
-        }
+      let cachedGeoJSON: UploadedFile['cachedGeoJSON'] = undefined;
+      try {
+        const detectionResult = await detectGeometryType(file, format);
+        geometryType = detectionResult.geometryType;
+        cachedGeoJSON = detectionResult.cachedGeoJSON;
+      } catch (error) {
+        console.warn('Failed to detect geometry type:', error);
+        // Continue without geometry type if detection fails
       }
       
       const uploaded: UploadedFile = {
         file,
-        format: format === 'unknown' ? null : format,
+        format,
         size: file.size,
         name: file.name,
         geometryType,
+        cachedGeoJSON,
       };
 
       setUploadedFile(uploaded);
-      
-      if (format !== 'unknown') {
-        setState('format-detection');
-      } else {
-        setState('upload-error');
-      }
+      setState('format-detection');
     } catch (error) {
       setState('upload-error');
     }
@@ -125,7 +140,8 @@ function App() {
         const response = await convertFile(
           uploadedFile.file,
           outputFormat,
-          pbfOptions
+          pbfOptions,
+          uploadedFile.cachedGeoJSON
         );
 
         if (progressInterval) {

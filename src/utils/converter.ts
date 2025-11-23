@@ -33,7 +33,8 @@ export async function convertFile(
     minZoom: number;
     maxZoom: number;
     layerName: string;
-  }
+  },
+  cachedGeoJSON?: string
 ): Promise<ConvertResponse> {
   return new Promise((resolve, reject) => {
     // Detect input format
@@ -55,6 +56,7 @@ export async function convertFile(
               inputFormat,
               outputFormat,
               file: buffer,
+              cachedGeoJSON,
               pbfOptions: outputFormat === 'pbf-zip' ? pbfOptions : undefined,
             };
 

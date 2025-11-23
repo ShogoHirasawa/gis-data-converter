@@ -1,5 +1,6 @@
 export type ConversionState = 
   | 'upload' 
+  | 'analyzing'
   | 'format-detection' 
   | 'converting' 
   | 'completed' 
@@ -16,6 +17,7 @@ export interface UploadedFile {
   size: number;
   name: string;
   geometryType?: GeometryType;
+  cachedGeoJSON?: string; // Cached GeoJSON from geometry type detection
 }
 
 export interface ConversionFormat {

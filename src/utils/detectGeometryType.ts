@@ -9,13 +9,21 @@ import { shapefileToGeoJSON } from './conversions/shapefile';
 import { kmlToGeoJSON } from './conversions/kml';
 
 /**
+ * Result of geometry type detection
+ */
+export interface GeometryDetectionResult {
+  geometryType: GeometryType;
+  cachedGeoJSON?: string; // Cached GeoJSON if conversion was performed
+}
+
+/**
  * Detect geometry type from file
+ * Returns both geometry type and optionally cached GeoJSON for formats that require conversion
  */
 export async function detectGeometryType(
   file: File | ArrayBuffer,
-  format: InputFormat,
-  fileName?: string
-): Promise<GeometryType> {
+  format: InputFormat
+): Promise<GeometryDetectionResult> {
   let buffer: ArrayBuffer;
   
   if (file instanceof File) {
@@ -27,23 +35,26 @@ export async function detectGeometryType(
   try {
     switch (format) {
       case 'geojson':
-        return detectGeometryTypeFromGeoJSON(buffer);
+        return {
+          geometryType: detectGeometryTypeFromGeoJSON(buffer),
+          cachedGeoJSON: new TextDecoder('utf-8', { fatal: false }).decode(buffer),
+        };
       case 'kml':
         return await detectGeometryTypeFromKML(buffer);
       case 'csv':
-        return 'point'; // CSV always contains point data
+        return { geometryType: 'point' }; // CSV always contains point data
       case 'shapefile':
         return await detectGeometryTypeFromShapefile(buffer);
       case 'gpx':
         // GPX is not fully supported, but if we need to support it in the future
         // we can convert to GeoJSON first
-        return 'unknown';
+        return { geometryType: 'unknown' };
       default:
-        return 'unknown';
+        return { geometryType: 'unknown' };
     }
   } catch (error) {
     console.error('Error detecting geometry type:', error);
-    return 'unknown';
+    return { geometryType: 'unknown' };
   }
 }
 
@@ -64,29 +75,35 @@ function detectGeometryTypeFromGeoJSON(buffer: ArrayBuffer): GeometryType {
 /**
  * Detect geometry type from KML (via GeoJSON conversion)
  */
-async function detectGeometryTypeFromKML(buffer: ArrayBuffer): Promise<GeometryType> {
+async function detectGeometryTypeFromKML(buffer: ArrayBuffer): Promise<GeometryDetectionResult> {
   try {
     const text = new TextDecoder('utf-8', { fatal: false }).decode(buffer);
     const geojsonText = kmlToGeoJSON(text);
     const geojson = JSON.parse(geojsonText);
     
-    return analyzeGeoJSONGeometry(geojson);
+    return {
+      geometryType: analyzeGeoJSONGeometry(geojson),
+      cachedGeoJSON: geojsonText,
+    };
   } catch (error) {
-    return 'unknown';
+    return { geometryType: 'unknown' };
   }
 }
 
 /**
  * Detect geometry type from Shapefile (via GeoJSON conversion)
  */
-async function detectGeometryTypeFromShapefile(buffer: ArrayBuffer): Promise<GeometryType> {
+async function detectGeometryTypeFromShapefile(buffer: ArrayBuffer): Promise<GeometryDetectionResult> {
   try {
     const geojsonText = await shapefileToGeoJSON(buffer);
     const geojson = JSON.parse(geojsonText);
     
-    return analyzeGeoJSONGeometry(geojson);
+    return {
+      geometryType: analyzeGeoJSONGeometry(geojson),
+      cachedGeoJSON: geojsonText,
+    };
   } catch (error) {
-    return 'unknown';
+    return { geometryType: 'unknown' };
   }
 }
 
