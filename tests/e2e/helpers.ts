@@ -4,12 +4,16 @@
 
 import { Page, expect } from '@playwright/test';
 import { readFile } from 'fs/promises';
-import { join, dirname } from 'path';
+import { join, dirname, resolve } from 'path';
 import { fileURLToPath } from 'url';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 const FIXTURES_DIR = join(__dirname, '../fixtures/input');
+
+// Get paths to libraries from node_modules
+const MAPLIBRE_GL_JS_PATH = resolve(__dirname, '../../node_modules/maplibre-gl/dist/maplibre-gl.js');
+const JSZIP_PATH = resolve(__dirname, '../../node_modules/jszip/dist/jszip.min.js');
 
 /**
  * Read fixture file as File object for upload
@@ -195,6 +199,42 @@ export async function getDownloadedFileBuffer(filePath: string): Promise<ArrayBu
 }
 
 /**
+ * Load MapLibre GL JS from local file if not already loaded
+ */
+async function ensureMapLibreLoaded(page: Page): Promise<void> {
+  // Check if MapLibre is already loaded
+  const isLoaded = await page.evaluate(() => typeof (window as any).maplibregl !== 'undefined');
+  
+  if (!isLoaded) {
+    // Load from local file
+    await page.addScriptTag({ path: MAPLIBRE_GL_JS_PATH });
+    
+    // Wait for MapLibre to be available
+    await page.waitForFunction(() => typeof (window as any).maplibregl !== 'undefined', {
+      timeout: 10000
+    });
+  }
+}
+
+/**
+ * Load JSZip from local file if not already loaded
+ */
+async function ensureJSZipLoaded(page: Page): Promise<void> {
+  // Check if JSZip is already loaded
+  const isLoaded = await page.evaluate(() => typeof (window as any).JSZip !== 'undefined');
+  
+  if (!isLoaded) {
+    // Load from local file
+    await page.addScriptTag({ path: JSZIP_PATH });
+    
+    // Wait for JSZip to be available
+    await page.waitForFunction(() => typeof (window as any).JSZip !== 'undefined', {
+      timeout: 10000
+    });
+  }
+}
+
+/**
  * Validate GeoJSON can be displayed in MapLibre GL JS
  */
 export async function validateGeoJSONInMapLibre(
@@ -204,21 +244,10 @@ export async function validateGeoJSONInMapLibre(
   const errors: string[] = [];
 
   try {
-    const result = await page.evaluate(async (geojsonStr) => {
-      // Load MapLibre GL JS if not already loaded
-      if (typeof (window as any).maplibregl === 'undefined') {
-        // Try to load from CDN or use the one from node_modules
-        const script = document.createElement('script');
-        script.src = 'https://unpkg.com/maplibre-gl@3.6.2/dist/maplibre-gl.js';
-        document.head.appendChild(script);
-        
-        await new Promise((resolve, reject) => {
-          script.onload = resolve;
-          script.onerror = reject;
-          setTimeout(reject, 10000); // 10s timeout
-        });
-      }
+    // Load MapLibre GL JS from local file
+    await ensureMapLibreLoaded(page);
 
+    const result = await page.evaluate(async (geojsonStr) => {
       const maplibregl = (window as any).maplibregl;
       if (!maplibregl) {
         return { valid: false, errors: ['MapLibre GL JS not available'] };
@@ -356,35 +385,14 @@ export async function validatePBFInMapLibre(
   const errors: string[] = [];
 
   try {
+    // Load MapLibre GL JS and JSZip from local files
+    await ensureMapLibreLoaded(page);
+    await ensureJSZipLoaded(page);
+
     // Convert ArrayBuffer to base64 for passing to page.evaluate
     const base64 = Buffer.from(zipBuffer).toString('base64');
 
     const result = await page.evaluate(async (base64Data) => {
-      // Load required libraries
-      if (typeof (window as any).JSZip === 'undefined') {
-        const script = document.createElement('script');
-        script.src = 'https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js';
-        document.head.appendChild(script);
-        
-        await new Promise((resolve, reject) => {
-          script.onload = resolve;
-          script.onerror = reject;
-          setTimeout(reject, 10000);
-        });
-      }
-
-      if (typeof (window as any).maplibregl === 'undefined') {
-        const script = document.createElement('script');
-        script.src = 'https://unpkg.com/maplibre-gl@3.6.2/dist/maplibre-gl.js';
-        document.head.appendChild(script);
-        
-        await new Promise((resolve, reject) => {
-          script.onload = resolve;
-          script.onerror = reject;
-          setTimeout(reject, 10000);
-        });
-      }
-
       const JSZip = (window as any).JSZip;
       const maplibregl = (window as any).maplibregl;
 
