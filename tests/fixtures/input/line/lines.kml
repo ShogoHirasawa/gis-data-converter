@@ -1,0 +1,18 @@
+<kml xmlns="http://www.opengis.net/kml/2.2"><Document>
+<Placemark id="0">
+<name>test001</name><description>hoge</description><ExtendedData>
+  <Data name="id"><value>001</value></Data></ExtendedData>
+  <LineString><coordinates>139.4119736521257,36.03474067820299
+140.17914576966615,36.05111268795082</coordinates></LineString></Placemark>
+<Placemark id="1">
+<name>test002</name><ExtendedData>
+  <Data name="id"><value>002</value></Data>
+  <Data name="descriptio"><value>hogehoge</value></Data></ExtendedData>
+  <LineString><coordinates>139.42772205336598,35.93279393565733
+139.8529288868413,36.00380648402418
+140.25563800426073,35.85442404789704</coordinates></LineString></Placemark>
+<Placemark id="2">
+<name>test003</name><description>hogehoge</description><ExtendedData>
+  <Data name="id"><value>003</value></Data></ExtendedData>
+  <LineString><coordinates>139.41647319533604,35.79970145579087
+140.2421393746256,35.80517541280787</coordinates></LineString></Placemark></Document></kml>

@@ -1,102 +1,135 @@
 # GIS Data Converter
 
-GISデータをWebで変換するツールのUI実装です。
+A web-based tool for converting GIS data formats in your browser. All processing happens locally - No need a server for prosessing.
 
-## 技術スタック
+## Features
 
-- **React 18** - UIライブラリ
-- **TypeScript** - 型安全性
-- **Vite** - ビルドツール
-- **Tailwind CSS** - スタイリング
-- **Iconify** - アイコン
+- **Multiple Format Support**: Convert between Shapefile, GeoJSON, KML, CSV, GPX, and PBF
+- **Point Data CSV Conversion**: CSV conversion is available only for point geometries
+- **Browser-Based**: All processing happens in your browser - no server uploads
+- **Multi-Language**: Supports 25 languages
+- **Responsive Design**: Works on desktop, tablet, and mobile devices
+- **PBF Vector Tiles**: Generate efficient PBF(directory type) tiles using WebAssembly
 
-## セットアップ
+## Supported Formats
 
-### 依存関係のインストール
+### Input Formats
+- **Shapefile** (.zip) - Upload as a ZIP file containing .shp, .shx, .dbf files
+- **GeoJSON** (.geojson, .json)
+- **KML** (.kml)
+- **CSV** (.csv) - Must contain latitude/longitude columns
+- **GPX** (.gpx)
+
+### Output Formats
+- **GeoJSON** - Ideal for web applications and GIS software
+- **KML** - Best for Google Earth
+- **CSV** - Only available for point data
+- **Shapefile** (.zip) - Only available when input is Shapefile
+- **PBF** - Vector tiles for efficient map rendering
+
+## Getting Started
+
+### Prerequisites
+
+- Node.js 20 or higher
+- npm
+
+### Installation
 
 ```bash
 npm install
 ```
 
-### 開発サーバーの起動
+### Development
+
+Start the development server:
 
 ```bash
 npm run dev
 ```
 
-ブラウザで `http://localhost:5173` を開いてください。
+Open `http://localhost:5173` in your browser.
 
-### ビルド
+### Build
+
+Build for production:
 
 ```bash
 npm run build
 ```
 
-ビルドされたファイルは `dist` ディレクトリに出力されます。
+Built files will be in the `dist` directory.
 
-## プロジェクト構造
+### Build WASM Module
+
+To rebuild the WebAssembly module for PBF conversion:
+
+```bash
+npm run build:wasm
+```
+
+Or build everything:
+
+```bash
+npm run build:all
+```
+
+### Testing
+
+Run E2E tests:
+
+```bash
+npm run test:e2e
+```
+
+Run tests with UI:
+
+```bash
+npm run test:e2e:ui
+```
+
+## Project Structure
 
 ```
 src/
-├── components/          # Reactコンポーネント
-│   ├── Header.tsx      # ヘッダー（言語選択含む）
-│   ├── Footer.tsx      # フッター
-│   ├── MainContent.tsx # メインコンテンツ（状態管理）
-│   └── states/         # 各状態のコンポーネント
+├── components/          # React components
+│   ├── Header.tsx       # Header with language selector
+│   ├── Footer.tsx       # Footer with navigation
+│   ├── MainContent.tsx  # Main content with state management
+│   └── states/          # State components
 │       ├── UploadState.tsx
 │       ├── FormatDetectionState.tsx
 │       ├── ConvertingState.tsx
 │       ├── CompletedState.tsx
-│       ├── ErrorState.tsx
-│       └── UploadErrorState.tsx
-├── i18n/               # 多言語対応
-│   ├── translations.ts # 翻訳データ
-│   └── LanguageContext.tsx # 言語コンテキスト
-├── types/              # TypeScript型定義
-│   └── index.ts
-├── App.tsx             # メインアプリケーション
-├── main.tsx            # エントリーポイント
-└── index.css           # グローバルスタイル
+│       └── ErrorState.tsx
+├── workers/             # Web Workers
+│   └── convert.worker.ts # File conversion worker
+├── utils/               # Utility functions
+│   ├── conversions/     # Format conversion modules
+│   ├── converter.ts     # Conversion orchestration
+│   └── detectFormat.ts  # Format detection
+├── i18n/                # Internationalization
+│   ├── translations.ts  # Translation data (25 languages)
+│   └── LanguageContext.tsx
+└── wasm/                # WebAssembly module for PBF
 ```
 
-## 機能
+## How It Works
 
-### 実装済み
+1. **Upload**: Drag and drop or select a GIS file (max 50MB)
+2. **Detect**: The tool automatically detects the file format
+3. **Convert**: Select your desired output format and start conversion
+4. **Download**: Download the converted file
 
-- ✅ 5つの状態管理（Upload, Format Detection, Converting, Completed, Error）
-- ✅ ファイルアップロード（ドラッグ&ドロップ対応）
-- ✅ 多言語対応（25言語、主要4言語は完全実装）
-- ✅ レスポンシブデザイン（Desktop, Tablet, Mobile）
-- ✅ Soft Materialスタイルの実装
-- ✅ プログレスバーアニメーション
-- ✅ 言語選択とローカルストレージへの保存
+All processing happens in your browser using Web Workers and WebAssembly. Your data is never sent to external servers.
 
-### 未実装（今後の実装予定）
+## Limitations
 
-- ⏳ 実際のGISファイル変換機能
-- ⏳ ファイル形式の詳細な自動判定
-- ⏳ エラーハンドリングの強化
-- ⏳ アクセシビリティの完全対応（ARIAラベルなど）
+- Maximum file size: 50MB
+- CSV conversion only supports point geometries
+- Shapefile must be uploaded as a ZIP file
+- Some complex data structures may not be fully supported
 
-## デザイン
+## License
 
-このプロジェクトは **Soft Material** スタイルガイドに基づいて設計されています：
-
-- プライマリカラー: `#7FAD6F` (ナチュラルグリーン)
-- 大きなボーダーラディウス: 32px
-- 柔らかいシャドウ
-- 親しみやすいデザイン
-
-詳細は `design/paraflow/Style Guide/Soft Material.style-guide.md` を参照してください。
-
-## ブラウザサポート
-
-- Chrome (最新版)
-- Firefox (最新版)
-- Safari (最新版)
-- Edge (最新版)
-
-## ライセンス
-
-LICENSE ファイルを参照してください。
-
+MIT LICENCE

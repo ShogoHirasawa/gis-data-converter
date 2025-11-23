@@ -124,11 +124,6 @@ const SupportedFormatsPage: React.FC<SupportedFormatsPageProps> = ({ onBack }) =
                   description: t.supportedFormatsOutputCsvDesc,
                 },
                 {
-                  name: t.supportedFormatsOutputTopoJson,
-                  extension: '.topojson',
-                  description: t.supportedFormatsOutputTopoJsonDesc,
-                },
-                {
                   name: t.supportedFormatsOutputPbf,
                   extension: '.pbf',
                   description: t.supportedFormatsOutputPbfDesc,
