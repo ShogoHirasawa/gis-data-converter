@@ -1,5 +1,4 @@
 import React from 'react';
-import { useLanguage } from '../../i18n/LanguageContext';
 import { Loader2 } from 'lucide-react';
 
 interface AnalyzingStateProps {
@@ -7,7 +6,6 @@ interface AnalyzingStateProps {
 }
 
 const AnalyzingState: React.FC<AnalyzingStateProps> = ({ fileName }) => {
-  const { t } = useLanguage();
 
   return (
     <div className="w-full max-w-2xl mx-auto text-center">
