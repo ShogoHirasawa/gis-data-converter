@@ -20,6 +20,7 @@ export interface ConvertRequest {
   inputFormat: InputFormat;
   outputFormat: OutputFormat;
   file: ArrayBuffer; // Original file binary
+  cachedGeoJSON?: string; // Cached GeoJSON from geometry type detection (for Shapefile/KML)
   pbfOptions?: {
     minZoom: number;
     maxZoom: number;
@@ -310,7 +311,7 @@ async function handleShapefileToPBFZip(
 
 
 export async function handleConvert(request: ConvertRequest): Promise<ConvertResponse> {
-  const { inputFormat, outputFormat, file, pbfOptions } = request;
+  const { inputFormat, outputFormat, file, cachedGeoJSON, pbfOptions } = request;
 
   try {
     if (
@@ -423,13 +424,30 @@ export async function handleConvert(request: ConvertRequest): Promise<ConvertRes
     }
 
     if (inputFormat === "shapefile") {
+      // Use cached GeoJSON if available to avoid reconversion
+      const getGeoJSON = async () => {
+        if (cachedGeoJSON) {
+          return cachedGeoJSON;
+        }
+        return await shapefileToGeoJSON(file);
+      };
+
       switch (outputFormat) {
-        case "geojson":
-          return handleShapefileToGeoJSON(file);
-        case "kml":
-          return handleShapefileToKML(file);
+        case "geojson": {
+          const geojson = await getGeoJSON();
+          return {
+            success: true,
+            data: geojson,
+            filename: "converted.geojson",
+            mimeType: "application/geo+json",
+          };
+        }
+        case "kml": {
+          const geojson = await getGeoJSON();
+          return handleGeoJSONToKML(geojson);
+        }
         case "csv": {
-          const geojson = await shapefileToGeoJSON(file);
+          const geojson = await getGeoJSON();
           const csv = geoJSONToCSVExport(geojson);
           return {
             success: true,
@@ -445,6 +463,10 @@ export async function handleConvert(request: ConvertRequest): Promise<ConvertRes
               error: "PBF options (minZoom, maxZoom, layerName) are required",
             };
           }
+          if (cachedGeoJSON) {
+            const normalizedGeoJSON = normalizeGeoJSONForPBF(cachedGeoJSON);
+            return handleGeoJSONToPBFZip(normalizedGeoJSON, pbfOptions);
+          }
           return handleShapefileToPBFZip(file, pbfOptions);
         default:
           return {
@@ -455,11 +477,20 @@ export async function handleConvert(request: ConvertRequest): Promise<ConvertRes
     }
 
     if (inputFormat === "kml") {
+      // Use cached GeoJSON if available to avoid reconversion
+      const getGeoJSON = () => {
+        if (cachedGeoJSON) {
+          return cachedGeoJSON;
+        }
+        const kmlText = new TextDecoder("utf-8", { fatal: false }).decode(file);
+        return kmlToGeoJSON(kmlText);
+      };
+
       const kmlText = new TextDecoder("utf-8", { fatal: false }).decode(file);
 
       switch (outputFormat) {
         case "geojson": {
-          const geojson = kmlToGeoJSON(kmlText);
+          const geojson = getGeoJSON();
           return {
             success: true,
             data: geojson,
@@ -476,7 +507,7 @@ export async function handleConvert(request: ConvertRequest): Promise<ConvertRes
             mimeType: "application/vnd.google-earth.kml+xml",
           };
         case "csv": {
-          const geojson = kmlToGeoJSON(kmlText);
+          const geojson = getGeoJSON();
           const csv = geoJSONToCSVExport(geojson);
           return {
             success: true,
@@ -486,7 +517,7 @@ export async function handleConvert(request: ConvertRequest): Promise<ConvertRes
           };
         }
         case "shapefile": {
-          const geojson = kmlToGeoJSON(kmlText);
+          const geojson = getGeoJSON();
           return handleGeoJSONToShapefile(geojson);
         }
         case "pbf-zip": {
@@ -496,7 +527,7 @@ export async function handleConvert(request: ConvertRequest): Promise<ConvertRes
               error: "PBF options (minZoom, maxZoom, layerName) are required",
             };
           }
-          const geojson = kmlToGeoJSON(kmlText);
+          const geojson = getGeoJSON();
           return handleGeoJSONToPBFZip(geojson, pbfOptions);
         }
         default:

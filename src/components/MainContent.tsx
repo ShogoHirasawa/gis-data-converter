@@ -1,6 +1,7 @@
 import React from 'react';
 import { ConversionState, UploadedFile, ConversionResult } from '../types';
 import UploadState from './states/UploadState';
+import AnalyzingState from './states/AnalyzingState';
 import FormatDetectionState from './states/FormatDetectionState';
 import ConvertingState from './states/ConvertingState';
 import CompletedState from './states/CompletedState';
@@ -34,6 +35,9 @@ const MainContent: React.FC<MainContentProps> = ({
     <main className="flex-1 overflow-x-hidden flex flex-col px-8 py-12">
       {state === 'upload' && (
         <UploadState onFileUpload={onFileUpload} />
+      )}
+      {state === 'analyzing' && uploadedFile && (
+        <AnalyzingState fileName={uploadedFile.name} />
       )}
       {state === 'format-detection' && uploadedFile && (
         <FormatDetectionState

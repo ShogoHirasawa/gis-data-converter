@@ -1,5 +1,6 @@
 export type ConversionState = 
   | 'upload' 
+  | 'analyzing'
   | 'format-detection' 
   | 'converting' 
   | 'completed' 
@@ -8,11 +9,15 @@ export type ConversionState =
 
 export type FileFormat = 'shapefile' | 'geojson' | 'kml' | 'csv' | 'gpx' | 'pbf';
 
+export type GeometryType = 'point' | 'line' | 'polygon' | 'mixed' | 'unknown';
+
 export interface UploadedFile {
   file: File;
   format: FileFormat | null;
   size: number;
   name: string;
+  geometryType?: GeometryType;
+  cachedGeoJSON?: string; // Cached GeoJSON from geometry type detection
 }
 
 export interface ConversionFormat {
