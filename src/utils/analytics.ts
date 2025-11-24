@@ -13,11 +13,7 @@ export const initGA = () => {
   if (typeof window === 'undefined') return;
   if (window.gtag) return;
 
-  const script = document.createElement('script');
-  script.async = true;
-  script.src = `https://www.googletagmanager.com/gtag/js?id=${measurementId}`;
-  document.head.appendChild(script);
-
+  // Initialize dataLayer first
   window.dataLayer = window.dataLayer ?? [];
   const dataLayer = window.dataLayer;
   function gtag(...args: any[]) {
@@ -25,7 +21,22 @@ export const initGA = () => {
   }
   window.gtag = gtag;
   gtag('js', new Date());
-  gtag('config', measurementId);
+
+  // Load the script and wait for it to load before calling config
+  const script = document.createElement('script');
+  script.async = true;
+  script.src = `https://www.googletagmanager.com/gtag/js?id=${measurementId}`;
+  
+  script.onload = () => {
+    // Script is loaded, now configure GA
+    gtag('config', measurementId);
+  };
+  
+  script.onerror = () => {
+    console.error('Failed to load Google Analytics script');
+  };
+  
+  document.head.appendChild(script);
 };
 
 export const trackEvent = (
