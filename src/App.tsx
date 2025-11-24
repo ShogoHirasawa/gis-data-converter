@@ -11,7 +11,7 @@ import { ConversionState, UploadedFile, ConversionResult } from './types';
 import { detectInputFormat } from './utils/detectFormat';
 import { detectGeometryType } from './utils/detectGeometryType';
 import { convertFile, getOutputFilename, getOutputMimeType, OutputFormat } from './utils/converter';
-import { initGA } from './utils/analytics';
+import { trackPageView, trackEvent } from './utils/analytics';
 import './App.css';
 
 type PageType = null | 'how-to-use' | 'supported-formats' | 'contact';
@@ -77,12 +77,25 @@ function App() {
 
       setUploadedFile(uploaded);
       setState('format-detection');
+      
+      // Track file upload event
+      trackEvent('file_upload', {
+        file_format: format,
+        file_size: file.size,
+        geometry_type: geometryType || 'unknown',
+      });
     } catch (error) {
       setState('upload-error');
     }
   };
 
   const handleFormatSelect = (formatId: string) => {
+    // Track format selection event
+    trackEvent('format_selected', {
+      input_format: uploadedFile?.format || 'unknown',
+      output_format: formatId,
+    });
+    
     if (formatId === 'pbf') {
       setPendingFormatId(formatId);
       setPbfOptionsDialogOpen(true);
@@ -107,6 +120,13 @@ function App() {
 
   const startConversion = async (formatId: string, pbfOptions?: PbfOptions) => {
     if (!uploadedFile) return;
+
+    // Track conversion start event
+    trackEvent('conversion_start', {
+      input_format: uploadedFile.format || 'unknown',
+      output_format: formatId,
+      file_size: uploadedFile.size,
+    });
 
     setSelectedFormat(formatId);
     setState('converting');
@@ -172,6 +192,14 @@ function App() {
           setTimeout(() => {
             setConversionResult(result);
             setState('completed');
+            
+            // Track conversion complete event
+            trackEvent('conversion_complete', {
+              input_format: uploadedFile.format || 'unknown',
+              output_format: formatId,
+              output_size: result.size,
+              success: true,
+            });
           }, 300);
         } else {
           throw new Error(response.error || 'Conversion failed');
@@ -182,10 +210,24 @@ function App() {
         }
         setProgress(0);
         setState('error');
+        
+        // Track conversion error event
+        trackEvent('conversion_error', {
+          input_format: uploadedFile.format || 'unknown',
+          output_format: formatId,
+          error_message: error instanceof Error ? error.message : 'Unknown error',
+        });
       }
     } catch (error) {
       setProgress(0);
       setState('error');
+      
+      // Track conversion error event
+      trackEvent('conversion_error', {
+        input_format: uploadedFile?.format || 'unknown',
+        output_format: formatId,
+        error_message: error instanceof Error ? error.message : 'Unknown error',
+      });
     }
   };
 
@@ -203,13 +245,20 @@ function App() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
+  // Track initial page view
   useEffect(() => {
-    initGA();
+    trackPageView('/');
   }, []);
 
   useEffect(() => {
     if (currentPage !== null) {
       window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+    
+    // Track page view when page changes
+    if (currentPage !== null) {
+      const path = `/${currentPage}`;
+      trackPageView(path);
     }
   }, [currentPage]);
 
@@ -224,6 +273,12 @@ function App() {
       a.click();
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
+      
+      // Track download event
+      trackEvent('file_download', {
+        file_format: conversionResult.format,
+        file_size: conversionResult.size,
+      });
     }
   }, [state, conversionResult]);
 
