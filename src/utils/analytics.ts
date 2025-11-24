@@ -13,29 +13,22 @@ export const initGA = () => {
   if (typeof window === 'undefined') return;
   if (window.gtag) return;
 
-  // Initialize dataLayer first
-  window.dataLayer = window.dataLayer ?? [];
-  const dataLayer = window.dataLayer;
+  // Initialize dataLayer (Google Analytics standard way)
+  window.dataLayer = window.dataLayer || [];
+  
+  // Define gtag function using arguments (matches Google's official implementation)
   function gtag(...args: any[]) {
-    dataLayer.push(args);
+    window.dataLayer!.push(args);
   }
-  window.gtag = gtag;
+  window.gtag = gtag as any;
+  
   gtag('js', new Date());
+  gtag('config', measurementId);
 
-  // Load the script and wait for it to load before calling config
+  // Load the script (async, so config can be called before it loads)
   const script = document.createElement('script');
   script.async = true;
   script.src = `https://www.googletagmanager.com/gtag/js?id=${measurementId}`;
-  
-  script.onload = () => {
-    // Script is loaded, now configure GA
-    gtag('config', measurementId);
-  };
-  
-  script.onerror = () => {
-    console.error('Failed to load Google Analytics script');
-  };
-  
   document.head.appendChild(script);
 };
 
