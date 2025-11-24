@@ -23,12 +23,21 @@ export const initGA = () => {
   window.gtag = gtag as any;
   
   gtag('js', new Date());
-  gtag('config', measurementId);
 
-  // Load the script (async, so config can be called before it loads)
+  // Load the script
   const script = document.createElement('script');
   script.async = true;
   script.src = `https://www.googletagmanager.com/gtag/js?id=${measurementId}`;
+  
+  script.onload = () => {
+    // Script is loaded, now configure GA (this triggers data collection)
+    gtag('config', measurementId);
+  };
+  
+  script.onerror = () => {
+    console.error('Failed to load Google Analytics script');
+  };
+  
   document.head.appendChild(script);
 };
 
