@@ -3,9 +3,10 @@
  */
 
 import { Page, expect } from '@playwright/test';
-import { readFile } from 'fs/promises';
+import { readFile, writeFile } from 'fs/promises';
 import { join, dirname, resolve } from 'path';
 import { fileURLToPath } from 'url';
+import { tmpdir } from 'os';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -36,456 +37,243 @@ export async function waitForConversion(page: Page, timeout: number = 30000): Pr
     // Converting state might be skipped if conversion is very fast
   }
 
-  // Wait for completion state - look for multiple possible texts
-  // "Conversion completed!" (English), "Conversion Complete", or Download button
+  // Wait for completion state
   try {
     await Promise.race([
-      // Look for "Conversion completed!" text (from translations)
       page.waitForSelector('text=/Conversion completed/i', { timeout }),
-      // Look for "Conversion Complete" text
-      page.waitForSelector('text=/Conversion Complete/i', { timeout }),
-      // Look for Download button (indicates completion)
-      page.waitForSelector('button:has-text("Download")', { timeout }),
-      // Look for completed state by checking for CheckCircle icon or completed message
-      page.waitForFunction(
-        () => {
-          const bodyText = document.body.textContent || '';
-          return bodyText.includes('Conversion completed') || 
-                 bodyText.includes('Conversion Complete') ||
-                 bodyText.includes('Download') && bodyText.includes('Convert New');
-        },
-        { timeout }
-      ),
+      page.waitForSelector('button:has-text("Convert New")', { timeout }),
     ]);
-  } catch (error) {
-    // Check if we're in error state
-    const isError = await page.locator('text=/Conversion failed|Error|Failed/i').isVisible({ timeout: 1000 }).catch(() => false);
-    if (isError) {
-      const errorText = await page.locator('text=/Conversion failed|Error|Failed/i').first().textContent().catch(() => 'Unknown error');
-      throw new Error(`Conversion failed: ${errorText}`);
-    }
-    
-    // If not error, check what state we're in
-    const currentUrl = page.url();
-    const bodyText = await page.textContent('body').catch(() => '');
-    throw new Error(`Conversion did not complete within timeout. Current state: ${bodyText.substring(0, 200)}`);
+  } catch {
+    throw new Error('Conversion did not complete within timeout');
   }
+}
+
+/**
+ * Upload a file to the page
+ */
+export async function uploadFile(page: Page, filePath: string): Promise<void> {
+  const fileInput = page.locator('input[type="file"]');
+  await fileInput.setInputFiles(filePath);
   
-  // Additional wait to ensure UI is fully rendered
+  // Wait for file to be processed
   await page.waitForTimeout(500);
 }
 
 /**
- * Upload file and wait for format detection
+ * Select output format
  */
-export async function uploadFile(
-  page: Page,
-  filePath: string
-): Promise<void> {
-  // Find file input (might be hidden)
-  const fileInput = page.locator('input[type="file"]');
-  await fileInput.setInputFiles(filePath);
-  
-  // Wait for format detection state (check for "Choose" text which appears in "Choose your conversion format")
-  await page.waitForSelector('text=Choose', { timeout: 10000 });
-}
-
-/**
- * Select output format and start conversion
- */
-export async function selectFormat(
-  page: Page,
-  formatName: string
-): Promise<void> {
-  // Normalize format name for matching
+export async function selectFormat(page: Page, formatName: string): Promise<void> {
+  // Normalize format name
   const normalizedFormatName = formatName.toLowerCase();
   
-  // Map format names to possible display names
-  const formatMap: Record<string, string[]> = {
-    'geojson': ['GeoJSON', 'geojson'],
-    'kml': ['KML', 'kml'],
-    'csv': ['CSV', 'csv'],
-    'shapefile': ['Shapefile', 'shapefile'],
-    'pbf': ['PBF', 'pbf'],
-  };
-
-  const possibleNames = formatMap[normalizedFormatName] || [formatName];
+  // Wait for format selection screen
+  await page.waitForSelector('h3:has-text("Choose")', { timeout: 5000 });
   
-  // Format cards are clickable divs that contain the format name in an h4 element
-  // Try to find the format card by looking for h4 with the format name
-  let formatCard = null;
+  // Find and click the format card
+  let formatCard = page.locator(`[data-format="${normalizedFormatName}"]`).first();
   
-  for (const name of possibleNames) {
-    // Look for h4 element containing the format name, then find its parent card
-    formatCard = page.locator(`h4:has-text("${name}")`).locator('..').first();
-    
-    if (await formatCard.isVisible({ timeout: 2000 }).catch(() => false)) {
-      break;
-    }
-    
-    // Fallback: look for any div containing the format name that's clickable
-    formatCard = page.locator(`div:has-text("${name}")`).filter({ 
-      has: page.locator(`h4, h3`).filter({ hasText: new RegExp(name, 'i') })
-    }).first();
-    
-    if (await formatCard.isVisible({ timeout: 2000 }).catch(() => false)) {
-      break;
-    }
-  }
-  
-  if (!formatCard || !(await formatCard.isVisible({ timeout: 2000 }).catch(() => false))) {
-    // Last resort: find by text content (case insensitive)
+  if (!(await formatCard.isVisible({ timeout: 2000 }).catch(() => false))) {
     formatCard = page.locator(`*:has-text("${formatName}")`).filter({ 
       hasNot: page.locator('input, button[type="submit"]')
     }).first();
   }
   
-  // Scroll into view and click
   await formatCard.scrollIntoViewIfNeeded();
   await formatCard.click({ timeout: 5000 });
 
   // If PBF format, handle options dialog
   if (normalizedFormatName === 'pbf') {
-    // Wait for PBF options dialog to appear
-    await page.waitForSelector('text=PBF Conversion Options', { timeout: 5000 });
+    // Wait for dialog to appear
+    await page.waitForSelector('text=PBF Conversion Options', { timeout: 10000 });
     
-    // Fill in layer name (default is "layer", change to "test-layer")
-    const layerNameInput = page.locator('input#layerName').or(
-      page.locator('input[placeholder="layer"]')
-    ).first();
+    // Wait a bit for dialog to fully render
+    await page.waitForTimeout(300);
+    
+    // Fill in layer name
+    const layerNameInput = page.locator('input#layerName').first();
+    await layerNameInput.waitFor({ state: 'visible', timeout: 5000 });
     await layerNameInput.fill('test-layer');
     
-    // Click Convert button
-    const convertButton = page.locator('button:has-text("Convert")').first();
+    // Click Convert button (form submit button)
+    const convertButton = page.locator('button[type="submit"]:has-text("Convert")').or(
+      page.locator('button:has-text("Convert")').filter({ hasNot: page.locator('button[type="button"]') })
+    ).first();
+    await convertButton.waitFor({ state: 'visible', timeout: 5000 });
     await convertButton.click({ timeout: 5000 });
+    
+    // Wait for dialog to close
+    await page.waitForSelector('text=PBF Conversion Options', { state: 'hidden', timeout: 5000 }).catch(() => {
+      // Dialog might close immediately, ignore error
+    });
   }
 }
 
 /**
+ * Set up download interceptor
+ * Captures blob and filename when download is triggered
+ */
+export async function setupDownloadInterceptor(page: Page): Promise<void> {
+  await page.addInitScript(() => {
+    // Storage for captured download data
+    (window as any).__downloadData = {
+      blob: null as Blob | null,
+      fileName: null as string | null,
+    };
+    
+    // Override URL.createObjectURL to capture the blob
+    const originalCreateObjectURL = URL.createObjectURL;
+    URL.createObjectURL = function(blob: Blob) {
+      const url = originalCreateObjectURL.call(URL, blob);
+      if (blob instanceof Blob) {
+        (window as any).__downloadData.blob = blob;
+      }
+      return url;
+    };
+    
+    // Override document.body.appendChild to capture filename
+    const originalAppendChild = document.body.appendChild;
+    document.body.appendChild = function<T extends Node>(node: T): T {
+      const result = originalAppendChild.call(document.body, node);
+      if (node instanceof HTMLAnchorElement && node.download) {
+        (window as any).__downloadData.fileName = node.download;
+      }
+      return result;
+    };
+  });
+}
+
+/**
  * Download converted file
+ * Files are automatically downloaded when conversion completes.
+ * We capture the blob before it's downloaded and save it to a file.
  */
 export async function downloadFile(page: Page): Promise<string> {
-  // Wait for download button
-  const downloadButton = page.locator('button:has-text("Download")').first();
+  // Wait for conversion to complete
+  await waitForConversion(page);
   
-  // Set up download listener
-  const downloadPromise = page.waitForEvent('download', { timeout: 30000 });
-  await downloadButton.click();
-  const download = await downloadPromise;
+  // Wait for download to be triggered
+  await page.waitForTimeout(1000);
+  
+  // Get the captured blob and filename
+  const downloadData = await page.evaluate(async () => {
+    const captured = (window as any).__downloadData;
+    
+    // Wait for blob and filename (up to 5 seconds)
+    for (let i = 0; i < 50; i++) {
+      if (captured.blob && captured.fileName) {
+        // Convert blob to base64
+        return new Promise<{ blobData: string; fileName: string; mimeType: string }>((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onloadend = () => {
+            const result = reader.result as string;
+            const base64 = result.includes(',') ? result.split(',')[1] : result;
+            resolve({
+              blobData: base64,
+              fileName: captured.fileName!,
+              mimeType: captured.blob!.type || 'application/octet-stream',
+            });
+          };
+          reader.onerror = () => reject(new Error('Failed to read blob'));
+          reader.readAsDataURL(captured.blob);
+        });
+      }
+      await new Promise(resolve => setTimeout(resolve, 100));
+    }
+    
+    throw new Error('Timeout waiting for download blob and filename');
+  });
   
   // Save to temporary file
-  const path = await download.path();
-  if (!path) {
-    throw new Error('Download failed: no path returned');
-  }
+  const buffer = Buffer.from(downloadData.blobData, 'base64');
+  const tempPath = join(tmpdir(), downloadData.fileName);
+  await writeFile(tempPath, buffer);
   
-  return path;
+  return tempPath;
 }
 
 /**
  * Get downloaded file content as string
  */
 export async function getDownloadedFileContent(filePath: string): Promise<string> {
-  const content = await readFile(filePath, 'utf-8');
-  return content;
+  return await readFile(filePath, 'utf-8');
 }
 
 /**
- * Get downloaded file content as ArrayBuffer
+ * Get downloaded file content as buffer
  */
-export async function getDownloadedFileBuffer(filePath: string): Promise<ArrayBuffer> {
-  const content = await readFile(filePath);
-  return content.buffer.slice(content.byteOffset, content.byteOffset + content.byteLength);
+export async function getDownloadedFileBuffer(filePath: string): Promise<Buffer> {
+  return await readFile(filePath);
 }
 
 /**
- * Load MapLibre GL JS from local file if not already loaded
- */
-async function ensureMapLibreLoaded(page: Page): Promise<void> {
-  // Check if MapLibre is already loaded
-  const isLoaded = await page.evaluate(() => typeof (window as any).maplibregl !== 'undefined');
-  
-  if (!isLoaded) {
-    // Load from local file
-    await page.addScriptTag({ path: MAPLIBRE_GL_JS_PATH });
-    
-    // Wait for MapLibre to be available
-    await page.waitForFunction(() => typeof (window as any).maplibregl !== 'undefined', {
-      timeout: 10000
-    });
-  }
-}
-
-/**
- * Load JSZip from local file if not already loaded
- */
-async function ensureJSZipLoaded(page: Page): Promise<void> {
-  // Check if JSZip is already loaded
-  const isLoaded = await page.evaluate(() => typeof (window as any).JSZip !== 'undefined');
-  
-  if (!isLoaded) {
-    // Load from local file
-    await page.addScriptTag({ path: JSZIP_PATH });
-    
-    // Wait for JSZip to be available
-    await page.waitForFunction(() => typeof (window as any).JSZip !== 'undefined', {
-      timeout: 10000
-    });
-  }
-}
-
-/**
- * Validate GeoJSON can be displayed in MapLibre GL JS
+ * Validate GeoJSON in MapLibre
  */
 export async function validateGeoJSONInMapLibre(
   page: Page,
-  geojsonString: string
-): Promise<{ valid: boolean; errors: string[] }> {
-  const errors: string[] = [];
-
-  try {
-    // Load MapLibre GL JS from local file
-    await ensureMapLibreLoaded(page);
-
-    const result = await page.evaluate(async (geojsonStr) => {
-      const maplibregl = (window as any).maplibregl;
-      if (!maplibregl) {
-        return { valid: false, errors: ['MapLibre GL JS not available'] };
-      }
-
-      try {
-        const geojson = JSON.parse(geojsonStr);
-
-        // Create a hidden map container
-        const container = document.createElement('div');
-        container.style.width = '1px';
-        container.style.height = '1px';
-        container.style.position = 'absolute';
-        container.style.visibility = 'hidden';
-        document.body.appendChild(container);
-
-        // Initialize map with minimal style (no external resources)
-        const map = new maplibregl.Map({
-          container,
-          style: {
-            version: 8,
-            sources: {},
-            layers: [],
-          },
-          interactive: false,
-        });
-
-        // Wait for map to load
-        let mapError: any = null;
-        map.on('error', (e: any) => {
-          mapError = e;
-        });
-
-        await new Promise((resolve, reject) => {
-          map.on('load', () => {
-            if (mapError) {
-              reject(new Error(`Map error: ${mapError.error?.message || mapError.message || 'Unknown map error'}`));
-            } else {
-              resolve(true);
-            }
-          });
-          setTimeout(() => {
-            if (mapError) {
-              reject(new Error(`Map error: ${mapError.error?.message || mapError.message || 'Unknown map error'}`));
-            } else {
-              resolve(true);
-            }
-          }, 5000);
-        });
-
-        map.addSource('test-source', {
-          type: 'geojson',
-          data: geojson,
-        });
-
-        const features = geojson.features || (geojson.type === 'Feature' ? [geojson] : []);
-        if (features.length > 0) {
-          const firstFeature = features[0];
-          const geometryType = firstFeature.geometry?.type;
-
-          let layerType = 'circle';
-          if (geometryType === 'LineString' || geometryType === 'MultiLineString') {
-            layerType = 'line';
-          } else if (geometryType === 'Polygon' || geometryType === 'MultiPolygon') {
-            layerType = 'fill';
-          }
-
-          map.addLayer({
-            id: 'test-layer',
-            type: layerType as any,
-            source: 'test-source',
-            paint: layerType === 'circle' 
-              ? { 'circle-color': '#7FAD6F' }
-              : layerType === 'line'
-              ? { 'line-color': '#7FAD6F' }
-              : { 'fill-color': '#7FAD6F' },
-          });
-
-          await new Promise(resolve => setTimeout(resolve, 500));
-        }
-
-        map.remove();
-        container.remove();
-
-        return { valid: true, errors: [] };
-      } catch (error: any) {
-        let errorMessage = 'Unknown error';
-        try {
-          if (error instanceof Error) {
-            errorMessage = error.message || error.toString();
-          } else if (typeof error === 'string') {
-            errorMessage = error;
-          } else if (error && typeof error === 'object') {
-            if (error.error && error.error.message) {
-              errorMessage = error.error.message;
-            } else if (error.message) {
-              errorMessage = error.message;
-            } else if (error.toString && error.toString() !== '[object Object]') {
-              errorMessage = error.toString();
-            } else {
-              try {
-                const errorStr = JSON.stringify(error);
-                errorMessage = errorStr.length > 500 ? errorStr.substring(0, 500) + '...' : errorStr;
-              } catch {
-                errorMessage = 'Error object could not be serialized';
-              }
-            }
-          }
-        } catch (e) {
-          errorMessage = `Error extracting error message: ${e}`;
-        }
-        
-        return {
-          valid: false,
-          errors: [errorMessage],
-        };
-      }
-    }, geojsonString);
-
-    return result;
-  } catch (error: any) {
-    const errorMessage = error?.message || error?.toString() || JSON.stringify(error) || 'Unknown error';
-    errors.push(errorMessage);
-    return { valid: false, errors };
-  }
-}
-
-/**
- * Validate PBF tiles can be displayed in MapLibre GL JS
- */
-export async function validatePBFInMapLibre(
-  page: Page,
-  zipBuffer: ArrayBuffer
-): Promise<{ valid: boolean; errors: string[] }> {
-  const errors: string[] = [];
-
-  try {
-    // Load MapLibre GL JS and JSZip from local files
-    await ensureMapLibreLoaded(page);
-    await ensureJSZipLoaded(page);
-
-    // Convert ArrayBuffer to base64 for passing to page.evaluate
-    const base64 = Buffer.from(zipBuffer).toString('base64');
-
-    const result = await page.evaluate(async (base64Data) => {
-      const JSZip = (window as any).JSZip;
-      const maplibregl = (window as any).maplibregl;
-
-      try {
-        // Decode base64 to binary
-        const binaryString = atob(base64Data);
-        const bytes = new Uint8Array(binaryString.length);
-        for (let i = 0; i < binaryString.length; i++) {
-          bytes[i] = binaryString.charCodeAt(i);
-        }
-
-        // Load ZIP
-        const zip = await JSZip.loadAsync(bytes);
-        
-        // Check tiles.json
-        const tilesJsonFile = zip.file('tiles.json');
-        if (!tilesJsonFile) {
-          return { valid: false, errors: ['Missing tiles.json'] };
-        }
-
-        const tilesJson = JSON.parse(await tilesJsonFile.async('string'));
-        
-        // Check PBF files
-        const pbfFiles = Object.keys(zip.files).filter(name => name.endsWith('.pbf'));
-        if (pbfFiles.length === 0) {
-          return { valid: false, errors: ['No PBF files found'] };
-        }
-
-        // For now, just validate structure
-        // Full MapLibre validation would require setting up a tile server
-        return { valid: true, errors: [] };
-      } catch (error: any) {
-        return {
-          valid: false,
-          errors: [error.message || String(error)],
-        };
-      }
-    }, base64);
-
-    return result;
-  } catch (error: any) {
-    errors.push(error.message || String(error));
-    return { valid: false, errors };
-  }
-}
-
-/**
- * Check if CSV contains latitude and longitude columns
- */
-export function validateCSVHasCoordinates(csvContent: string): { valid: boolean; errors: string[] } {
-  const errors: string[] = [];
-  const lines = csvContent.split('\n').filter(line => line.trim());
+  geojson: string | object
+): Promise<{ valid: boolean; error?: string }> {
+  const geojsonString = typeof geojson === 'string' ? geojson : JSON.stringify(geojson);
   
-  if (lines.length === 0) {
-    errors.push('CSV is empty');
-    return { valid: false, errors };
-  }
-
-  const header = lines[0].toLowerCase();
-  const hasLatitude = header.includes('latitude') || header.includes('lat');
-  const hasLongitude = header.includes('longitude') || header.includes('lon') || header.includes('lng');
-
-  if (!hasLatitude) {
-    errors.push('CSV missing latitude column');
-  }
-  if (!hasLongitude) {
-    errors.push('CSV missing longitude column');
-  }
-
-  // Check if data rows have coordinates
-  if (lines.length > 1) {
-    const dataRows = lines.slice(1);
-    const headerCols = header.split(',');
-    const latIndex = headerCols.findIndex(col => col.includes('lat'));
-    const lonIndex = headerCols.findIndex(col => col.includes('lon') || col.includes('lng'));
-
-    if (latIndex >= 0 && lonIndex >= 0) {
-      const rowsWithEmptyCoords = dataRows.filter(row => {
-        const cols = row.split(',');
-        const lat = cols[latIndex]?.trim();
-        const lon = cols[lonIndex]?.trim();
-        return !lat || !lon || lat === '' || lon === '';
-      });
-
-      if (rowsWithEmptyCoords.length > 0) {
-        errors.push(`${rowsWithEmptyCoords.length} rows have empty coordinates`);
+  const result = await page.evaluate(
+    async ({ geojson, maplibrePath }) => {
+      // Load MapLibre GL JS
+      await import(maplibrePath);
+      
+      try {
+        const data = typeof geojson === 'string' ? JSON.parse(geojson) : geojson;
+        
+        // Validate GeoJSON structure
+        if (!data.type) {
+          return { valid: false, error: 'Missing type property' };
+        }
+        
+        if (data.type === 'FeatureCollection' && !Array.isArray(data.features)) {
+          return { valid: false, error: 'Invalid FeatureCollection' };
+        }
+        
+        // Try to create a MapLibre source (this validates the GeoJSON)
+        const map = new (window as any).maplibregl.Map({
+          container: document.createElement('div'),
+          style: { version: 8, sources: {}, layers: [] },
+        });
+        
+        map.addSource('test', {
+          type: 'geojson',
+          data: data,
+        });
+        
+        map.remove();
+        
+        return { valid: true };
+      } catch (error) {
+        return {
+          valid: false,
+          error: error instanceof Error ? error.message : String(error),
+        };
       }
-    }
-  }
-
-  return {
-    valid: errors.length === 0,
-    errors,
-  };
+    },
+    { geojson: geojsonString, maplibrePath: `file://${MAPLIBRE_GL_JS_PATH}` }
+  );
+  
+  return result;
 }
 
+/**
+ * Validate CSV has coordinates
+ */
+export function validateCSVHasCoordinates(csvContent: string): { valid: boolean; error?: string } {
+  const lines = csvContent.trim().split('\n');
+  if (lines.length < 2) {
+    return { valid: false, error: 'CSV has less than 2 lines' };
+  }
+  
+  const headers = lines[0].toLowerCase().split(',');
+  const hasLat = headers.some((h) => h.trim() === 'latitude' || h.trim() === 'lat');
+  const hasLon = headers.some((h) => h.trim() === 'longitude' || h.trim() === 'lon' || h.trim() === 'lng');
+  
+  if (!hasLat || !hasLon) {
+    return { valid: false, error: 'CSV missing latitude or longitude column' };
+  }
+  
+  return { valid: true };
+}

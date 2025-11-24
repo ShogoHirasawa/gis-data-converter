@@ -1,7 +1,7 @@
 import React from 'react';
 import { useLanguage } from '../i18n/LanguageContext';
 
-type PageType = 'how-to-use' | 'supported-formats';
+type PageType = 'how-to-use' | 'supported-formats' | 'contact';
 
 interface FooterProps {
   onPageChange: (page: PageType) => void;
@@ -40,6 +40,14 @@ const Footer: React.FC<FooterProps> = ({ onPageChange }) => {
               style={{ color: '#5A6A58' }}
             >
               {t.supportedFormatsLink}
+            </a>
+            <a
+              href="#"
+              onClick={(e) => handleLinkClick(e, 'contact')}
+              className="text-base font-medium hover:text-[#7FAD6F] transition cursor-pointer"
+              style={{ color: '#5A6A58' }}
+            >
+              {t.contact}
             </a>
           </div>
           <div className="text-base" style={{ color: '#8A9A88' }}>

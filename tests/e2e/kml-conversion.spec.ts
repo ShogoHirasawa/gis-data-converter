@@ -13,6 +13,7 @@ import {
   getDownloadedFileBuffer,
   validateGeoJSONInMapLibre,
   validateCSVHasCoordinates,
+  setupDownloadInterceptor,
 } from './helpers';
 import { kmlToGeoJSON } from '../../src/utils/conversions/kml';
 import { csvToGeoJSON } from '../../src/utils/conversions/csv';
@@ -24,6 +25,10 @@ test.describe('KML Conversion E2E', () => {
 
   geometries.forEach((geometry) => {
     test.describe(`${geometry} KML`, () => {
+      test.beforeEach(async ({ page }) => {
+        await setupDownloadInterceptor(page);
+      });
+
       test('should convert to GeoJSON and be displayable in MapLibre', async ({ page }) => {
         await page.goto('/');
 
@@ -35,7 +40,6 @@ test.describe('KML Conversion E2E', () => {
         const downloadedPath = await downloadFile(page);
         const content = await getDownloadedFileContent(downloadedPath);
 
-        // Validate GeoJSON structure
         const geojson = JSON.parse(content);
         expect(geojson.type).toBe('FeatureCollection');
         expect(geojson.features.length).toBeGreaterThan(0);
@@ -93,7 +97,8 @@ test.describe('KML Conversion E2E', () => {
         const downloadedPath = await downloadFile(page);
         const zipBuffer = await getDownloadedFileBuffer(downloadedPath);
 
-        const geojson = await shapefileToGeoJSON(zipBuffer);
+        const arrayBuffer = zipBuffer.buffer.slice(zipBuffer.byteOffset, zipBuffer.byteOffset + zipBuffer.byteLength) as ArrayBuffer;
+        const geojson = await shapefileToGeoJSON(arrayBuffer);
         const geojsonString = typeof geojson === 'string' ? geojson : JSON.stringify(geojson);
 
         const mapLibreValidation = await validateGeoJSONInMapLibre(page, geojsonString);
@@ -111,7 +116,6 @@ test.describe('KML Conversion E2E', () => {
         const downloadedPath = await downloadFile(page);
         const zipBuffer = await getDownloadedFileBuffer(downloadedPath);
 
-        // Validate PBF structure
         const zip = await JSZip.loadAsync(zipBuffer);
         
         const tilesJsonFile = zip.file('tiles.json');
@@ -128,4 +132,3 @@ test.describe('KML Conversion E2E', () => {
     });
   });
 });
-
