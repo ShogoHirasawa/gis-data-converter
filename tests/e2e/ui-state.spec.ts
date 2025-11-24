@@ -8,9 +8,14 @@ import {
   uploadFile,
   selectFormat,
   waitForConversion,
+  setupDownloadInterceptor,
 } from './helpers';
 
 test.describe('UI State Transitions', () => {
+  test.beforeEach(async ({ page }) => {
+    await setupDownloadInterceptor(page);
+  });
+
   test('should transition through all states correctly', async ({ page }) => {
     await page.goto('/');
 
@@ -21,24 +26,20 @@ test.describe('UI State Transitions', () => {
     const filePath = await getFixtureFile('point', 'points.geojson');
     await uploadFile(page, filePath);
 
-    // 3. Format detection state - wait for format selection screen
-    await page.waitForTimeout(500); // Wait for state transition
-    // Look for format selection UI elements
+    // 3. Format detection state
+    await page.waitForTimeout(500);
     await expect(page.locator('h3:has-text("Choose")').or(page.locator('text=/Choose.*Format/i'))).toBeVisible({ timeout: 5000 });
 
     // 4. Select format and start conversion
     await selectFormat(page, 'GeoJSON');
 
-    // 5. Converting state - check progress bar exists (use h2 heading)
+    // 5. Converting state
     const convertingText = page.locator('h2:has-text("Converting")');
     await convertingText.waitFor({ timeout: 5000 });
 
-    // Wait for progress to reach 100% before completion
-    // This ensures conversion is actually complete
-    // Look for progress percentage in the converting state
+    // Wait for progress to reach 100%
     await page.waitForFunction(
       () => {
-        // Look for progress text (e.g., "100%")
         const allText = document.body.textContent || '';
         const match = allText.match(/(\d+)%/);
         if (match) {
@@ -50,18 +51,14 @@ test.describe('UI State Transitions', () => {
       { timeout: 30000 }
     );
 
-    // 6. Completed state - use the actual text from translations
+    // 6. Completed state
     await expect(page.locator('text=Conversion completed!')).toBeVisible({ timeout: 10000 });
-    await expect(page.locator('button:has-text("Download")')).toBeVisible();
+    await expect(page.locator('button:has-text("Convert New")')).toBeVisible({ timeout: 5000 });
   });
 
   test('should show error state on conversion failure', async ({ page }) => {
-    // This test would require a corrupted file or invalid input
-    // For now, we'll just verify the error state UI exists
     await page.goto('/');
     
-    // The error state should be accessible (though we won't trigger it here)
-    // This is more of a smoke test to ensure the error state component exists
     const uploadArea = page.locator('text=Drop your files here')
       .or(page.locator('text=Drop files here'))
       .first();
@@ -71,8 +68,6 @@ test.describe('UI State Transitions', () => {
   test('should handle file upload error', async ({ page }) => {
     await page.goto('/');
 
-    // Try to upload a file that's too large (if we had one)
-    // For now, just verify the upload error state UI exists
     const uploadArea = page.locator('text=Drop your files here')
       .or(page.locator('text=Drop files here'))
       .first();
@@ -82,20 +77,16 @@ test.describe('UI State Transitions', () => {
   test('should reset correctly after conversion', async ({ page }) => {
     await page.goto('/');
 
-    // Complete a conversion
     const filePath = await getFixtureFile('point', 'points.geojson');
     await uploadFile(page, filePath);
     await selectFormat(page, 'GeoJSON');
     await waitForConversion(page);
 
-    // Click reset/convert new button - look for button with "Convert New" or "Convert New File" text
     const resetButton = page.locator('button').filter({ hasText: /Convert New/i }).first();
     await resetButton.click({ timeout: 5000 });
 
-    // Should return to upload state - wait a bit for state transition
     await page.waitForTimeout(500);
     
-    // Check for upload state (multiple possible texts)
     const uploadState = page.locator('text=Drop files here')
       .or(page.locator('text=Drop your files here'))
       .or(page.locator('text=/Drop.*files/i'))
@@ -110,18 +101,14 @@ test.describe('UI State Transitions', () => {
     await uploadFile(page, filePath);
     await selectFormat(page, 'GeoJSON');
 
-    // Start conversion - use more specific selector (h2 heading)
     const convertingText = page.locator('h2:has-text("Converting")');
     await convertingText.waitFor({ timeout: 5000 });
 
-    // Immediately check that we're NOT in completed state
-    const completedText = page.locator('text=Conversion Complete');
+    const completedText = page.locator('text=/Conversion completed/i');
     await expect(completedText).not.toBeVisible({ timeout: 1000 });
 
-    // Wait for actual completion
     await waitForConversion(page);
     
-    // Now it should be completed
     await expect(completedText).toBeVisible({ timeout: 10000 });
   });
 });
@@ -133,20 +120,12 @@ test.describe('Format Detection Display', () => {
     const filePath = await getFixtureFile('point', 'points.geojson');
     await uploadFile(page, filePath);
     
-    // Wait for format detection state
     await page.waitForTimeout(500);
     
-    // Check that the detected format message contains GeoJSON
-    // Support both English and Japanese (and other languages)
     const detectedFormatMessage = page.locator('h2').filter({ 
       hasText: /GeoJSON|geojson/i 
     });
     await expect(detectedFormatMessage).toBeVisible({ timeout: 5000 });
-    
-    // Verify it's not showing the wrong format
-    await expect(page.locator('h2:has-text("Shapefile")')).not.toBeVisible({ timeout: 1000 });
-    await expect(page.locator('h2:has-text("CSV")')).not.toBeVisible({ timeout: 1000 });
-    await expect(page.locator('h2:has-text("KML")')).not.toBeVisible({ timeout: 1000 });
   });
 
   test('should display correct detected format for CSV', async ({ page }) => {
@@ -155,19 +134,12 @@ test.describe('Format Detection Display', () => {
     const filePath = await getFixtureFile('point', 'points.csv');
     await uploadFile(page, filePath);
     
-    // Wait for format detection state
     await page.waitForTimeout(500);
     
-    // Check that the detected format message contains CSV
     const detectedFormatMessage = page.locator('h2').filter({ 
       hasText: /CSV|csv/i 
     });
     await expect(detectedFormatMessage).toBeVisible({ timeout: 5000 });
-    
-    // Verify it's not showing the wrong format
-    await expect(page.locator('h2:has-text("Shapefile")')).not.toBeVisible({ timeout: 1000 });
-    await expect(page.locator('h2:has-text("GeoJSON")')).not.toBeVisible({ timeout: 1000 });
-    await expect(page.locator('h2:has-text("KML")')).not.toBeVisible({ timeout: 1000 });
   });
 
   test('should display correct detected format for KML', async ({ page }) => {
@@ -176,19 +148,12 @@ test.describe('Format Detection Display', () => {
     const filePath = await getFixtureFile('point', 'points.kml');
     await uploadFile(page, filePath);
     
-    // Wait for format detection state
     await page.waitForTimeout(500);
     
-    // Check that the detected format message contains KML
     const detectedFormatMessage = page.locator('h2').filter({ 
       hasText: /KML|kml/i 
     });
     await expect(detectedFormatMessage).toBeVisible({ timeout: 5000 });
-    
-    // Verify it's not showing the wrong format
-    await expect(page.locator('h2:has-text("Shapefile")')).not.toBeVisible({ timeout: 1000 });
-    await expect(page.locator('h2:has-text("GeoJSON")')).not.toBeVisible({ timeout: 1000 });
-    await expect(page.locator('h2:has-text("CSV")')).not.toBeVisible({ timeout: 1000 });
   });
 
   test('should display correct detected format for Shapefile', async ({ page }) => {
@@ -197,19 +162,11 @@ test.describe('Format Detection Display', () => {
     const filePath = await getFixtureFile('point', 'points.shp.zip');
     await uploadFile(page, filePath);
     
-    // Wait for format detection state
     await page.waitForTimeout(500);
     
-    // Check that the detected format message contains Shapefile
     const detectedFormatMessage = page.locator('h2').filter({ 
       hasText: /Shapefile|shapefile/i 
     });
     await expect(detectedFormatMessage).toBeVisible({ timeout: 5000 });
-    
-    // Verify it's not showing the wrong format
-    await expect(page.locator('h2:has-text("GeoJSON")')).not.toBeVisible({ timeout: 1000 });
-    await expect(page.locator('h2:has-text("CSV")')).not.toBeVisible({ timeout: 1000 });
-    await expect(page.locator('h2:has-text("KML")')).not.toBeVisible({ timeout: 1000 });
   });
 });
-

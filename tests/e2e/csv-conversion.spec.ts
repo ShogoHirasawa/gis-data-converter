@@ -13,12 +13,17 @@ import {
   getDownloadedFileBuffer,
   validateGeoJSONInMapLibre,
   validateCSVHasCoordinates,
+  setupDownloadInterceptor,
 } from './helpers';
 import { csvToGeoJSON } from '../../src/utils/conversions/csv';
 import { kmlToGeoJSON } from '../../src/utils/conversions/kml';
 import { shapefileToGeoJSON } from '../../src/utils/conversions/shapefile';
 
 test.describe('CSV Conversion E2E', () => {
+  test.beforeEach(async ({ page }) => {
+    await setupDownloadInterceptor(page);
+  });
+
   test('should convert point CSV to GeoJSON and be displayable in MapLibre', async ({ page }) => {
     await page.goto('/');
 
@@ -85,7 +90,8 @@ test.describe('CSV Conversion E2E', () => {
     const downloadedPath = await downloadFile(page);
     const zipBuffer = await getDownloadedFileBuffer(downloadedPath);
 
-    const geojson = await shapefileToGeoJSON(zipBuffer);
+    const arrayBuffer = zipBuffer.buffer.slice(zipBuffer.byteOffset, zipBuffer.byteOffset + zipBuffer.byteLength) as ArrayBuffer;
+    const geojson = await shapefileToGeoJSON(arrayBuffer);
     const geojsonString = typeof geojson === 'string' ? geojson : JSON.stringify(geojson);
 
     const mapLibreValidation = await validateGeoJSONInMapLibre(page, geojsonString);
@@ -115,4 +121,3 @@ test.describe('CSV Conversion E2E', () => {
     }
   });
 });
-
