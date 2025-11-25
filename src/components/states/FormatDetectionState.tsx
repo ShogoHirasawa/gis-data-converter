@@ -43,12 +43,6 @@ const FormatDetectionState: React.FC<FormatDetectionStateProps> = ({
         icon: 'map-pin',
       },
       {
-        id: 'csv',
-        name: t.csvTitle,
-        description: t.csvDesc,
-        icon: 'table',
-      },
-      {
         id: 'pbf',
         name: t.pbfTitle,
         description: t.pbfDesc,
@@ -56,15 +50,24 @@ const FormatDetectionState: React.FC<FormatDetectionStateProps> = ({
       },
     ];
 
-    // Add Shapefile option only if geometry type is point
+    // Add Shapefile and CSV options only if geometry type is point
     // Note: While the Shapefile format supports points, lines, and polygons,
     // we currently only support exporting point data as Shapefile (see src/utils/conversions/shapefile.ts).
+    // CSV format only supports point geometry (coordinates as latitude/longitude columns).
     if (uploadedFile.geometryType === 'point') {
       baseOptions.unshift({
         id: 'shapefile',
         name: 'Shapefile',
         description: 'Standard GIS format with multiple files (ZIP)',
         icon: 'archive',
+      });
+      
+      // Add CSV option only for point geometry
+      baseOptions.push({
+        id: 'csv',
+        name: t.csvTitle,
+        description: t.csvDesc,
+        icon: 'table',
       });
     }
 
