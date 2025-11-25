@@ -1,1 +1,57 @@
-{"type":"FeatureCollection","features":[{"type":"Feature","properties":{"id":"001","name":"test001","description":"hogehoge"},"geometry":{"coordinates":[139.53909286397084,35.74123390116384],"type":"Point"},"id":0},{"type":"Feature","properties":{"id":"002","name":"test002","description":"hogehoge"},"geometry":{"coordinates":[139.858985724594,35.90362837951173],"type":"Point"},"id":1},{"type":"Feature","properties":{"id":"003","name":"test003","description":"hogehoge"},"geometry":{"coordinates":[140.24285715733976,35.75026453029008],"type":"Point"},"id":2},{"type":"Feature","properties":{"id":"004","name":"004","description":"hogehoge"},"geometry":{"coordinates":[139.8784574639369,35.58076985943853],"type":"Point"},"id":3}]}
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "001",
+        "name": "test001",
+        "description": "hogehoge"
+      },
+      "geometry": {
+        "coordinates": [139.53909286397084, 35.74123390116384],
+        "type": "Point"
+      },
+      "id": 0
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "002",
+        "name": "test002",
+        "description": "hogehoge"
+      },
+      "geometry": {
+        "coordinates": [139.858985724594, 35.90362837951173],
+        "type": "Point"
+      },
+      "id": 1
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "003",
+        "name": "test003",
+        "description": "hogehoge"
+      },
+      "geometry": {
+        "coordinates": [140.24285715733976, 35.75026453029008],
+        "type": "Point"
+      },
+      "id": 2
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "004",
+        "name": "test004",
+        "description": "hogehoge"
+      },
+      "geometry": {
+        "coordinates": [139.8784574639369, 35.58076985943853],
+        "type": "Point"
+      },
+      "id": 3
+    }
+  ]
+}

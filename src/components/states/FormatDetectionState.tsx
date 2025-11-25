@@ -43,12 +43,6 @@ const FormatDetectionState: React.FC<FormatDetectionStateProps> = ({
         icon: 'map-pin',
       },
       {
-        id: 'csv',
-        name: t.csvTitle,
-        description: t.csvDesc,
-        icon: 'table',
-      },
-      {
         id: 'pbf',
         name: t.pbfTitle,
         description: t.pbfDesc,
@@ -56,15 +50,25 @@ const FormatDetectionState: React.FC<FormatDetectionStateProps> = ({
       },
     ];
 
-    // Add Shapefile option only if geometry type is point
-    // Note: While the Shapefile format supports points, lines, and polygons,
-    // we currently only support exporting point data as Shapefile (see src/utils/conversions/shapefile.ts).
-    if (uploadedFile.geometryType === 'point') {
+    // Add Shapefile option only if input format is not GeoJSON or KML
+    // Shapefile conversion is not available for GeoJSON and KML input formats
+    if (uploadedFile.format !== 'geojson' && uploadedFile.format !== 'kml') {
       baseOptions.unshift({
         id: 'shapefile',
         name: 'Shapefile',
         description: 'Standard GIS format with multiple files (ZIP)',
         icon: 'archive',
+      });
+    }
+
+    // Add CSV option only if geometry type is point
+    // CSV format only supports point geometry (coordinates as latitude/longitude columns).
+    if (uploadedFile.geometryType === 'point') {
+      baseOptions.push({
+        id: 'csv',
+        name: t.csvTitle,
+        description: t.csvDesc,
+        icon: 'table',
       });
     }
 
@@ -100,7 +104,6 @@ const FormatDetectionState: React.FC<FormatDetectionStateProps> = ({
     const formatName = getFormatDisplayName(uploadedFile.format);
     
     // Try to replace "Shapefile" in the message with the actual format name
-    // This works for both English and Japanese (and other languages)
     let message = t.detectedFormat;
     
     // Replace "Shapefile" or "Shapefile形式" or "Shapefile format" with the actual format

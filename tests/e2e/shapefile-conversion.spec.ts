@@ -66,6 +66,25 @@ test.describe('Shapefile Conversion E2E', () => {
         expect(mapLibreValidation.valid).toBe(true);
       });
 
+      test('should convert to Shapefile and be displayable in MapLibre', async ({ page }) => {
+        await page.goto('/');
+
+        const filePath = await getFixtureFile(geometry, `${geometry}s.shp.zip`);
+        await uploadFile(page, filePath);
+        await selectFormat(page, 'Shapefile');
+        await waitForConversion(page);
+
+        const downloadedPath = await downloadFile(page);
+        const zipBuffer = await getDownloadedFileBuffer(downloadedPath);
+
+        const arrayBuffer = zipBuffer.buffer.slice(zipBuffer.byteOffset, zipBuffer.byteOffset + zipBuffer.byteLength) as ArrayBuffer;
+        const geojson = await shapefileToGeoJSON(arrayBuffer);
+        const geojsonString = typeof geojson === 'string' ? geojson : JSON.stringify(geojson);
+
+        const mapLibreValidation = await validateGeoJSONInMapLibre(page, geojsonString);
+        expect(mapLibreValidation.valid).toBe(true);
+      });
+
       if (geometry === 'point') {
         test('should convert to CSV with latitude and longitude columns', async ({ page }) => {
           await page.goto('/');
@@ -82,25 +101,6 @@ test.describe('Shapefile Conversion E2E', () => {
           expect(csvValidation.valid).toBe(true);
           const geojson = await csvToGeoJSON(csvContent);
           const mapLibreValidation = await validateGeoJSONInMapLibre(page, geojson);
-          expect(mapLibreValidation.valid).toBe(true);
-        });
-
-        test('should convert to Shapefile and be displayable in MapLibre', async ({ page }) => {
-          await page.goto('/');
-
-          const filePath = await getFixtureFile(geometry, `${geometry}s.shp.zip`);
-          await uploadFile(page, filePath);
-          await selectFormat(page, 'Shapefile');
-          await waitForConversion(page);
-
-          const downloadedPath = await downloadFile(page);
-          const zipBuffer = await getDownloadedFileBuffer(downloadedPath);
-
-          const arrayBuffer = zipBuffer.buffer.slice(zipBuffer.byteOffset, zipBuffer.byteOffset + zipBuffer.byteLength) as ArrayBuffer;
-          const geojson = await shapefileToGeoJSON(arrayBuffer);
-          const geojsonString = typeof geojson === 'string' ? geojson : JSON.stringify(geojson);
-
-          const mapLibreValidation = await validateGeoJSONInMapLibre(page, geojsonString);
           expect(mapLibreValidation.valid).toBe(true);
         });
       }
