@@ -8,18 +8,23 @@ import shpjs from "shpjs";
 import * as shpWriteModule from "shp-write";
 // @ts-ignore - shp-write zip function type is not defined
 const shpZip = (shpWriteModule as any).zip || shpWriteModule.zip;
+import { convertShapefileEncoding } from "../dbfEncoding";
 
 /**
  * Convert Shapefile (ZIP) to GeoJSON
  * Using shpjs library for better compatibility
+ * Automatically detects and converts .dbf file encoding to UTF-8 if needed
  */
 export async function shapefileToGeoJSON(
   zipBuffer: ArrayBuffer
 ): Promise<string> {
   try {
+    // First, convert .dbf file encoding to UTF-8 if needed
+    const convertedZipBuffer = await convertShapefileEncoding(zipBuffer);
+    
     // shpjs can directly accept a ZIP buffer containing shapefile
     // It will automatically extract and parse the shapefile
-    const geojson = await shpjs(zipBuffer);
+    const geojson = await shpjs(convertedZipBuffer);
 
     // shpjs returns GeoJSON FeatureCollection directly
     // If it's an array of FeatureCollections (multiple shapefiles in ZIP), take the first one
