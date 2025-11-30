@@ -461,6 +461,20 @@ export function convertDbfEncoding(
       if (pos + 32 > headerLength) break;
       if (uint8Array[pos] === 0x0D) break;
       
+      // Store original field descriptor bytes 11-31 before conversion
+      // to ensure we don't accidentally overwrite them
+      const originalFieldType = uint8Array[pos + 11];
+      const originalFieldLength = uint8Array[pos + 16];
+      const originalFieldDecimal = uint8Array[pos + 17];
+      const originalBytes11to31 = uint8Array.slice(pos + 11, pos + 32);
+      
+      // Explicitly copy the entire field descriptor first to ensure all parts are preserved
+      // This includes: field name (0-10), field type (11), field length (16), etc.
+      // This is a safety measure to ensure field descriptor bytes 11-31 are not corrupted
+      const fieldDescriptorBytes = uint8Array.slice(pos, pos + 32);
+      convertedView.set(fieldDescriptorBytes, pos);
+      
+      // Now, only modify the field name part (first 11 bytes)
       const nameBytes = uint8Array.slice(pos, pos + 11);
       const nameEnd = nameBytes.indexOf(0);
       const actualNameBytes = nameBytes.slice(0, nameEnd >= 0 ? nameEnd : 11);
@@ -469,16 +483,45 @@ export function convertDbfEncoding(
         const nameBuffer = Buffer.from(actualNameBytes);
         const decodedName = iconv.decode(nameBuffer, sourceEncoding);
         const encodedName = iconv.encode(decodedName, targetEncoding);
-        const convertedName = new Uint8Array(encodedName.buffer, encodedName.byteOffset, Math.min(encodedName.length, 11));
         
-        // Copy converted name
-        convertedView.set(convertedName, pos);
-        // Pad with null bytes if needed
-        for (let i = convertedName.length; i < 11; i++) {
-          convertedView[pos + i] = 0x00;
+        // Safely copy converted name byte by byte (only first 11 bytes)
+        // Directly access encodedName bytes to avoid buffer issues
+        // This ensures we don't overwrite field descriptor parts (byte 11+)
+        // Field descriptor structure:
+        // Bytes 0-10: Field name (null-terminated)
+        // Byte 11: Field type
+        // Bytes 12-15: Field data address (not used in modern DBF)
+        // Byte 16: Field length
+        // Byte 17: Field decimal places
+        // Bytes 18-31: Reserved
+        for (let i = 0; i < 11; i++) {
+          if (i < encodedName.length) {
+            convertedView[pos + i] = encodedName[i];
+          } else {
+            // Pad with null bytes if converted name is shorter
+            convertedView[pos + i] = 0x00;
+          }
+        }
+        
+        // Verify that field descriptor bytes 11-31 are still intact
+        const convertedFieldType = convertedView[pos + 11];
+        const convertedFieldLength = convertedView[pos + 16];
+        const convertedFieldDecimal = convertedView[pos + 17];
+        
+        if (convertedFieldType !== originalFieldType || 
+            convertedFieldLength !== originalFieldLength || 
+            convertedFieldDecimal !== originalFieldDecimal) {
+          console.error(`[DBF Encoding] Field descriptor corruption detected at pos ${pos}!`);
+          console.error(`  Original: type=${String.fromCharCode(originalFieldType)}, length=${originalFieldLength}, decimal=${originalFieldDecimal}`);
+          console.error(`  Converted: type=${String.fromCharCode(convertedFieldType)}, length=${convertedFieldLength}, decimal=${convertedFieldDecimal}`);
+          // Restore original bytes 11-31
+          convertedView.set(originalBytes11to31, pos + 11);
         }
       } catch (error) {
         console.warn(`Failed to convert field name at pos ${pos}: ${error}`);
+        // Keep original field name if conversion fails (already copied above)
+        // But ensure field descriptor bytes 11-31 are preserved
+        convertedView.set(originalBytes11to31, pos + 11);
       }
       
       pos += 32;

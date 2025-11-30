@@ -8,35 +8,126 @@ import shpjs from "shpjs";
 import * as shpWriteModule from "shp-write";
 // @ts-ignore - shp-write zip function type is not defined
 const shpZip = (shpWriteModule as any).zip || shpWriteModule.zip;
-import { convertShapefileEncoding } from "../dbfEncoding";
+import JSZip from "jszip";
+import { 
+  detectEncodingFromDbf
+} from "../dbfEncoding";
+
+/**
+ * Normalize encoding name for parsedbf (TextDecoder compatibility)
+ * parsedbf uses TextDecoder, which supports encoding names like:
+ * - 'Shift_JIS' (not 'CP932')
+ * - 'windows-932' (for code page 932)
+ * - 'UTF-8'
+ * 
+ * Note: 'SHIFT-JIS' (with hyphen) is not a valid label per WHATWG Encoding Standard
+ */
+function normalizeEncodingForParsedbf(encoding: string): string {
+  const normalized = encoding.trim().toUpperCase();
+  
+  // Map common encoding names to TextDecoder compatible format
+  const encodingMap: Record<string, string> = {
+    'CP932': 'Shift_JIS',
+    'SHIFT_JIS': 'Shift_JIS',
+    // 'SHIFT-JIS' is removed - not a valid label per WHATWG Encoding Standard
+    'SJIS': 'Shift_JIS',
+    'WINDOWS-31J': 'Shift_JIS',
+    'UTF-8': 'UTF-8',
+    'UTF8': 'UTF-8',
+    'ISO-8859-1': 'ISO-8859-1',
+    'LATIN1': 'ISO-8859-1',
+  };
+  
+  return encodingMap[normalized] || normalized;
+}
 
 /**
  * Convert Shapefile (ZIP) to GeoJSON
- * Using shpjs library for better compatibility
- * Automatically detects and converts .dbf file encoding to UTF-8 if needed
+ * Using shpjs library with individual file objects
+ * shpjs handles encoding conversion based on CPG file
  */
 export async function shapefileToGeoJSON(
   zipBuffer: ArrayBuffer
 ): Promise<string> {
   try {
-    // First, convert .dbf file encoding to UTF-8 if needed
-    const convertedZipBuffer = await convertShapefileEncoding(zipBuffer);
+    const zip = await JSZip.loadAsync(zipBuffer);
     
-    // shpjs can directly accept a ZIP buffer containing shapefile
-    // It will automatically extract and parse the shapefile
-    const geojson = await shpjs(convertedZipBuffer);
-
+    // Find .shp file
+    const shpFiles = Object.keys(zip.files).filter(name => 
+      name.toLowerCase().endsWith('.shp')
+    );
+    
+    if (shpFiles.length === 0) {
+      throw new Error('No .shp file found in ZIP');
+    }
+    
+    // Use the first .shp file found
+    const baseName = shpFiles[0].replace(/\.shp$/i, '');
+    
+    // Get individual files
+    const shpFile = zip.file(`${baseName}.shp`);
+    const dbfFile = zip.file(`${baseName}.dbf`);
+    const prjFile = zip.file(`${baseName}.prj`);
+    const cpgFile = zip.file(`${baseName}.cpg`);
+    
+    if (!shpFile) {
+      throw new Error(`Could not find ${baseName}.shp in ZIP`);
+    }
+    
+    // Prepare object for shpjs
+    const shapefileObject: any = {
+      shp: await shpFile.async('arraybuffer')
+    };
+    
+    // Add DBF file if exists (no conversion, shpjs will handle it)
+    if (dbfFile) {
+      shapefileObject.dbf = await dbfFile.async('arraybuffer');
+    }
+    
+    // Add PRJ file if exists
+    if (prjFile) {
+      shapefileObject.prj = await prjFile.async('arraybuffer');
+    }
+    
+    // Handle CPG file (encoding specification)
+    // If CPG file exists, use it; otherwise, detect encoding and create CPG file
+    if (cpgFile) {
+      // Use existing CPG file
+      let cpgEncoding = await cpgFile.async('string');
+      // Normalize encoding name for parsedbf (TextDecoder compatibility)
+      cpgEncoding = normalizeEncodingForParsedbf(cpgEncoding);
+      shapefileObject.cpg = cpgEncoding;
+      console.log(`[DBF Encoding] Using existing CPG file: ${cpgEncoding}`);
+    } else if (dbfFile) {
+      // No CPG file, detect encoding and create CPG file for shpjs
+      const dbfBuffer = await dbfFile.async('arraybuffer');
+      let encoding = detectEncodingFromDbf(dbfBuffer);
+      console.log(`[DBF Encoding] Auto-detected encoding: ${encoding}`);
+      
+      // Normalize encoding name for parsedbf (TextDecoder compatibility)
+      encoding = normalizeEncodingForParsedbf(encoding);
+      
+      // Set CPG file so shpjs can handle encoding conversion
+      // shpjs will use this CPG file to read DBF file with correct encoding
+      shapefileObject.cpg = encoding;
+      console.log(`[DBF Encoding] Setting CPG file to: ${encoding}`);
+    }
+    
+    // Use shpjs with object format
+    // shpjs will handle encoding conversion based on CPG file
+    const geojson = await shpjs(shapefileObject);
+    
     // shpjs returns GeoJSON FeatureCollection directly
     // If it's an array of FeatureCollections (multiple shapefiles in ZIP), take the first one
     const featureCollection: GeoJSON.FeatureCollection = Array.isArray(geojson)
       ? geojson[0]
       : geojson;
-
+    
     // Ensure it's a FeatureCollection
     if (!featureCollection || featureCollection.type !== 'FeatureCollection') {
       throw new Error('Invalid GeoJSON format returned from shpjs');
     }
-
+    
     return JSON.stringify(featureCollection);
   } catch (error) {
     throw new Error(
