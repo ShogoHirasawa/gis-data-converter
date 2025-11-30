@@ -13,23 +13,11 @@ import {
   detectEncodingFromDbf
 } from "../dbfEncoding";
 
-/**
- * Normalize encoding name for parsedbf (TextDecoder compatibility)
- * parsedbf uses TextDecoder, which supports encoding names like:
- * - 'Shift_JIS' (not 'CP932')
- * - 'windows-932' (for code page 932)
- * - 'UTF-8'
- * 
- * Note: 'SHIFT-JIS' (with hyphen) is not a valid label per WHATWG Encoding Standard
- */
 function normalizeEncodingForParsedbf(encoding: string): string {
   const normalized = encoding.trim().toUpperCase();
-  
-  // Map common encoding names to TextDecoder compatible format
   const encodingMap: Record<string, string> = {
     'CP932': 'Shift_JIS',
     'SHIFT_JIS': 'Shift_JIS',
-    // 'SHIFT-JIS' is removed - not a valid label per WHATWG Encoding Standard
     'SJIS': 'Shift_JIS',
     'WINDOWS-31J': 'Shift_JIS',
     'UTF-8': 'UTF-8',
@@ -37,7 +25,6 @@ function normalizeEncodingForParsedbf(encoding: string): string {
     'ISO-8859-1': 'ISO-8859-1',
     'LATIN1': 'ISO-8859-1',
   };
-  
   return encodingMap[normalized] || normalized;
 }
 
@@ -89,36 +76,18 @@ export async function shapefileToGeoJSON(
       shapefileObject.prj = await prjFile.async('arraybuffer');
     }
     
-    // Handle CPG file (encoding specification)
-    // If CPG file exists, use it; otherwise, detect encoding and create CPG file
     if (cpgFile) {
-      // Use existing CPG file
       let cpgEncoding = await cpgFile.async('string');
-      // Normalize encoding name for parsedbf (TextDecoder compatibility)
       cpgEncoding = normalizeEncodingForParsedbf(cpgEncoding);
       shapefileObject.cpg = cpgEncoding;
-      console.log(`[DBF Encoding] Using existing CPG file: ${cpgEncoding}`);
     } else if (dbfFile) {
-      // No CPG file, detect encoding and create CPG file for shpjs
       const dbfBuffer = await dbfFile.async('arraybuffer');
       let encoding = detectEncodingFromDbf(dbfBuffer);
-      console.log(`[DBF Encoding] Auto-detected encoding: ${encoding}`);
-      
-      // Normalize encoding name for parsedbf (TextDecoder compatibility)
       encoding = normalizeEncodingForParsedbf(encoding);
-      
-      // Set CPG file so shpjs can handle encoding conversion
-      // shpjs will use this CPG file to read DBF file with correct encoding
       shapefileObject.cpg = encoding;
-      console.log(`[DBF Encoding] Setting CPG file to: ${encoding}`);
     }
     
-    // Use shpjs with object format
-    // shpjs will handle encoding conversion based on CPG file
     const geojson = await shpjs(shapefileObject);
-    
-    // shpjs returns GeoJSON FeatureCollection directly
-    // If it's an array of FeatureCollections (multiple shapefiles in ZIP), take the first one
     const featureCollection: GeoJSON.FeatureCollection = Array.isArray(geojson)
       ? geojson[0]
       : geojson;
@@ -161,16 +130,12 @@ export async function geoJSONToShapefile(
       throw new Error('GeoJSON must have a features array');
     }
 
-    // Clean up features - remove 'id' property from feature level if it exists
-    // shp-write may have issues with certain properties
     const cleanedFeatures = geojsonObj.features.map((feature: any) => {
-      const cleaned: any = {
+      return {
         type: feature.type,
         geometry: feature.geometry,
         properties: { ...feature.properties }
       };
-      // Remove 'id' from top level if it exists (keep it in properties)
-      return cleaned;
     });
 
     // Filter features by geometry type and group them
@@ -184,12 +149,8 @@ export async function geoJSONToShapefile(
       (f: any) => f.geometry && (f.geometry.type === 'Polygon' || f.geometry.type === 'MultiPolygon')
     );
 
-    // Use shp-write's zip function which handles the conversion and zipping
-    // shpZip returns a Buffer (Node.js) or ArrayBuffer (browser)
     try {
       const featureCollection = { type: 'FeatureCollection', features: cleanedFeatures };
-      
-      // shp-write's zip function returns a Buffer in Node.js or ArrayBuffer in browser
       const zipResult = shpZip(featureCollection, {
         types: {
           point: pointFeatures.length > 0 ? 'points' : undefined,
@@ -198,15 +159,11 @@ export async function geoJSONToShapefile(
         },
       });
 
-      // Convert Buffer to ArrayBuffer
       if (zipResult instanceof Buffer) {
-        // Node.js Buffer
         return zipResult.buffer.slice(zipResult.byteOffset, zipResult.byteOffset + zipResult.byteLength);
       } else if (zipResult instanceof ArrayBuffer) {
-        // Browser ArrayBuffer
         return zipResult;
       } else if (zipResult && typeof zipResult.buffer === 'object') {
-        // Uint8Array or similar
         return zipResult.buffer.slice(zipResult.byteOffset, zipResult.byteOffset + zipResult.byteLength);
       } else {
         throw new Error(`shp-write zip function returned unexpected type: ${typeof zipResult}`);
@@ -227,14 +184,9 @@ export async function geoJSONToShapefile(
   }
 }
 
-/**
- * Reformat Shapefile (simply return input as-is)
- * For now, we skip actual reformatting and just return the input file
- */
 export async function reformatShapefile(
   zipBuffer: ArrayBuffer
 ): Promise<ArrayBuffer> {
-  // Simply return the input file as-is
   return zipBuffer;
 }
 
