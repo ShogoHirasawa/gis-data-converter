@@ -10,5 +10,13 @@ export default defineConfig({
     format: 'es',
     plugins: () => [wasm()],
   },
+  define: {
+    'global': 'globalThis',
+  },
+  resolve: {
+    alias: {
+      buffer: 'buffer',
+    },
+  },
 })
 

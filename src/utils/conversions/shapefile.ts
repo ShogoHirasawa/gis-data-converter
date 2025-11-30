@@ -8,30 +8,95 @@ import shpjs from "shpjs";
 import * as shpWriteModule from "shp-write";
 // @ts-ignore - shp-write zip function type is not defined
 const shpZip = (shpWriteModule as any).zip || shpWriteModule.zip;
+import JSZip from "jszip";
+import { 
+  detectEncodingFromDbf
+} from "../dbfEncoding";
+
+function normalizeEncodingForParsedbf(encoding: string): string {
+  const normalized = encoding.trim().toUpperCase();
+  const encodingMap: Record<string, string> = {
+    'CP932': 'Shift_JIS',
+    'SHIFT_JIS': 'Shift_JIS',
+    'SJIS': 'Shift_JIS',
+    'WINDOWS-31J': 'Shift_JIS',
+    'UTF-8': 'UTF-8',
+    'UTF8': 'UTF-8',
+    'ISO-8859-1': 'ISO-8859-1',
+    'LATIN1': 'ISO-8859-1',
+  };
+  return encodingMap[normalized] || normalized;
+}
 
 /**
  * Convert Shapefile (ZIP) to GeoJSON
- * Using shpjs library for better compatibility
+ * Using shpjs library with individual file objects
+ * shpjs handles encoding conversion based on CPG file
  */
 export async function shapefileToGeoJSON(
   zipBuffer: ArrayBuffer
 ): Promise<string> {
   try {
-    // shpjs can directly accept a ZIP buffer containing shapefile
-    // It will automatically extract and parse the shapefile
-    const geojson = await shpjs(zipBuffer);
-
-    // shpjs returns GeoJSON FeatureCollection directly
-    // If it's an array of FeatureCollections (multiple shapefiles in ZIP), take the first one
+    const zip = await JSZip.loadAsync(zipBuffer);
+    
+    // Find .shp file
+    const shpFiles = Object.keys(zip.files).filter(name => 
+      name.toLowerCase().endsWith('.shp')
+    );
+    
+    if (shpFiles.length === 0) {
+      throw new Error('No .shp file found in ZIP');
+    }
+    
+    // Use the first .shp file found
+    const baseName = shpFiles[0].replace(/\.shp$/i, '');
+    
+    // Get individual files
+    const shpFile = zip.file(`${baseName}.shp`);
+    const dbfFile = zip.file(`${baseName}.dbf`);
+    const prjFile = zip.file(`${baseName}.prj`);
+    const cpgFile = zip.file(`${baseName}.cpg`);
+    
+    if (!shpFile) {
+      throw new Error(`Could not find ${baseName}.shp in ZIP`);
+    }
+    
+    // Prepare object for shpjs
+    const shapefileObject: any = {
+      shp: await shpFile.async('arraybuffer')
+    };
+    
+    // Add DBF file if exists (no conversion, shpjs will handle it)
+    if (dbfFile) {
+      shapefileObject.dbf = await dbfFile.async('arraybuffer');
+    }
+    
+    // Add PRJ file if exists
+    if (prjFile) {
+      shapefileObject.prj = await prjFile.async('arraybuffer');
+    }
+    
+    if (cpgFile) {
+      let cpgEncoding = await cpgFile.async('string');
+      cpgEncoding = normalizeEncodingForParsedbf(cpgEncoding);
+      shapefileObject.cpg = cpgEncoding;
+    } else if (dbfFile) {
+      const dbfBuffer = await dbfFile.async('arraybuffer');
+      let encoding = detectEncodingFromDbf(dbfBuffer);
+      encoding = normalizeEncodingForParsedbf(encoding);
+      shapefileObject.cpg = encoding;
+    }
+    
+    const geojson = await shpjs(shapefileObject);
     const featureCollection: GeoJSON.FeatureCollection = Array.isArray(geojson)
       ? geojson[0]
       : geojson;
-
+    
     // Ensure it's a FeatureCollection
     if (!featureCollection || featureCollection.type !== 'FeatureCollection') {
       throw new Error('Invalid GeoJSON format returned from shpjs');
     }
-
+    
     return JSON.stringify(featureCollection);
   } catch (error) {
     throw new Error(
@@ -65,16 +130,12 @@ export async function geoJSONToShapefile(
       throw new Error('GeoJSON must have a features array');
     }
 
-    // Clean up features - remove 'id' property from feature level if it exists
-    // shp-write may have issues with certain properties
     const cleanedFeatures = geojsonObj.features.map((feature: any) => {
-      const cleaned: any = {
+      return {
         type: feature.type,
         geometry: feature.geometry,
         properties: { ...feature.properties }
       };
-      // Remove 'id' from top level if it exists (keep it in properties)
-      return cleaned;
     });
 
     // Filter features by geometry type and group them
@@ -88,12 +149,8 @@ export async function geoJSONToShapefile(
       (f: any) => f.geometry && (f.geometry.type === 'Polygon' || f.geometry.type === 'MultiPolygon')
     );
 
-    // Use shp-write's zip function which handles the conversion and zipping
-    // shpZip returns a Buffer (Node.js) or ArrayBuffer (browser)
     try {
       const featureCollection = { type: 'FeatureCollection', features: cleanedFeatures };
-      
-      // shp-write's zip function returns a Buffer in Node.js or ArrayBuffer in browser
       const zipResult = shpZip(featureCollection, {
         types: {
           point: pointFeatures.length > 0 ? 'points' : undefined,
@@ -102,15 +159,11 @@ export async function geoJSONToShapefile(
         },
       });
 
-      // Convert Buffer to ArrayBuffer
       if (zipResult instanceof Buffer) {
-        // Node.js Buffer
         return zipResult.buffer.slice(zipResult.byteOffset, zipResult.byteOffset + zipResult.byteLength);
       } else if (zipResult instanceof ArrayBuffer) {
-        // Browser ArrayBuffer
         return zipResult;
       } else if (zipResult && typeof zipResult.buffer === 'object') {
-        // Uint8Array or similar
         return zipResult.buffer.slice(zipResult.byteOffset, zipResult.byteOffset + zipResult.byteLength);
       } else {
         throw new Error(`shp-write zip function returned unexpected type: ${typeof zipResult}`);
@@ -131,14 +184,9 @@ export async function geoJSONToShapefile(
   }
 }
 
-/**
- * Reformat Shapefile (simply return input as-is)
- * For now, we skip actual reformatting and just return the input file
- */
 export async function reformatShapefile(
   zipBuffer: ArrayBuffer
 ): Promise<ArrayBuffer> {
-  // Simply return the input file as-is
   return zipBuffer;
 }
 

@@ -31,7 +31,9 @@
     "shp-write": "^0.3.2",
     "shpjs": "^6.2.0",
     "togpx": "^0.5.4",
-    "tokml": "^0.4.0"
+    "tokml": "^0.4.0",
+    "iconv-lite": "^0.6.3",
+    "buffer": "^6.0.3"
   },
   "devDependencies": {
     "@mapbox/togeojson": "^0.16.2",
