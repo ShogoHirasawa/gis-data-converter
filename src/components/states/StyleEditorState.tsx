@@ -1,7 +1,7 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useLanguage } from '../../i18n/LanguageContext';
 import { ConversionResult, UploadedFile, ColorMode, CategoricalCategory, ContinuousStyle } from '../../types';
-import { ChevronDown, Download, ArrowLeft, RefreshCw } from 'lucide-react';
+import { ChevronDown, Download, ArrowLeft, RefreshCw, Check } from 'lucide-react';
 import maplibregl from 'maplibre-gl';
 import 'maplibre-gl/dist/maplibre-gl.css';
 
@@ -20,22 +20,30 @@ const StyleEditorState: React.FC<StyleEditorStateProps> = ({
 }) => {
   const { t } = useLanguage();
 
+  // Gradient presets (lightest to darkest)
+  const gradientPresets = {
+    green: ['#F5F9F3', '#7FAD6F', '#4A7C3F'],
+    blue: ['#F0F5FC', '#4A90E2', '#1E5FA8'],
+    red: ['#FDF2F2', '#E24A4A', '#B81E1E'],
+  };
+
+  type GradientPresetKey = keyof typeof gradientPresets;
+  type GradientSelection = GradientPresetKey | 'transparent';
+
   // Use first available property or empty string
   const initialProperty = result.featureInfo?.properties?.[0] || '';
   const [selectedProperty, setSelectedProperty] = useState<string>(initialProperty);
   const [colorMode, setColorMode] = useState<ColorMode>('categorical');
-  const [categories, setCategories] = useState<CategoricalCategory[]>([
-    { value: '東京都', color: '#7FAD6F', label: '東京都' },
-    { value: '大阪府', color: '#A3C595', label: '大阪府' },
-    { value: '愛知県', color: '#D9B88F', label: '愛知県' },
-    { value: '福岡県', color: '#8BAAA5', label: '福岡県' },
-    { value: 'その他', color: '#B8A99A', label: 'その他' },
-  ]);
-  const [continuousStyle] = useState<ContinuousStyle>({
+  const [selectedGradient, setSelectedGradient] = useState<GradientSelection>('green');
+  const [categories, setCategories] = useState<CategoricalCategory[]>([]);
+  const [continuousStyle, setContinuousStyle] = useState<ContinuousStyle>({
     minValue: 0,
     maxValue: 100000,
-    gradientColors: ['#7FAD6F', '#A3C595', '#D9B88F'],
+    gradientColors: gradientPresets.green,
   });
+  const [circleStrokeColor, setCircleStrokeColor] = useState<string>('#FFFFFF');
+  const [fillOutlineColor, setFillOutlineColor] = useState<string>('#7FAD6F');
+  const [strokeWidth, setStrokeWidth] = useState<number>(1);
 
   const geometryType = uploadedFile?.geometryType || 'point';
   
@@ -231,8 +239,8 @@ const StyleEditorState: React.FC<StyleEditorStateProps> = ({
             paint: {
               'circle-radius': 6,
               'circle-color': '#7FAD6F',
-              'circle-stroke-width': 1,
-              'circle-stroke-color': '#FFFFFF',
+              'circle-stroke-width': strokeWidth,
+              'circle-stroke-color': circleStrokeColor,
             },
           });
         }
@@ -259,13 +267,14 @@ const StyleEditorState: React.FC<StyleEditorStateProps> = ({
               'fill-opacity': 0.6,
             },
           });
+          // lineレイヤーを追加してアウトラインとして使用
           map.addLayer({
             id: 'geojson-outline-layer',
             type: 'line',
             source: 'geojson-source',
             paint: {
-              'line-color': '#7FAD6F',
-              'line-width': 1,
+              'line-color': fillOutlineColor,
+              'line-width': strokeWidth,
             },
           });
         }
@@ -406,6 +415,80 @@ const StyleEditorState: React.FC<StyleEditorStateProps> = ({
     }
   }, [uploadedFile?.cachedGeoJSON, geometryType]);
 
+  // Extract unique values from GeoJSON for selected property
+  const extractCategories = useCallback((property: string): CategoricalCategory[] => {
+    if (!uploadedFile?.cachedGeoJSON || !property) {
+      return [];
+    }
+
+    try {
+      const geojson = JSON.parse(uploadedFile.cachedGeoJSON) as GeoJSON.FeatureCollection;
+      const uniqueValues = new Set<string>();
+      
+      // Collect unique values
+      geojson.features.forEach((feature) => {
+        if (feature.properties && feature.properties[property] !== undefined && feature.properties[property] !== null) {
+          const value = feature.properties[property];
+          // Convert to string for consistency
+          const valueStr = String(value);
+          uniqueValues.add(valueStr);
+        }
+      });
+
+      // Convert to sorted array (no limit - display all)
+      const sortedValues = Array.from(uniqueValues).sort();
+      const displayValues = sortedValues;
+      
+      // If transparent is selected, set all colors to transparent
+      if (selectedGradient === 'transparent') {
+        return displayValues.map((value) => ({
+          value,
+          color: 'rgba(0, 0, 0, 0)',
+          label: value,
+        }));
+      }
+      
+      // Generate colors from selected gradient
+      const gradient = gradientPresets[selectedGradient];
+      const colors = generateColorsFromGradient(gradient, displayValues.length);
+      
+      // Create categories
+      return displayValues.map((value, index) => ({
+        value,
+        color: colors[index] || gradient[0],
+        label: value,
+      }));
+    } catch (error) {
+      console.error('Error extracting categories:', error);
+      return [];
+    }
+  }, [uploadedFile?.cachedGeoJSON, selectedGradient]);
+
+  // Extract categories when property or gradient changes (only for categorical mode)
+  useEffect(() => {
+    if (colorMode === 'categorical' && selectedProperty && uploadedFile?.cachedGeoJSON) {
+      const extractedCategories = extractCategories(selectedProperty);
+      setCategories(extractedCategories);
+    }
+  }, [selectedProperty, selectedGradient, colorMode, uploadedFile?.cachedGeoJSON, extractCategories]);
+
+  // Update continuous style when gradient changes (only for continuous mode)
+  useEffect(() => {
+    if (colorMode === 'continuous') {
+      if (selectedGradient === 'transparent') {
+        setContinuousStyle((prev) => ({
+          ...prev,
+          gradientColors: ['rgba(0, 0, 0, 0)', 'rgba(0, 0, 0, 0)', 'rgba(0, 0, 0, 0)'],
+        }));
+      } else {
+        setContinuousStyle((prev) => ({
+          ...prev,
+          gradientColors: gradientPresets[selectedGradient],
+        }));
+      }
+    }
+  }, [selectedGradient, colorMode]);
+
   // Update map style based on selected property and color mode
   useEffect(() => {
     const map = mapRef.current;
@@ -469,14 +552,87 @@ const StyleEditorState: React.FC<StyleEditorStateProps> = ({
         if (map.getLayer('geojson-fill-layer')) {
           map.setPaintProperty('geojson-fill-layer', 'fill-color', colorExpression);
         }
-        if (map.getLayer('geojson-outline-layer')) {
-          map.setPaintProperty('geojson-outline-layer', 'line-color', colorExpression);
-        }
       }
     } catch (error) {
       console.error('Error updating map style:', error);
     }
   }, [selectedProperty, colorMode, categories, continuousStyle, geometryType]);
+
+  // Update stroke colors and width when they change
+  useEffect(() => {
+    if (!mapRef.current) return;
+
+    const map = mapRef.current;
+    if (!map.loaded()) return;
+
+    try {
+      if (geometryType === 'point' || geometryType === 'mixed') {
+        if (map.getLayer('geojson-layer')) {
+          map.setPaintProperty('geojson-layer', 'circle-stroke-color', circleStrokeColor);
+          map.setPaintProperty('geojson-layer', 'circle-stroke-width', strokeWidth);
+        }
+      }
+
+      if (geometryType === 'polygon' || geometryType === 'mixed') {
+        if (map.getLayer('geojson-outline-layer')) {
+          map.setPaintProperty('geojson-outline-layer', 'line-color', fillOutlineColor);
+          map.setPaintProperty('geojson-outline-layer', 'line-width', strokeWidth);
+        }
+      }
+    } catch (error) {
+      console.error('Error updating stroke colors and width:', error);
+    }
+  }, [circleStrokeColor, fillOutlineColor, strokeWidth, geometryType]);
+
+  // Generate colors from gradient
+  const generateColorsFromGradient = (gradient: string[], count: number): string[] => {
+    if (count === 0) return [];
+    if (count === 1) return [gradient[0]];
+    if (count <= gradient.length) {
+      // If count is less than or equal to gradient length, use colors directly
+      return gradient.slice(0, count);
+    }
+    
+    // Interpolate colors for more categories
+    const colors: string[] = [];
+    for (let i = 0; i < count; i++) {
+      const position = i / (count - 1); // 0 to 1
+      const gradientIndex = position * (gradient.length - 1);
+      const lowerIndex = Math.floor(gradientIndex);
+      const upperIndex = Math.ceil(gradientIndex);
+      const fraction = gradientIndex - lowerIndex;
+      
+      if (lowerIndex === upperIndex) {
+        colors.push(gradient[lowerIndex]);
+      } else {
+        // Interpolate between two colors
+        const lowerColor = gradient[lowerIndex];
+        const upperColor = gradient[upperIndex];
+        colors.push(interpolateColor(lowerColor, upperColor, fraction));
+      }
+    }
+    return colors;
+  };
+
+  // Interpolate between two hex colors
+  const interpolateColor = (color1: string, color2: string, fraction: number): string => {
+    const hex1 = color1.replace('#', '');
+    const hex2 = color2.replace('#', '');
+    
+    const r1 = parseInt(hex1.substring(0, 2), 16);
+    const g1 = parseInt(hex1.substring(2, 4), 16);
+    const b1 = parseInt(hex1.substring(4, 6), 16);
+    
+    const r2 = parseInt(hex2.substring(0, 2), 16);
+    const g2 = parseInt(hex2.substring(2, 4), 16);
+    const b2 = parseInt(hex2.substring(4, 6), 16);
+    
+    const r = Math.round(r1 + (r2 - r1) * fraction);
+    const g = Math.round(g1 + (g2 - g1) * fraction);
+    const b = Math.round(b1 + (b2 - b1) * fraction);
+    
+    return `#${r.toString(16).padStart(2, '0')}${g.toString(16).padStart(2, '0')}${b.toString(16).padStart(2, '0')}`;
+  };
 
   const handleCategoryColorChange = (index: number, color: string) => {
     const newCategories = [...categories];
@@ -843,41 +999,52 @@ const StyleEditorState: React.FC<StyleEditorStateProps> = ({
                   >
                     {t.selectGradient || 'Select Gradient'}
                   </div>
-                  <div className="flex gap-2">
+                  <div className="flex gap-2 overflow-x-auto">
+                    {(Object.keys(gradientPresets) as GradientPresetKey[]).map((key) => (
+                      <button
+                        key={key}
+                        onClick={() => setSelectedGradient(key)}
+                        className="px-4 py-2 rounded-full text-sm border transition whitespace-nowrap flex-shrink-0"
+                        style={{
+                          backgroundColor: selectedGradient === key ? '#E8F3E4' : '#F8FAF7',
+                          borderColor: selectedGradient === key ? '#7FAD6F' : '#C8D8C5',
+                          color: '#2A3A28',
+                          fontWeight: selectedGradient === key ? '600' : '400',
+                        }}
+                      >
+                        {key.charAt(0).toUpperCase() + key.slice(1)}
+                      </button>
+                    ))}
                     <button
-                      className="px-4 py-2 rounded-full text-sm border"
+                      onClick={() => setSelectedGradient('transparent')}
+                      className="px-4 py-2 rounded-full text-sm border transition flex items-center gap-2 whitespace-nowrap flex-shrink-0"
                       style={{
-                        backgroundColor: '#F8FAF7',
-                        borderColor: '#C8D8C5',
+                        backgroundColor: selectedGradient === 'transparent' ? '#E8F3E4' : '#F8FAF7',
+                        borderColor: selectedGradient === 'transparent' ? '#7FAD6F' : '#C8D8C5',
                         color: '#2A3A28',
+                        fontWeight: selectedGradient === 'transparent' ? '600' : '400',
                       }}
                     >
-                      Green
-                    </button>
-                    <button
-                      className="px-4 py-2 rounded-full text-sm border"
-                      style={{
-                        backgroundColor: '#F8FAF7',
-                        borderColor: '#C8D8C5',
-                        color: '#2A3A28',
-                      }}
-                    >
-                      Blue
-                    </button>
-                    <button
-                      className="px-4 py-2 rounded-full text-sm border"
-                      style={{
-                        backgroundColor: '#F8FAF7',
-                        borderColor: '#C8D8C5',
-                        color: '#2A3A28',
-                      }}
-                    >
-                      Red
+                      <div
+                        className="w-4 h-4 rounded border flex-shrink-0"
+                        style={{
+                          backgroundImage: 'repeating-conic-gradient(#C8D8C5 0% 25%, transparent 0% 50%) 50% / 4px 4px',
+                        }}
+                      />
+                      {t.transparent || 'Transparent'}
                     </button>
                   </div>
                 </div>
-                <div className="space-y-3">
-                  {categories.map((category, index) => (
+                <div className="space-y-3 max-h-64 overflow-y-auto">
+                  {categories.length === 0 ? (
+                    <div
+                      className="text-sm text-center py-4"
+                      style={{ color: '#8A9A88' }}
+                    >
+                      {t.noCategories || 'No categories found'}
+                    </div>
+                  ) : (
+                    categories.map((category, index) => (
                     <div
                       key={index}
                       className="flex items-center justify-between px-3 py-3 rounded-2xl"
@@ -890,16 +1057,37 @@ const StyleEditorState: React.FC<StyleEditorStateProps> = ({
                         {category.label}
                       </span>
                       <div className="flex items-center gap-2">
+                        <button
+                          onClick={() => handleCategoryColorChange(index, 'rgba(0, 0, 0, 0)')}
+                          className="relative w-6 h-6 rounded border flex items-center justify-center transition"
+                          style={{
+                            borderColor: category.color === 'rgba(0, 0, 0, 0)' ? '#7FAD6F' : '#C8D8C5',
+                            backgroundColor: category.color === 'rgba(0, 0, 0, 0)' ? '#E8F3E4' : '#FFFFFF',
+                          }}
+                          title={t.transparent || 'Transparent'}
+                        >
+                          {category.color === 'rgba(0, 0, 0, 0)' ? (
+                            <Check size={14} style={{ color: '#7FAD6F' }} />
+                          ) : (
+                            <div
+                              className="w-4 h-4 rounded"
+                              style={{
+                                background: 'repeating-conic-gradient(#C8D8C5 0% 25%, transparent 0% 50%) 50% / 4px 4px',
+                              }}
+                            />
+                          )}
+                        </button>
                         <input
                           type="color"
-                          value={category.color}
+                          value={category.color === 'rgba(0, 0, 0, 0)' ? '#FFFFFF' : category.color}
                           onChange={(e) => handleCategoryColorChange(index, e.target.value)}
                           className="w-6 h-6 rounded border cursor-pointer"
                           style={{ borderColor: '#C8D8C5' }}
                         />
                       </div>
                     </div>
-                  ))}
+                    ))
+                  )}
                 </div>
               </div>
             ) : (
@@ -925,36 +1113,39 @@ const StyleEditorState: React.FC<StyleEditorStateProps> = ({
                   >
                     {t.selectGradient || 'Select Gradient'}
                   </div>
-                  <div className="flex gap-2">
+                  <div className="flex gap-2 overflow-x-auto">
+                    {(Object.keys(gradientPresets) as GradientPresetKey[]).map((key) => (
+                      <button
+                        key={key}
+                        onClick={() => setSelectedGradient(key)}
+                        className="px-4 py-2 rounded-full text-sm border transition whitespace-nowrap flex-shrink-0"
+                        style={{
+                          backgroundColor: selectedGradient === key ? '#E8F3E4' : '#F8FAF7',
+                          borderColor: selectedGradient === key ? '#7FAD6F' : '#C8D8C5',
+                          color: '#2A3A28',
+                          fontWeight: selectedGradient === key ? '600' : '400',
+                        }}
+                      >
+                        {key.charAt(0).toUpperCase() + key.slice(1)}
+                      </button>
+                    ))}
                     <button
-                      className="px-4 py-2 rounded-full text-sm border"
+                      onClick={() => setSelectedGradient('transparent')}
+                      className="px-4 py-2 rounded-full text-sm border transition flex items-center gap-2 whitespace-nowrap flex-shrink-0"
                       style={{
-                        backgroundColor: '#F8FAF7',
-                        borderColor: '#C8D8C5',
+                        backgroundColor: selectedGradient === 'transparent' ? '#E8F3E4' : '#F8FAF7',
+                        borderColor: selectedGradient === 'transparent' ? '#7FAD6F' : '#C8D8C5',
                         color: '#2A3A28',
+                        fontWeight: selectedGradient === 'transparent' ? '600' : '400',
                       }}
                     >
-                      Green
-                    </button>
-                    <button
-                      className="px-4 py-2 rounded-full text-sm border"
-                      style={{
-                        backgroundColor: '#F8FAF7',
-                        borderColor: '#C8D8C5',
-                        color: '#2A3A28',
-                      }}
-                    >
-                      Blue
-                    </button>
-                    <button
-                      className="px-4 py-2 rounded-full text-sm border"
-                      style={{
-                        backgroundColor: '#F8FAF7',
-                        borderColor: '#C8D8C5',
-                        color: '#2A3A28',
-                      }}
-                    >
-                      Red
+                      <div
+                        className="w-4 h-4 rounded border flex-shrink-0"
+                        style={{
+                          backgroundImage: 'repeating-conic-gradient(#C8D8C5 0% 25%, transparent 0% 50%) 50% / 4px 4px',
+                        }}
+                      />
+                      {t.transparent || 'Transparent'}
                     </button>
                   </div>
                 </div>
@@ -963,7 +1154,165 @@ const StyleEditorState: React.FC<StyleEditorStateProps> = ({
           </div>
         </div>
 
-        {/* Section 4: Legend Preview */}
+        {/* Section 4: Stroke Color and Width Settings */}
+        {(geometryType === 'point' || geometryType === 'mixed' || geometryType === 'polygon') && (
+          <div className="mb-8">
+            <div
+              className="p-6 rounded-[32px]"
+              style={{
+                backgroundColor: '#FFFFFF',
+                boxShadow: '0 2px 12px rgba(127, 173, 111, 0.08)',
+              }}
+            >
+              <h3
+                className="mb-4 text-lg font-semibold"
+                style={{ color: '#2A3A28' }}
+              >
+                {t.strokeColorAndWidth || '4. Set stroke color and width'}
+              </h3>
+              <div
+                className="mb-4 text-sm"
+                style={{ color: '#5A6A58' }}
+              >
+                {t.strokeColorAndWidthDescription || 'Set the stroke color and width for points and polygons'}
+              </div>
+              
+              {/* Stroke Width Slider */}
+              <div className="mb-6">
+                <div className="flex items-center justify-between mb-2">
+                  <div
+                    className="text-sm font-medium"
+                    style={{ color: '#5A6A58' }}
+                  >
+                    {t.strokeWidth || 'Stroke width'}
+                  </div>
+                  <div
+                    className="text-sm"
+                    style={{ color: '#2A3A28' }}
+                  >
+                    {strokeWidth}px
+                  </div>
+                </div>
+                <input
+                  type="range"
+                  min="0"
+                  max="10"
+                  step="0.5"
+                  value={strokeWidth}
+                  onChange={(e) => setStrokeWidth(parseFloat(e.target.value))}
+                  className="w-full h-2 rounded-lg appearance-none cursor-pointer"
+                  style={{
+                    background: '#E8F3E4',
+                    outline: 'none',
+                  }}
+                />
+              </div>
+
+              <div className="space-y-4">
+                {(geometryType === 'point' || geometryType === 'mixed') && (
+                  <div>
+                    <div
+                      className="mb-2 text-sm font-medium"
+                      style={{ color: '#5A6A58' }}
+                    >
+                      {t.circleStrokeColor || 'Point stroke color'}
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <button
+                        onClick={() => setCircleStrokeColor('rgba(0, 0, 0, 0)')}
+                        className="relative w-6 h-6 rounded border flex items-center justify-center transition"
+                        style={{
+                          borderColor: circleStrokeColor === 'rgba(0, 0, 0, 0)' ? '#7FAD6F' : '#C8D8C5',
+                          backgroundColor: circleStrokeColor === 'rgba(0, 0, 0, 0)' ? '#E8F3E4' : '#FFFFFF',
+                        }}
+                        title={t.transparent || 'Transparent'}
+                      >
+                        {circleStrokeColor === 'rgba(0, 0, 0, 0)' ? (
+                          <Check size={14} style={{ color: '#7FAD6F' }} />
+                        ) : (
+                          <div
+                            className="w-4 h-4 rounded"
+                            style={{
+                              background: 'repeating-conic-gradient(#C8D8C5 0% 25%, transparent 0% 50%) 50% / 4px 4px',
+                            }}
+                          />
+                        )}
+                      </button>
+                      <input
+                        type="color"
+                        value={circleStrokeColor === 'rgba(0, 0, 0, 0)' ? '#FFFFFF' : circleStrokeColor}
+                        onChange={(e) => setCircleStrokeColor(e.target.value)}
+                        className="w-6 h-6 rounded border cursor-pointer"
+                        style={{ borderColor: '#C8D8C5' }}
+                      />
+                      <div
+                        className="w-8 h-8 rounded border flex items-center justify-center"
+                        style={{
+                          backgroundColor: circleStrokeColor === 'rgba(0, 0, 0, 0)' ? 'transparent' : circleStrokeColor,
+                          borderColor: '#C8D8C5',
+                          backgroundImage: circleStrokeColor === 'rgba(0, 0, 0, 0)' 
+                            ? 'repeating-conic-gradient(#C8D8C5 0% 25%, transparent 0% 50%) 50% / 4px 4px'
+                            : 'none',
+                        }}
+                      />
+                    </div>
+                  </div>
+                )}
+                {(geometryType === 'polygon' || geometryType === 'mixed') && (
+                  <div>
+                    <div
+                      className="mb-2 text-sm font-medium"
+                      style={{ color: '#5A6A58' }}
+                    >
+                      {t.fillOutlineColor || 'Polygon outline color'}
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <button
+                        onClick={() => setFillOutlineColor('rgba(0, 0, 0, 0)')}
+                        className="relative w-6 h-6 rounded border flex items-center justify-center transition"
+                        style={{
+                          borderColor: fillOutlineColor === 'rgba(0, 0, 0, 0)' ? '#7FAD6F' : '#C8D8C5',
+                          backgroundColor: fillOutlineColor === 'rgba(0, 0, 0, 0)' ? '#E8F3E4' : '#FFFFFF',
+                        }}
+                        title={t.transparent || 'Transparent'}
+                      >
+                        {fillOutlineColor === 'rgba(0, 0, 0, 0)' ? (
+                          <Check size={14} style={{ color: '#7FAD6F' }} />
+                        ) : (
+                          <div
+                            className="w-4 h-4 rounded"
+                            style={{
+                              background: 'repeating-conic-gradient(#C8D8C5 0% 25%, transparent 0% 50%) 50% / 4px 4px',
+                            }}
+                          />
+                        )}
+                      </button>
+                      <input
+                        type="color"
+                        value={fillOutlineColor === 'rgba(0, 0, 0, 0)' ? '#FFFFFF' : fillOutlineColor}
+                        onChange={(e) => setFillOutlineColor(e.target.value)}
+                        className="w-6 h-6 rounded border cursor-pointer"
+                        style={{ borderColor: '#C8D8C5' }}
+                      />
+                      <div
+                        className="w-8 h-8 rounded border flex items-center justify-center"
+                        style={{
+                          backgroundColor: fillOutlineColor === 'rgba(0, 0, 0, 0)' ? 'transparent' : fillOutlineColor,
+                          borderColor: '#C8D8C5',
+                          backgroundImage: fillOutlineColor === 'rgba(0, 0, 0, 0)' 
+                            ? 'repeating-conic-gradient(#C8D8C5 0% 25%, transparent 0% 50%) 50% / 4px 4px'
+                            : 'none',
+                        }}
+                      />
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Section 5: Legend Preview */}
         <div className="mb-8">
           <div
             className="p-6 rounded-[32px]"
@@ -1014,7 +1363,7 @@ const StyleEditorState: React.FC<StyleEditorStateProps> = ({
           </div>
         </div>
 
-        {/* Section 5: Export Buttons */}
+        {/* Section 6: Export Buttons */}
         <div>
           <div
             className="p-6 rounded-[32px]"

@@ -148,6 +148,15 @@ export interface Translations {
   featureInfoError: string;
   featureProperties: string;
   mapPreviewNotice: string;
+  noCategories: string;
+  transparent: string;
+  strokeColor: string;
+  strokeColorDescription: string;
+  circleStrokeColor: string;
+  fillOutlineColor: string;
+  strokeColorAndWidth: string;
+  strokeColorAndWidthDescription: string;
+  strokeWidth: string;
 }
 
 // English translations
@@ -299,6 +308,15 @@ const enTranslations: Translations = {
     featureInfoError: 'Failed to load feature information',
     featureProperties: 'Feature Properties',
     mapPreviewNotice: 'Large data files may take time to display',
+    noCategories: 'No categories found',
+    transparent: 'Transparent',
+    strokeColor: '4. Set stroke color',
+    strokeColorDescription: 'Set the stroke color for points and polygons',
+    circleStrokeColor: 'Point stroke color',
+    fillOutlineColor: 'Polygon outline color',
+    strokeColorAndWidth: '4. Set stroke color and width',
+    strokeColorAndWidthDescription: 'Set the stroke color and width for points and polygons',
+    strokeWidth: 'Stroke width',
 
   };
 
@@ -450,6 +468,15 @@ const jaTranslations: Translations = {
     featureInfoError: 'データ情報の読み込みに失敗しました',
     featureProperties: 'フィーチャの属性',
     mapPreviewNotice: 'データ容量が大きいと表示に時間がかかることがあります',
+    noCategories: 'カテゴリが見つかりません',
+    transparent: '透明',
+    strokeColor: '4. 枠線の色を設定',
+    strokeColorDescription: '点と面の枠線の色を設定します',
+    circleStrokeColor: '点の枠線の色',
+    fillOutlineColor: '面の枠線の色',
+    strokeColorAndWidth: '4. 枠線の色と幅を設定',
+    strokeColorAndWidthDescription: '点と面の枠線の色と幅を設定します',
+    strokeWidth: '枠線の幅',
   };
 
 const zhHantTranslations: Translations = {
@@ -600,6 +627,15 @@ const zhHantTranslations: Translations = {
     featureInfoError: 'Failed to load feature information',
     featureProperties: 'Feature Properties',
     mapPreviewNotice: 'Large data files may take time to display',
+    noCategories: 'No categories found',
+    transparent: 'Transparent',
+    strokeColor: '4. Set stroke color',
+    strokeColorDescription: 'Set the stroke color for points and polygons',
+    circleStrokeColor: 'Point stroke color',
+    fillOutlineColor: 'Polygon outline color',
+    strokeColorAndWidth: '4. Set stroke color and width',
+    strokeColorAndWidthDescription: 'Set the stroke color and width for points and polygons',
+    strokeWidth: 'Stroke width',
 
   };
 
@@ -751,6 +787,15 @@ const zhHansTranslations: Translations = {
     featureInfoError: 'Failed to load feature information',
     featureProperties: 'Feature Properties',
     mapPreviewNotice: 'Large data files may take time to display',
+    noCategories: 'No categories found',
+    transparent: 'Transparent',
+    strokeColor: '4. Set stroke color',
+    strokeColorDescription: 'Set the stroke color for points and polygons',
+    circleStrokeColor: 'Point stroke color',
+    fillOutlineColor: 'Polygon outline color',
+    strokeColorAndWidth: '4. Set stroke color and width',
+    strokeColorAndWidthDescription: 'Set the stroke color and width for points and polygons',
+    strokeWidth: 'Stroke width',
 
   };
 
@@ -903,6 +948,15 @@ const plTranslations: Translations = {
     featureInfoError: 'Failed to load feature information',
     featureProperties: 'Feature Properties',
     mapPreviewNotice: 'Large data files may take time to display',
+    noCategories: 'No categories found',
+    transparent: 'Transparent',
+    strokeColor: '4. Set stroke color',
+    strokeColorDescription: 'Set the stroke color for points and polygons',
+    circleStrokeColor: 'Point stroke color',
+    fillOutlineColor: 'Polygon outline color',
+    strokeColorAndWidth: '4. Set stroke color and width',
+    strokeColorAndWidthDescription: 'Set the stroke color and width for points and polygons',
+    strokeWidth: 'Stroke width',
 
   };
 
@@ -1055,6 +1109,15 @@ const esTranslations: Translations = {
     featureInfoError: 'Failed to load feature information',
     featureProperties: 'Feature Properties',
     mapPreviewNotice: 'Large data files may take time to display',
+    noCategories: 'No categories found',
+    transparent: 'Transparent',
+    strokeColor: '4. Set stroke color',
+    strokeColorDescription: 'Set the stroke color for points and polygons',
+    circleStrokeColor: 'Point stroke color',
+    fillOutlineColor: 'Polygon outline color',
+    strokeColorAndWidth: '4. Set stroke color and width',
+    strokeColorAndWidthDescription: 'Set the stroke color and width for points and polygons',
+    strokeWidth: 'Stroke width',
 
   };
 
@@ -1207,6 +1270,15 @@ const arTranslations: Translations = {
     featureInfoError: 'Failed to load feature information',
     featureProperties: 'Feature Properties',
     mapPreviewNotice: 'Large data files may take time to display',
+    noCategories: 'No categories found',
+    transparent: 'Transparent',
+    strokeColor: '4. Set stroke color',
+    strokeColorDescription: 'Set the stroke color for points and polygons',
+    circleStrokeColor: 'Point stroke color',
+    fillOutlineColor: 'Polygon outline color',
+    strokeColorAndWidth: '4. Set stroke color and width',
+    strokeColorAndWidthDescription: 'Set the stroke color and width for points and polygons',
+    strokeWidth: 'Stroke width',
 
   };
 
@@ -1359,6 +1431,15 @@ const svTranslations: Translations = {
     featureInfoError: 'Failed to load feature information',
     featureProperties: 'Feature Properties',
     mapPreviewNotice: 'Large data files may take time to display',
+    noCategories: 'No categories found',
+    transparent: 'Transparent',
+    strokeColor: '4. Set stroke color',
+    strokeColorDescription: 'Set the stroke color for points and polygons',
+    circleStrokeColor: 'Point stroke color',
+    fillOutlineColor: 'Polygon outline color',
+    strokeColorAndWidth: '4. Set stroke color and width',
+    strokeColorAndWidthDescription: 'Set the stroke color and width for points and polygons',
+    strokeWidth: 'Stroke width',
 
   };
 
@@ -1511,6 +1592,15 @@ const frTranslations: Translations = {
     featureInfoError: 'Failed to load feature information',
     featureProperties: 'Feature Properties',
     mapPreviewNotice: 'Large data files may take time to display',
+    noCategories: 'No categories found',
+    transparent: 'Transparent',
+    strokeColor: '4. Set stroke color',
+    strokeColorDescription: 'Set the stroke color for points and polygons',
+    circleStrokeColor: 'Point stroke color',
+    fillOutlineColor: 'Polygon outline color',
+    strokeColorAndWidth: '4. Set stroke color and width',
+    strokeColorAndWidthDescription: 'Set the stroke color and width for points and polygons',
+    strokeWidth: 'Stroke width',
 
   };
 
@@ -1663,6 +1753,15 @@ const bgTranslations: Translations = {
     featureInfoError: 'Failed to load feature information',
     featureProperties: 'Feature Properties',
     mapPreviewNotice: 'Large data files may take time to display',
+    noCategories: 'No categories found',
+    transparent: 'Transparent',
+    strokeColor: '4. Set stroke color',
+    strokeColorDescription: 'Set the stroke color for points and polygons',
+    circleStrokeColor: 'Point stroke color',
+    fillOutlineColor: 'Polygon outline color',
+    strokeColorAndWidth: '4. Set stroke color and width',
+    strokeColorAndWidthDescription: 'Set the stroke color and width for points and polygons',
+    strokeWidth: 'Stroke width',
 
   };
 
@@ -1815,6 +1914,15 @@ const thTranslations: Translations = {
     featureInfoError: 'Failed to load feature information',
     featureProperties: 'Feature Properties',
     mapPreviewNotice: 'Large data files may take time to display',
+    noCategories: 'No categories found',
+    transparent: 'Transparent',
+    strokeColor: '4. Set stroke color',
+    strokeColorDescription: 'Set the stroke color for points and polygons',
+    circleStrokeColor: 'Point stroke color',
+    fillOutlineColor: 'Polygon outline color',
+    strokeColorAndWidth: '4. Set stroke color and width',
+    strokeColorAndWidthDescription: 'Set the stroke color and width for points and polygons',
+    strokeWidth: 'Stroke width',
 
   };
 
@@ -1967,6 +2075,15 @@ const deTranslations: Translations = {
     featureInfoError: 'Failed to load feature information',
     featureProperties: 'Feature Properties',
     mapPreviewNotice: 'Large data files may take time to display',
+    noCategories: 'No categories found',
+    transparent: 'Transparent',
+    strokeColor: '4. Set stroke color',
+    strokeColorDescription: 'Set the stroke color for points and polygons',
+    circleStrokeColor: 'Point stroke color',
+    fillOutlineColor: 'Polygon outline color',
+    strokeColorAndWidth: '4. Set stroke color and width',
+    strokeColorAndWidthDescription: 'Set the stroke color and width for points and polygons',
+    strokeWidth: 'Stroke width',
 
   };
 
@@ -2119,6 +2236,15 @@ const caTranslations: Translations = {
     featureInfoError: 'Failed to load feature information',
     featureProperties: 'Feature Properties',
     mapPreviewNotice: 'Large data files may take time to display',
+    noCategories: 'No categories found',
+    transparent: 'Transparent',
+    strokeColor: '4. Set stroke color',
+    strokeColorDescription: 'Set the stroke color for points and polygons',
+    circleStrokeColor: 'Point stroke color',
+    fillOutlineColor: 'Polygon outline color',
+    strokeColorAndWidth: '4. Set stroke color and width',
+    strokeColorAndWidthDescription: 'Set the stroke color and width for points and polygons',
+    strokeWidth: 'Stroke width',
 
   };
 
@@ -2271,6 +2397,15 @@ const trTranslations: Translations = {
     featureInfoError: 'Failed to load feature information',
     featureProperties: 'Feature Properties',
     mapPreviewNotice: 'Large data files may take time to display',
+    noCategories: 'No categories found',
+    transparent: 'Transparent',
+    strokeColor: '4. Set stroke color',
+    strokeColorDescription: 'Set the stroke color for points and polygons',
+    circleStrokeColor: 'Point stroke color',
+    fillOutlineColor: 'Polygon outline color',
+    strokeColorAndWidth: '4. Set stroke color and width',
+    strokeColorAndWidthDescription: 'Set the stroke color and width for points and polygons',
+    strokeWidth: 'Stroke width',
 
   };
 
@@ -2423,6 +2558,15 @@ const itTranslations: Translations = {
     featureInfoError: 'Failed to load feature information',
     featureProperties: 'Feature Properties',
     mapPreviewNotice: 'Large data files may take time to display',
+    noCategories: 'No categories found',
+    transparent: 'Transparent',
+    strokeColor: '4. Set stroke color',
+    strokeColorDescription: 'Set the stroke color for points and polygons',
+    circleStrokeColor: 'Point stroke color',
+    fillOutlineColor: 'Polygon outline color',
+    strokeColorAndWidth: '4. Set stroke color and width',
+    strokeColorAndWidthDescription: 'Set the stroke color and width for points and polygons',
+    strokeWidth: 'Stroke width',
 
   };
 
@@ -2575,6 +2719,15 @@ const nlTranslations: Translations = {
     featureInfoError: 'Failed to load feature information',
     featureProperties: 'Feature Properties',
     mapPreviewNotice: 'Large data files may take time to display',
+    noCategories: 'No categories found',
+    transparent: 'Transparent',
+    strokeColor: '4. Set stroke color',
+    strokeColorDescription: 'Set the stroke color for points and polygons',
+    circleStrokeColor: 'Point stroke color',
+    fillOutlineColor: 'Polygon outline color',
+    strokeColorAndWidth: '4. Set stroke color and width',
+    strokeColorAndWidthDescription: 'Set the stroke color and width for points and polygons',
+    strokeWidth: 'Stroke width',
 
   };
 
@@ -2727,6 +2880,15 @@ const ukTranslations: Translations = {
     featureInfoError: 'Failed to load feature information',
     featureProperties: 'Feature Properties',
     mapPreviewNotice: 'Large data files may take time to display',
+    noCategories: 'No categories found',
+    transparent: 'Transparent',
+    strokeColor: '4. Set stroke color',
+    strokeColorDescription: 'Set the stroke color for points and polygons',
+    circleStrokeColor: 'Point stroke color',
+    fillOutlineColor: 'Polygon outline color',
+    strokeColorAndWidth: '4. Set stroke color and width',
+    strokeColorAndWidthDescription: 'Set the stroke color and width for points and polygons',
+    strokeWidth: 'Stroke width',
 
   };
 
@@ -2879,6 +3041,15 @@ const ptTranslations: Translations = {
     featureInfoError: 'Failed to load feature information',
     featureProperties: 'Feature Properties',
     mapPreviewNotice: 'Large data files may take time to display',
+    noCategories: 'No categories found',
+    transparent: 'Transparent',
+    strokeColor: '4. Set stroke color',
+    strokeColorDescription: 'Set the stroke color for points and polygons',
+    circleStrokeColor: 'Point stroke color',
+    fillOutlineColor: 'Polygon outline color',
+    strokeColorAndWidth: '4. Set stroke color and width',
+    strokeColorAndWidthDescription: 'Set the stroke color and width for points and polygons',
+    strokeWidth: 'Stroke width',
 
   };
 
@@ -3031,6 +3202,15 @@ const elTranslations: Translations = {
     featureInfoError: 'Failed to load feature information',
     featureProperties: 'Feature Properties',
     mapPreviewNotice: 'Large data files may take time to display',
+    noCategories: 'No categories found',
+    transparent: 'Transparent',
+    strokeColor: '4. Set stroke color',
+    strokeColorDescription: 'Set the stroke color for points and polygons',
+    circleStrokeColor: 'Point stroke color',
+    fillOutlineColor: 'Polygon outline color',
+    strokeColorAndWidth: '4. Set stroke color and width',
+    strokeColorAndWidthDescription: 'Set the stroke color and width for points and polygons',
+    strokeWidth: 'Stroke width',
 
   };
 
@@ -3183,6 +3363,15 @@ const viTranslations: Translations = {
     featureInfoError: 'Failed to load feature information',
     featureProperties: 'Feature Properties',
     mapPreviewNotice: 'Large data files may take time to display',
+    noCategories: 'No categories found',
+    transparent: 'Transparent',
+    strokeColor: '4. Set stroke color',
+    strokeColorDescription: 'Set the stroke color for points and polygons',
+    circleStrokeColor: 'Point stroke color',
+    fillOutlineColor: 'Polygon outline color',
+    strokeColorAndWidth: '4. Set stroke color and width',
+    strokeColorAndWidthDescription: 'Set the stroke color and width for points and polygons',
+    strokeWidth: 'Stroke width',
 
   };
 
@@ -3335,6 +3524,15 @@ const hiTranslations: Translations = {
     featureInfoError: 'Failed to load feature information',
     featureProperties: 'Feature Properties',
     mapPreviewNotice: 'Large data files may take time to display',
+    noCategories: 'No categories found',
+    transparent: 'Transparent',
+    strokeColor: '4. Set stroke color',
+    strokeColorDescription: 'Set the stroke color for points and polygons',
+    circleStrokeColor: 'Point stroke color',
+    fillOutlineColor: 'Polygon outline color',
+    strokeColorAndWidth: '4. Set stroke color and width',
+    strokeColorAndWidthDescription: 'Set the stroke color and width for points and polygons',
+    strokeWidth: 'Stroke width',
 
   };
 
@@ -3487,6 +3685,15 @@ const ruTranslations: Translations = {
     featureInfoError: 'Failed to load feature information',
     featureProperties: 'Feature Properties',
     mapPreviewNotice: 'Large data files may take time to display',
+    noCategories: 'No categories found',
+    transparent: 'Transparent',
+    strokeColor: '4. Set stroke color',
+    strokeColorDescription: 'Set the stroke color for points and polygons',
+    circleStrokeColor: 'Point stroke color',
+    fillOutlineColor: 'Polygon outline color',
+    strokeColorAndWidth: '4. Set stroke color and width',
+    strokeColorAndWidthDescription: 'Set the stroke color and width for points and polygons',
+    strokeWidth: 'Stroke width',
 
   };
 
@@ -3639,6 +3846,15 @@ const koTranslations: Translations = {
     featureInfoError: 'Failed to load feature information',
     featureProperties: 'Feature Properties',
     mapPreviewNotice: 'Large data files may take time to display',
+    noCategories: 'No categories found',
+    transparent: 'Transparent',
+    strokeColor: '4. Set stroke color',
+    strokeColorDescription: 'Set the stroke color for points and polygons',
+    circleStrokeColor: 'Point stroke color',
+    fillOutlineColor: 'Polygon outline color',
+    strokeColorAndWidth: '4. Set stroke color and width',
+    strokeColorAndWidthDescription: 'Set the stroke color and width for points and polygons',
+    strokeWidth: 'Stroke width',
 
   };
 
@@ -3791,6 +4007,15 @@ const idTranslations: Translations = {
     featureInfoError: 'Failed to load feature information',
     featureProperties: 'Feature Properties',
     mapPreviewNotice: 'Large data files may take time to display',
+    noCategories: 'No categories found',
+    transparent: 'Transparent',
+    strokeColor: '4. Set stroke color',
+    strokeColorDescription: 'Set the stroke color for points and polygons',
+    circleStrokeColor: 'Point stroke color',
+    fillOutlineColor: 'Polygon outline color',
+    strokeColorAndWidth: '4. Set stroke color and width',
+    strokeColorAndWidthDescription: 'Set the stroke color and width for points and polygons',
+    strokeWidth: 'Stroke width',
 
   };
 
@@ -3943,6 +4168,15 @@ const msTranslations: Translations = {
     featureInfoError: 'Failed to load feature information',
     featureProperties: 'Feature Properties',
     mapPreviewNotice: 'Large data files may take time to display',
+    noCategories: 'No categories found',
+    transparent: 'Transparent',
+    strokeColor: '4. Set stroke color',
+    strokeColorDescription: 'Set the stroke color for points and polygons',
+    circleStrokeColor: 'Point stroke color',
+    fillOutlineColor: 'Polygon outline color',
+    strokeColorAndWidth: '4. Set stroke color and width',
+    strokeColorAndWidthDescription: 'Set the stroke color and width for points and polygons',
+    strokeWidth: 'Stroke width',
 
   };
 
