@@ -119,6 +119,31 @@ export interface Translations {
   contactTitle: string;
   contactDescription: string;
   contactEmailTitle: string;
+  // Style Editor
+  styleEditor: string;
+  dataInfo: string;
+  uploadedData: string;
+  featureCount: string;
+  availableProperties: string;
+  mapPreview: string;
+  mapPreviewArea: string;
+  styleSettings: string;
+  selectProperty: string;
+  selectPropertyDescription: string;
+  selectColorMode: string;
+  selectColorModeDescription: string;
+  categoricalMode: string;
+  continuousMode: string;
+  styleDetails: string;
+  styleDetailsDescription: string;
+  legendPreview: string;
+  currentSettings: string;
+  exportMapLibre: string;
+  exportReEarth: string;
+  minValue: string;
+  maxValue: string;
+  selectGradient: string;
+  other: string;
 }
 
 // English translations
@@ -241,6 +266,32 @@ const enTranslations: Translations = {
     contactTitle: 'Contact',
     contactDescription: 'If you have any questions, comments, or requests regarding this service, please feel free to contact us.',
     contactEmailTitle: 'Email Address',
+    // Style Editor
+    styleEditor: 'Style Editor',
+    dataInfo: 'Data Information',
+    uploadedData: 'Uploaded Data',
+    featureCount: 'Feature Count',
+    availableProperties: 'Available Properties',
+    mapPreview: 'Map Preview',
+    mapPreviewArea: 'Map preview area',
+    styleSettings: 'Style Settings',
+    selectProperty: '1. Select the property to use for coloring',
+    selectPropertyDescription: 'Select the property to use for coloring',
+    selectColorMode: '2. Select how to apply colors',
+    selectColorModeDescription: 'Select how to apply colors',
+    categoricalMode: 'Color by category (categorical)',
+    continuousMode: 'Gradient by value (continuous)',
+    styleDetails: '3. Set color details',
+    styleDetailsDescription: 'Set color details',
+    legendPreview: 'Legend Preview',
+    currentSettings: 'Current Settings',
+    exportMapLibre: 'Export MapLibre / Mapbox style.json',
+    exportReEarth: 'Export Re:Earth style.json',
+    minValue: 'Min Value',
+    maxValue: 'Max Value',
+    selectGradient: 'Select Gradient',
+    other: 'Other',
+
   };
 
 const jaTranslations: Translations = {
@@ -362,7 +413,32 @@ const jaTranslations: Translations = {
     contactTitle: 'お問い合わせ',
     contactDescription: '本サービスに関するご質問、ご意見、ご要望がございましたら、お気軽にお問い合わせください。',
     contactEmailTitle: 'メールアドレス',
-  };
+    // Style Editor
+    styleEditor: 'スタイルエディタ',
+    dataInfo: 'データ情報',
+    uploadedData: 'アップロード済みデータ',
+    featureCount: 'フィーチャ数',
+    availableProperties: '利用可能な属性',
+    mapPreview: '地図プレビュー',
+    mapPreviewArea: 'Map preview area',
+    styleSettings: 'スタイル設定',
+    selectProperty: '1. 色分けに使う項目を選びます',
+    selectPropertyDescription: '色分けに使う項目を選びます',
+    selectColorMode: '2. 色の付け方を選びます',
+    selectColorModeDescription: '色の付け方を選びます',
+    categoricalMode: 'カテゴリ別に色分け（categorical）',
+    continuousMode: '数値の大小でグラデーション（continuous）',
+    styleDetails: '3. 色の詳細を設定します',
+    styleDetailsDescription: '色の詳細を設定します',
+    legendPreview: '凡例のプレビュー',
+    currentSettings: '現在の設定',
+    exportMapLibre: 'Export MapLibre / Mapbox style.json',
+    exportReEarth: 'Export Re:Earth style.json',
+    minValue: '最小値',
+    maxValue: '最大値',
+    selectGradient: 'グラデーションを選択',
+    other: 'その他',
+};
 
 const zhHantTranslations: Translations = {
     title: 'GIS Converter',
@@ -483,6 +559,32 @@ const zhHantTranslations: Translations = {
     contactTitle: '聯絡',
     contactDescription: '如果您對本服務有任何問題、意見或建議，歡迎隨時與我們聯繫。',
     contactEmailTitle: '電子郵件地址',
+    // Style Editor
+    styleEditor: 'Style Editor',
+    dataInfo: 'Data Information',
+    uploadedData: 'Uploaded Data',
+    featureCount: 'Feature Count',
+    availableProperties: 'Available Properties',
+    mapPreview: 'Map Preview',
+    mapPreviewArea: 'Map preview area',
+    styleSettings: 'Style Settings',
+    selectProperty: '1. Select the property to use for coloring',
+    selectPropertyDescription: 'Select the property to use for coloring',
+    selectColorMode: '2. Select how to apply colors',
+    selectColorModeDescription: 'Select how to apply colors',
+    categoricalMode: 'Color by category (categorical)',
+    continuousMode: 'Gradient by value (continuous)',
+    styleDetails: '3. Set color details',
+    styleDetailsDescription: 'Set color details',
+    legendPreview: 'Legend Preview',
+    currentSettings: 'Current Settings',
+    exportMapLibre: 'Export MapLibre / Mapbox style.json',
+    exportReEarth: 'Export Re:Earth style.json',
+    minValue: 'Min Value',
+    maxValue: 'Max Value',
+    selectGradient: 'Select Gradient',
+    other: 'Other',
+
   };
 
 const zhHansTranslations: Translations = {
@@ -604,6 +706,32 @@ const zhHansTranslations: Translations = {
     contactTitle: '联系',
     contactDescription: '如果您对本服务有任何问题、意见或建议，欢迎随时与我们联系。',
     contactEmailTitle: '电子邮件地址',
+    // Style Editor
+    styleEditor: 'Style Editor',
+    dataInfo: 'Data Information',
+    uploadedData: 'Uploaded Data',
+    featureCount: 'Feature Count',
+    availableProperties: 'Available Properties',
+    mapPreview: 'Map Preview',
+    mapPreviewArea: 'Map preview area',
+    styleSettings: 'Style Settings',
+    selectProperty: '1. Select the property to use for coloring',
+    selectPropertyDescription: 'Select the property to use for coloring',
+    selectColorMode: '2. Select how to apply colors',
+    selectColorModeDescription: 'Select how to apply colors',
+    categoricalMode: 'Color by category (categorical)',
+    continuousMode: 'Gradient by value (continuous)',
+    styleDetails: '3. Set color details',
+    styleDetailsDescription: 'Set color details',
+    legendPreview: 'Legend Preview',
+    currentSettings: 'Current Settings',
+    exportMapLibre: 'Export MapLibre / Mapbox style.json',
+    exportReEarth: 'Export Re:Earth style.json',
+    minValue: 'Min Value',
+    maxValue: 'Max Value',
+    selectGradient: 'Select Gradient',
+    other: 'Other',
+
   };
 
 // Polish translations
@@ -726,6 +854,32 @@ const plTranslations: Translations = {
     contactTitle: 'Kontakt',
     contactDescription: 'Jeśli masz pytania, uwagi lub prośby dotyczące tej usługi, prosimy o kontakt.',
     contactEmailTitle: 'Adres e-mail',
+    // Style Editor
+    styleEditor: 'Style Editor',
+    dataInfo: 'Data Information',
+    uploadedData: 'Uploaded Data',
+    featureCount: 'Feature Count',
+    availableProperties: 'Available Properties',
+    mapPreview: 'Map Preview',
+    mapPreviewArea: 'Map preview area',
+    styleSettings: 'Style Settings',
+    selectProperty: '1. Select the property to use for coloring',
+    selectPropertyDescription: 'Select the property to use for coloring',
+    selectColorMode: '2. Select how to apply colors',
+    selectColorModeDescription: 'Select how to apply colors',
+    categoricalMode: 'Color by category (categorical)',
+    continuousMode: 'Gradient by value (continuous)',
+    styleDetails: '3. Set color details',
+    styleDetailsDescription: 'Set color details',
+    legendPreview: 'Legend Preview',
+    currentSettings: 'Current Settings',
+    exportMapLibre: 'Export MapLibre / Mapbox style.json',
+    exportReEarth: 'Export Re:Earth style.json',
+    minValue: 'Min Value',
+    maxValue: 'Max Value',
+    selectGradient: 'Select Gradient',
+    other: 'Other',
+
   };
 
 // Spanish translations
@@ -848,6 +1002,32 @@ const esTranslations: Translations = {
     contactTitle: 'Contacto',
     contactDescription: 'Si tiene alguna pregunta, comentario o solicitud sobre este servicio, no dude en contactarnos.',
     contactEmailTitle: 'Dirección de correo electrónico',
+    // Style Editor
+    styleEditor: 'Style Editor',
+    dataInfo: 'Data Information',
+    uploadedData: 'Uploaded Data',
+    featureCount: 'Feature Count',
+    availableProperties: 'Available Properties',
+    mapPreview: 'Map Preview',
+    mapPreviewArea: 'Map preview area',
+    styleSettings: 'Style Settings',
+    selectProperty: '1. Select the property to use for coloring',
+    selectPropertyDescription: 'Select the property to use for coloring',
+    selectColorMode: '2. Select how to apply colors',
+    selectColorModeDescription: 'Select how to apply colors',
+    categoricalMode: 'Color by category (categorical)',
+    continuousMode: 'Gradient by value (continuous)',
+    styleDetails: '3. Set color details',
+    styleDetailsDescription: 'Set color details',
+    legendPreview: 'Legend Preview',
+    currentSettings: 'Current Settings',
+    exportMapLibre: 'Export MapLibre / Mapbox style.json',
+    exportReEarth: 'Export Re:Earth style.json',
+    minValue: 'Min Value',
+    maxValue: 'Max Value',
+    selectGradient: 'Select Gradient',
+    other: 'Other',
+
   };
 
 // Arabic translations
@@ -970,6 +1150,32 @@ const arTranslations: Translations = {
     contactTitle: 'اتصل',
     contactDescription: 'إذا كان لديك أي أسئلة أو تعليقات أو طلبات بخصوص هذه الخدمة، يرجى عدم التردد في الاتصال بنا.',
     contactEmailTitle: 'عنوان البريد الإلكتروني',
+    // Style Editor
+    styleEditor: 'Style Editor',
+    dataInfo: 'Data Information',
+    uploadedData: 'Uploaded Data',
+    featureCount: 'Feature Count',
+    availableProperties: 'Available Properties',
+    mapPreview: 'Map Preview',
+    mapPreviewArea: 'Map preview area',
+    styleSettings: 'Style Settings',
+    selectProperty: '1. Select the property to use for coloring',
+    selectPropertyDescription: 'Select the property to use for coloring',
+    selectColorMode: '2. Select how to apply colors',
+    selectColorModeDescription: 'Select how to apply colors',
+    categoricalMode: 'Color by category (categorical)',
+    continuousMode: 'Gradient by value (continuous)',
+    styleDetails: '3. Set color details',
+    styleDetailsDescription: 'Set color details',
+    legendPreview: 'Legend Preview',
+    currentSettings: 'Current Settings',
+    exportMapLibre: 'Export MapLibre / Mapbox style.json',
+    exportReEarth: 'Export Re:Earth style.json',
+    minValue: 'Min Value',
+    maxValue: 'Max Value',
+    selectGradient: 'Select Gradient',
+    other: 'Other',
+
   };
 
 // Swedish translations
@@ -1092,6 +1298,32 @@ const svTranslations: Translations = {
     contactTitle: 'Kontakt',
     contactDescription: 'Om du har några frågor, kommentarer eller önskemål angående denna tjänst, tveka inte att kontakta oss.',
     contactEmailTitle: 'E-postadress',
+    // Style Editor
+    styleEditor: 'Style Editor',
+    dataInfo: 'Data Information',
+    uploadedData: 'Uploaded Data',
+    featureCount: 'Feature Count',
+    availableProperties: 'Available Properties',
+    mapPreview: 'Map Preview',
+    mapPreviewArea: 'Map preview area',
+    styleSettings: 'Style Settings',
+    selectProperty: '1. Select the property to use for coloring',
+    selectPropertyDescription: 'Select the property to use for coloring',
+    selectColorMode: '2. Select how to apply colors',
+    selectColorModeDescription: 'Select how to apply colors',
+    categoricalMode: 'Color by category (categorical)',
+    continuousMode: 'Gradient by value (continuous)',
+    styleDetails: '3. Set color details',
+    styleDetailsDescription: 'Set color details',
+    legendPreview: 'Legend Preview',
+    currentSettings: 'Current Settings',
+    exportMapLibre: 'Export MapLibre / Mapbox style.json',
+    exportReEarth: 'Export Re:Earth style.json',
+    minValue: 'Min Value',
+    maxValue: 'Max Value',
+    selectGradient: 'Select Gradient',
+    other: 'Other',
+
   };
 
 // French translations
@@ -1214,6 +1446,32 @@ const frTranslations: Translations = {
     contactTitle: 'Kontakt',
     contactDescription: 'Om du har några frågor, kommentarer eller önskemål angående denna tjänst, tveka inte att kontakta oss.',
     contactEmailTitle: 'E-postadress',
+    // Style Editor
+    styleEditor: 'Style Editor',
+    dataInfo: 'Data Information',
+    uploadedData: 'Uploaded Data',
+    featureCount: 'Feature Count',
+    availableProperties: 'Available Properties',
+    mapPreview: 'Map Preview',
+    mapPreviewArea: 'Map preview area',
+    styleSettings: 'Style Settings',
+    selectProperty: '1. Select the property to use for coloring',
+    selectPropertyDescription: 'Select the property to use for coloring',
+    selectColorMode: '2. Select how to apply colors',
+    selectColorModeDescription: 'Select how to apply colors',
+    categoricalMode: 'Color by category (categorical)',
+    continuousMode: 'Gradient by value (continuous)',
+    styleDetails: '3. Set color details',
+    styleDetailsDescription: 'Set color details',
+    legendPreview: 'Legend Preview',
+    currentSettings: 'Current Settings',
+    exportMapLibre: 'Export MapLibre / Mapbox style.json',
+    exportReEarth: 'Export Re:Earth style.json',
+    minValue: 'Min Value',
+    maxValue: 'Max Value',
+    selectGradient: 'Select Gradient',
+    other: 'Other',
+
   };
 
 // Bulgarian translations
@@ -1336,6 +1594,32 @@ const bgTranslations: Translations = {
     contactTitle: 'Контакт',
     contactDescription: 'Ако имате въпроси, коментари или заявки относно тази услуга, моля не се колебайте да се свържете с нас.',
     contactEmailTitle: 'Имейл адрес',
+    // Style Editor
+    styleEditor: 'Style Editor',
+    dataInfo: 'Data Information',
+    uploadedData: 'Uploaded Data',
+    featureCount: 'Feature Count',
+    availableProperties: 'Available Properties',
+    mapPreview: 'Map Preview',
+    mapPreviewArea: 'Map preview area',
+    styleSettings: 'Style Settings',
+    selectProperty: '1. Select the property to use for coloring',
+    selectPropertyDescription: 'Select the property to use for coloring',
+    selectColorMode: '2. Select how to apply colors',
+    selectColorModeDescription: 'Select how to apply colors',
+    categoricalMode: 'Color by category (categorical)',
+    continuousMode: 'Gradient by value (continuous)',
+    styleDetails: '3. Set color details',
+    styleDetailsDescription: 'Set color details',
+    legendPreview: 'Legend Preview',
+    currentSettings: 'Current Settings',
+    exportMapLibre: 'Export MapLibre / Mapbox style.json',
+    exportReEarth: 'Export Re:Earth style.json',
+    minValue: 'Min Value',
+    maxValue: 'Max Value',
+    selectGradient: 'Select Gradient',
+    other: 'Other',
+
   };
 
 // Thai translations
@@ -1458,6 +1742,32 @@ const thTranslations: Translations = {
     contactTitle: 'ติดต่อ',
     contactDescription: 'หากคุณมีคำถาม ข้อคิดเห็น หรือคำขอเกี่ยวกับบริการนี้ กรุณาติดต่อเราได้ตามสะดวก',
     contactEmailTitle: 'ที่อยู่อีเมล',
+    // Style Editor
+    styleEditor: 'Style Editor',
+    dataInfo: 'Data Information',
+    uploadedData: 'Uploaded Data',
+    featureCount: 'Feature Count',
+    availableProperties: 'Available Properties',
+    mapPreview: 'Map Preview',
+    mapPreviewArea: 'Map preview area',
+    styleSettings: 'Style Settings',
+    selectProperty: '1. Select the property to use for coloring',
+    selectPropertyDescription: 'Select the property to use for coloring',
+    selectColorMode: '2. Select how to apply colors',
+    selectColorModeDescription: 'Select how to apply colors',
+    categoricalMode: 'Color by category (categorical)',
+    continuousMode: 'Gradient by value (continuous)',
+    styleDetails: '3. Set color details',
+    styleDetailsDescription: 'Set color details',
+    legendPreview: 'Legend Preview',
+    currentSettings: 'Current Settings',
+    exportMapLibre: 'Export MapLibre / Mapbox style.json',
+    exportReEarth: 'Export Re:Earth style.json',
+    minValue: 'Min Value',
+    maxValue: 'Max Value',
+    selectGradient: 'Select Gradient',
+    other: 'Other',
+
   };
 
 // German translations
@@ -1580,6 +1890,32 @@ const deTranslations: Translations = {
     contactTitle: 'Kontakt',
     contactDescription: 'Wenn Sie Fragen, Kommentare oder Anfragen zu diesem Service haben, zögern Sie bitte nicht, uns zu kontaktieren.',
     contactEmailTitle: 'E-Mail-Adresse',
+    // Style Editor
+    styleEditor: 'Style Editor',
+    dataInfo: 'Data Information',
+    uploadedData: 'Uploaded Data',
+    featureCount: 'Feature Count',
+    availableProperties: 'Available Properties',
+    mapPreview: 'Map Preview',
+    mapPreviewArea: 'Map preview area',
+    styleSettings: 'Style Settings',
+    selectProperty: '1. Select the property to use for coloring',
+    selectPropertyDescription: 'Select the property to use for coloring',
+    selectColorMode: '2. Select how to apply colors',
+    selectColorModeDescription: 'Select how to apply colors',
+    categoricalMode: 'Color by category (categorical)',
+    continuousMode: 'Gradient by value (continuous)',
+    styleDetails: '3. Set color details',
+    styleDetailsDescription: 'Set color details',
+    legendPreview: 'Legend Preview',
+    currentSettings: 'Current Settings',
+    exportMapLibre: 'Export MapLibre / Mapbox style.json',
+    exportReEarth: 'Export Re:Earth style.json',
+    minValue: 'Min Value',
+    maxValue: 'Max Value',
+    selectGradient: 'Select Gradient',
+    other: 'Other',
+
   };
 
 // Catalan translations
@@ -1702,6 +2038,32 @@ const caTranslations: Translations = {
     contactTitle: 'Contacte',
     contactDescription: 'Si teniu preguntes, comentaris o sol·licituds sobre aquest servei, no dubteu a contactar-nos.',
     contactEmailTitle: 'Adreça de correu electrònic',
+    // Style Editor
+    styleEditor: 'Style Editor',
+    dataInfo: 'Data Information',
+    uploadedData: 'Uploaded Data',
+    featureCount: 'Feature Count',
+    availableProperties: 'Available Properties',
+    mapPreview: 'Map Preview',
+    mapPreviewArea: 'Map preview area',
+    styleSettings: 'Style Settings',
+    selectProperty: '1. Select the property to use for coloring',
+    selectPropertyDescription: 'Select the property to use for coloring',
+    selectColorMode: '2. Select how to apply colors',
+    selectColorModeDescription: 'Select how to apply colors',
+    categoricalMode: 'Color by category (categorical)',
+    continuousMode: 'Gradient by value (continuous)',
+    styleDetails: '3. Set color details',
+    styleDetailsDescription: 'Set color details',
+    legendPreview: 'Legend Preview',
+    currentSettings: 'Current Settings',
+    exportMapLibre: 'Export MapLibre / Mapbox style.json',
+    exportReEarth: 'Export Re:Earth style.json',
+    minValue: 'Min Value',
+    maxValue: 'Max Value',
+    selectGradient: 'Select Gradient',
+    other: 'Other',
+
   };
 
 // Turkish translations
@@ -1824,6 +2186,32 @@ const trTranslations: Translations = {
     contactTitle: 'İletişim',
     contactDescription: 'Bu hizmet hakkında sorularınız, yorumlarınız veya istekleriniz varsa, lütfen bizimle iletişime geçmekten çekinmeyin.',
     contactEmailTitle: 'E-posta adresi',
+    // Style Editor
+    styleEditor: 'Style Editor',
+    dataInfo: 'Data Information',
+    uploadedData: 'Uploaded Data',
+    featureCount: 'Feature Count',
+    availableProperties: 'Available Properties',
+    mapPreview: 'Map Preview',
+    mapPreviewArea: 'Map preview area',
+    styleSettings: 'Style Settings',
+    selectProperty: '1. Select the property to use for coloring',
+    selectPropertyDescription: 'Select the property to use for coloring',
+    selectColorMode: '2. Select how to apply colors',
+    selectColorModeDescription: 'Select how to apply colors',
+    categoricalMode: 'Color by category (categorical)',
+    continuousMode: 'Gradient by value (continuous)',
+    styleDetails: '3. Set color details',
+    styleDetailsDescription: 'Set color details',
+    legendPreview: 'Legend Preview',
+    currentSettings: 'Current Settings',
+    exportMapLibre: 'Export MapLibre / Mapbox style.json',
+    exportReEarth: 'Export Re:Earth style.json',
+    minValue: 'Min Value',
+    maxValue: 'Max Value',
+    selectGradient: 'Select Gradient',
+    other: 'Other',
+
   };
 
 // Italian translations
@@ -1946,6 +2334,32 @@ const itTranslations: Translations = {
     contactTitle: 'Contact',
     contactDescription: 'If you have any questions, comments, or requests regarding this service, please feel free to contact us.',
     contactEmailTitle: 'Email Address',
+    // Style Editor
+    styleEditor: 'Style Editor',
+    dataInfo: 'Data Information',
+    uploadedData: 'Uploaded Data',
+    featureCount: 'Feature Count',
+    availableProperties: 'Available Properties',
+    mapPreview: 'Map Preview',
+    mapPreviewArea: 'Map preview area',
+    styleSettings: 'Style Settings',
+    selectProperty: '1. Select the property to use for coloring',
+    selectPropertyDescription: 'Select the property to use for coloring',
+    selectColorMode: '2. Select how to apply colors',
+    selectColorModeDescription: 'Select how to apply colors',
+    categoricalMode: 'Color by category (categorical)',
+    continuousMode: 'Gradient by value (continuous)',
+    styleDetails: '3. Set color details',
+    styleDetailsDescription: 'Set color details',
+    legendPreview: 'Legend Preview',
+    currentSettings: 'Current Settings',
+    exportMapLibre: 'Export MapLibre / Mapbox style.json',
+    exportReEarth: 'Export Re:Earth style.json',
+    minValue: 'Min Value',
+    maxValue: 'Max Value',
+    selectGradient: 'Select Gradient',
+    other: 'Other',
+
   };
 
 // Dutch translations
@@ -2068,6 +2482,32 @@ const nlTranslations: Translations = {
     contactTitle: 'Contact',
     contactDescription: 'Als u vragen, opmerkingen of verzoeken heeft met betrekking tot deze service, aarzel dan niet om contact met ons op te nemen.',
     contactEmailTitle: 'E-mailadres',
+    // Style Editor
+    styleEditor: 'Style Editor',
+    dataInfo: 'Data Information',
+    uploadedData: 'Uploaded Data',
+    featureCount: 'Feature Count',
+    availableProperties: 'Available Properties',
+    mapPreview: 'Map Preview',
+    mapPreviewArea: 'Map preview area',
+    styleSettings: 'Style Settings',
+    selectProperty: '1. Select the property to use for coloring',
+    selectPropertyDescription: 'Select the property to use for coloring',
+    selectColorMode: '2. Select how to apply colors',
+    selectColorModeDescription: 'Select how to apply colors',
+    categoricalMode: 'Color by category (categorical)',
+    continuousMode: 'Gradient by value (continuous)',
+    styleDetails: '3. Set color details',
+    styleDetailsDescription: 'Set color details',
+    legendPreview: 'Legend Preview',
+    currentSettings: 'Current Settings',
+    exportMapLibre: 'Export MapLibre / Mapbox style.json',
+    exportReEarth: 'Export Re:Earth style.json',
+    minValue: 'Min Value',
+    maxValue: 'Max Value',
+    selectGradient: 'Select Gradient',
+    other: 'Other',
+
   };
 
 // Ukrainian translations
@@ -2190,6 +2630,32 @@ const ukTranslations: Translations = {
     contactTitle: 'Contact',
     contactDescription: 'If you have any questions, comments, or requests regarding this service, please feel free to contact us.',
     contactEmailTitle: 'Email Address',
+    // Style Editor
+    styleEditor: 'Style Editor',
+    dataInfo: 'Data Information',
+    uploadedData: 'Uploaded Data',
+    featureCount: 'Feature Count',
+    availableProperties: 'Available Properties',
+    mapPreview: 'Map Preview',
+    mapPreviewArea: 'Map preview area',
+    styleSettings: 'Style Settings',
+    selectProperty: '1. Select the property to use for coloring',
+    selectPropertyDescription: 'Select the property to use for coloring',
+    selectColorMode: '2. Select how to apply colors',
+    selectColorModeDescription: 'Select how to apply colors',
+    categoricalMode: 'Color by category (categorical)',
+    continuousMode: 'Gradient by value (continuous)',
+    styleDetails: '3. Set color details',
+    styleDetailsDescription: 'Set color details',
+    legendPreview: 'Legend Preview',
+    currentSettings: 'Current Settings',
+    exportMapLibre: 'Export MapLibre / Mapbox style.json',
+    exportReEarth: 'Export Re:Earth style.json',
+    minValue: 'Min Value',
+    maxValue: 'Max Value',
+    selectGradient: 'Select Gradient',
+    other: 'Other',
+
   };
 
 // Portuguese translations
@@ -2312,6 +2778,32 @@ const ptTranslations: Translations = {
     contactTitle: 'Contact',
     contactDescription: 'If you have any questions, comments, or requests regarding this service, please feel free to contact us.',
     contactEmailTitle: 'Email Address',
+    // Style Editor
+    styleEditor: 'Style Editor',
+    dataInfo: 'Data Information',
+    uploadedData: 'Uploaded Data',
+    featureCount: 'Feature Count',
+    availableProperties: 'Available Properties',
+    mapPreview: 'Map Preview',
+    mapPreviewArea: 'Map preview area',
+    styleSettings: 'Style Settings',
+    selectProperty: '1. Select the property to use for coloring',
+    selectPropertyDescription: 'Select the property to use for coloring',
+    selectColorMode: '2. Select how to apply colors',
+    selectColorModeDescription: 'Select how to apply colors',
+    categoricalMode: 'Color by category (categorical)',
+    continuousMode: 'Gradient by value (continuous)',
+    styleDetails: '3. Set color details',
+    styleDetailsDescription: 'Set color details',
+    legendPreview: 'Legend Preview',
+    currentSettings: 'Current Settings',
+    exportMapLibre: 'Export MapLibre / Mapbox style.json',
+    exportReEarth: 'Export Re:Earth style.json',
+    minValue: 'Min Value',
+    maxValue: 'Max Value',
+    selectGradient: 'Select Gradient',
+    other: 'Other',
+
   };
 
 // Greek translations
@@ -2434,6 +2926,32 @@ const elTranslations: Translations = {
     contactTitle: 'Contact',
     contactDescription: 'If you have any questions, comments, or requests regarding this service, please feel free to contact us.',
     contactEmailTitle: 'Email Address',
+    // Style Editor
+    styleEditor: 'Style Editor',
+    dataInfo: 'Data Information',
+    uploadedData: 'Uploaded Data',
+    featureCount: 'Feature Count',
+    availableProperties: 'Available Properties',
+    mapPreview: 'Map Preview',
+    mapPreviewArea: 'Map preview area',
+    styleSettings: 'Style Settings',
+    selectProperty: '1. Select the property to use for coloring',
+    selectPropertyDescription: 'Select the property to use for coloring',
+    selectColorMode: '2. Select how to apply colors',
+    selectColorModeDescription: 'Select how to apply colors',
+    categoricalMode: 'Color by category (categorical)',
+    continuousMode: 'Gradient by value (continuous)',
+    styleDetails: '3. Set color details',
+    styleDetailsDescription: 'Set color details',
+    legendPreview: 'Legend Preview',
+    currentSettings: 'Current Settings',
+    exportMapLibre: 'Export MapLibre / Mapbox style.json',
+    exportReEarth: 'Export Re:Earth style.json',
+    minValue: 'Min Value',
+    maxValue: 'Max Value',
+    selectGradient: 'Select Gradient',
+    other: 'Other',
+
   };
 
 // Vietnamese translations
@@ -2556,6 +3074,32 @@ const viTranslations: Translations = {
     contactTitle: 'Liên hệ',
     contactDescription: 'Nếu bạn có bất kỳ câu hỏi, ý kiến hoặc yêu cầu nào về dịch vụ này, vui lòng liên hệ với chúng tôi.',
     contactEmailTitle: 'Địa chỉ email',
+    // Style Editor
+    styleEditor: 'Style Editor',
+    dataInfo: 'Data Information',
+    uploadedData: 'Uploaded Data',
+    featureCount: 'Feature Count',
+    availableProperties: 'Available Properties',
+    mapPreview: 'Map Preview',
+    mapPreviewArea: 'Map preview area',
+    styleSettings: 'Style Settings',
+    selectProperty: '1. Select the property to use for coloring',
+    selectPropertyDescription: 'Select the property to use for coloring',
+    selectColorMode: '2. Select how to apply colors',
+    selectColorModeDescription: 'Select how to apply colors',
+    categoricalMode: 'Color by category (categorical)',
+    continuousMode: 'Gradient by value (continuous)',
+    styleDetails: '3. Set color details',
+    styleDetailsDescription: 'Set color details',
+    legendPreview: 'Legend Preview',
+    currentSettings: 'Current Settings',
+    exportMapLibre: 'Export MapLibre / Mapbox style.json',
+    exportReEarth: 'Export Re:Earth style.json',
+    minValue: 'Min Value',
+    maxValue: 'Max Value',
+    selectGradient: 'Select Gradient',
+    other: 'Other',
+
   };
 
 // Hindi translations
@@ -2678,6 +3222,32 @@ const hiTranslations: Translations = {
     contactTitle: 'Contact',
     contactDescription: 'If you have any questions, comments, or requests regarding this service, please feel free to contact us.',
     contactEmailTitle: 'Email Address',
+    // Style Editor
+    styleEditor: 'Style Editor',
+    dataInfo: 'Data Information',
+    uploadedData: 'Uploaded Data',
+    featureCount: 'Feature Count',
+    availableProperties: 'Available Properties',
+    mapPreview: 'Map Preview',
+    mapPreviewArea: 'Map preview area',
+    styleSettings: 'Style Settings',
+    selectProperty: '1. Select the property to use for coloring',
+    selectPropertyDescription: 'Select the property to use for coloring',
+    selectColorMode: '2. Select how to apply colors',
+    selectColorModeDescription: 'Select how to apply colors',
+    categoricalMode: 'Color by category (categorical)',
+    continuousMode: 'Gradient by value (continuous)',
+    styleDetails: '3. Set color details',
+    styleDetailsDescription: 'Set color details',
+    legendPreview: 'Legend Preview',
+    currentSettings: 'Current Settings',
+    exportMapLibre: 'Export MapLibre / Mapbox style.json',
+    exportReEarth: 'Export Re:Earth style.json',
+    minValue: 'Min Value',
+    maxValue: 'Max Value',
+    selectGradient: 'Select Gradient',
+    other: 'Other',
+
   };
 
 // Russian translations
@@ -2800,6 +3370,32 @@ const ruTranslations: Translations = {
     contactTitle: 'Contact',
     contactDescription: 'If you have any questions, comments, or requests regarding this service, please feel free to contact us.',
     contactEmailTitle: 'Email Address',
+    // Style Editor
+    styleEditor: 'Style Editor',
+    dataInfo: 'Data Information',
+    uploadedData: 'Uploaded Data',
+    featureCount: 'Feature Count',
+    availableProperties: 'Available Properties',
+    mapPreview: 'Map Preview',
+    mapPreviewArea: 'Map preview area',
+    styleSettings: 'Style Settings',
+    selectProperty: '1. Select the property to use for coloring',
+    selectPropertyDescription: 'Select the property to use for coloring',
+    selectColorMode: '2. Select how to apply colors',
+    selectColorModeDescription: 'Select how to apply colors',
+    categoricalMode: 'Color by category (categorical)',
+    continuousMode: 'Gradient by value (continuous)',
+    styleDetails: '3. Set color details',
+    styleDetailsDescription: 'Set color details',
+    legendPreview: 'Legend Preview',
+    currentSettings: 'Current Settings',
+    exportMapLibre: 'Export MapLibre / Mapbox style.json',
+    exportReEarth: 'Export Re:Earth style.json',
+    minValue: 'Min Value',
+    maxValue: 'Max Value',
+    selectGradient: 'Select Gradient',
+    other: 'Other',
+
   };
 
 // Korean translations
@@ -2922,6 +3518,32 @@ const koTranslations: Translations = {
     contactTitle: 'Contact',
     contactDescription: 'If you have any questions, comments, or requests regarding this service, please feel free to contact us.',
     contactEmailTitle: 'Email Address',
+    // Style Editor
+    styleEditor: 'Style Editor',
+    dataInfo: 'Data Information',
+    uploadedData: 'Uploaded Data',
+    featureCount: 'Feature Count',
+    availableProperties: 'Available Properties',
+    mapPreview: 'Map Preview',
+    mapPreviewArea: 'Map preview area',
+    styleSettings: 'Style Settings',
+    selectProperty: '1. Select the property to use for coloring',
+    selectPropertyDescription: 'Select the property to use for coloring',
+    selectColorMode: '2. Select how to apply colors',
+    selectColorModeDescription: 'Select how to apply colors',
+    categoricalMode: 'Color by category (categorical)',
+    continuousMode: 'Gradient by value (continuous)',
+    styleDetails: '3. Set color details',
+    styleDetailsDescription: 'Set color details',
+    legendPreview: 'Legend Preview',
+    currentSettings: 'Current Settings',
+    exportMapLibre: 'Export MapLibre / Mapbox style.json',
+    exportReEarth: 'Export Re:Earth style.json',
+    minValue: 'Min Value',
+    maxValue: 'Max Value',
+    selectGradient: 'Select Gradient',
+    other: 'Other',
+
   };
 
 // Indonesian translations
@@ -3044,6 +3666,32 @@ const idTranslations: Translations = {
     contactTitle: 'Kontak',
     contactDescription: 'Jika Anda memiliki pertanyaan, komentar, atau permintaan terkait layanan ini, jangan ragu untuk menghubungi kami.',
     contactEmailTitle: 'Alamat email',
+    // Style Editor
+    styleEditor: 'Style Editor',
+    dataInfo: 'Data Information',
+    uploadedData: 'Uploaded Data',
+    featureCount: 'Feature Count',
+    availableProperties: 'Available Properties',
+    mapPreview: 'Map Preview',
+    mapPreviewArea: 'Map preview area',
+    styleSettings: 'Style Settings',
+    selectProperty: '1. Select the property to use for coloring',
+    selectPropertyDescription: 'Select the property to use for coloring',
+    selectColorMode: '2. Select how to apply colors',
+    selectColorModeDescription: 'Select how to apply colors',
+    categoricalMode: 'Color by category (categorical)',
+    continuousMode: 'Gradient by value (continuous)',
+    styleDetails: '3. Set color details',
+    styleDetailsDescription: 'Set color details',
+    legendPreview: 'Legend Preview',
+    currentSettings: 'Current Settings',
+    exportMapLibre: 'Export MapLibre / Mapbox style.json',
+    exportReEarth: 'Export Re:Earth style.json',
+    minValue: 'Min Value',
+    maxValue: 'Max Value',
+    selectGradient: 'Select Gradient',
+    other: 'Other',
+
   };
 
 // Malay translations
@@ -3166,6 +3814,32 @@ const msTranslations: Translations = {
     contactTitle: 'Contact',
     contactDescription: 'If you have any questions, comments, or requests regarding this service, please feel free to contact us.',
     contactEmailTitle: 'Email Address',
+    // Style Editor
+    styleEditor: 'Style Editor',
+    dataInfo: 'Data Information',
+    uploadedData: 'Uploaded Data',
+    featureCount: 'Feature Count',
+    availableProperties: 'Available Properties',
+    mapPreview: 'Map Preview',
+    mapPreviewArea: 'Map preview area',
+    styleSettings: 'Style Settings',
+    selectProperty: '1. Select the property to use for coloring',
+    selectPropertyDescription: 'Select the property to use for coloring',
+    selectColorMode: '2. Select how to apply colors',
+    selectColorModeDescription: 'Select how to apply colors',
+    categoricalMode: 'Color by category (categorical)',
+    continuousMode: 'Gradient by value (continuous)',
+    styleDetails: '3. Set color details',
+    styleDetailsDescription: 'Set color details',
+    legendPreview: 'Legend Preview',
+    currentSettings: 'Current Settings',
+    exportMapLibre: 'Export MapLibre / Mapbox style.json',
+    exportReEarth: 'Export Re:Earth style.json',
+    minValue: 'Min Value',
+    maxValue: 'Max Value',
+    selectGradient: 'Select Gradient',
+    other: 'Other',
+
   };
 
 export const translations: Record<Language, Translations> = {

@@ -4,6 +4,7 @@ export type ConversionState =
   | 'format-detection' 
   | 'converting' 
   | 'completed' 
+  | 'style-editor'
   | 'error' 
   | 'upload-error';
 
@@ -33,5 +34,29 @@ export interface ConversionResult {
   format: FileFormat;
   size: number;
   blob: Blob | null;
+}
+
+// Style Editor types
+export type ColorMode = 'categorical' | 'continuous';
+
+export interface CategoricalCategory {
+  value: string;
+  color: string;
+  label: string;
+}
+
+export interface ContinuousStyle {
+  minValue: number;
+  maxValue: number;
+  gradientColors: string[];
+}
+
+export interface StyleConfig {
+  property: string;
+  mode: ColorMode;
+  categorical?: {
+    categories: CategoricalCategory[];
+  };
+  continuous?: ContinuousStyle;
 }
 

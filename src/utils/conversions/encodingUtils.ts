@@ -45,3 +45,4 @@ export function normalizeEncodingForParsedbf(encoding: string): string {
   return encodingMap[normalized] || normalized;
 }
 
+

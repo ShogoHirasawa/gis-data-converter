@@ -1,16 +1,18 @@
 import React from 'react';
 import { useLanguage } from '../../i18n/LanguageContext';
 import { ConversionResult } from '../../types';
-import { CheckCircle, FileText, RefreshCw } from 'lucide-react';
+import { CheckCircle, FileText, RefreshCw, Palette } from 'lucide-react';
 
 interface CompletedStateProps {
   result: ConversionResult;
   onReset: () => void;
+  onStyleEditor?: () => void;
 }
 
 const CompletedState: React.FC<CompletedStateProps> = ({
   result,
   onReset,
+  onStyleEditor,
 }) => {
   const { t } = useLanguage();
 
@@ -71,23 +73,44 @@ const CompletedState: React.FC<CompletedStateProps> = ({
             </div>
           </div>
         </div>
-        <button
-          onClick={onReset}
-          className="w-full flex justify-center items-center gap-3 border border-solid rounded-full hover:bg-[#F8FAF7] transition"
-          style={{
-            backgroundColor: '#FFFFFF',
-            color: '#7FAD6F',
-            padding: '1rem 2rem',
-            borderColor: '#C8D8C5',
-          }}
-        >
-          <div className="flex justify-center items-center w-5 h-5">
-            <RefreshCw size={20} />
-          </div>
-          <span className="text-base whitespace-nowrap font-semibold">
-            {t.convertNew}
-          </span>
-        </button>
+        <div className="flex justify-center items-center gap-4 w-full">
+          {onStyleEditor && (
+            <button
+              onClick={onStyleEditor}
+              className="flex-1 flex justify-center items-center gap-3 border border-solid rounded-full hover:bg-[#F8FAF7] transition"
+              style={{
+                backgroundColor: '#FFFFFF',
+                color: '#7FAD6F',
+                padding: '1rem 2rem',
+                borderColor: '#C8D8C5',
+              }}
+            >
+              <div className="flex justify-center items-center w-5 h-5">
+                <Palette size={20} />
+              </div>
+              <span className="text-lg whitespace-nowrap font-semibold">
+                {t.styleEditor || 'Style Editor'}
+              </span>
+            </button>
+          )}
+          <button
+            onClick={onReset}
+            className="flex-1 flex justify-center items-center gap-3 border border-solid rounded-full hover:bg-[#F8FAF7] transition"
+            style={{
+              backgroundColor: '#FFFFFF',
+              color: '#7FAD6F',
+              padding: '1rem 2rem',
+              borderColor: '#C8D8C5',
+            }}
+          >
+            <div className="flex justify-center items-center w-5 h-5">
+              <RefreshCw size={20} />
+            </div>
+            <span className="text-lg whitespace-nowrap font-semibold">
+              {t.convertNew}
+            </span>
+          </button>
+        </div>
       </div>
     </div>
   );

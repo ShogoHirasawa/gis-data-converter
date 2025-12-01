@@ -20,3 +20,4 @@ wasm-pack build --target web --out-dir ../src/wasm
 echo "WASM build completed successfully!"
 echo "Output files are in src/wasm/"
 
+

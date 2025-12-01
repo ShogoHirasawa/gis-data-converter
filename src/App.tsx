@@ -307,6 +307,13 @@ function App() {
             onFileUpload={handleFileUpload}
             onFormatSelect={handleFormatSelect}
             onReset={handleReset}
+            onStyleEditor={() => setState('style-editor')}
+            onBackToFormatSelection={() => {
+              // Reset conversion result and go back to format selection
+              setConversionResult(null);
+              setSelectedFormat(null);
+              setState('format-detection');
+            }}
           />
         )}
         <Footer onPageChange={handlePageChange} />
