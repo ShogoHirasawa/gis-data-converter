@@ -133,7 +133,6 @@ The hosted web app can use Google Analytics (GA4). By default (no env set), anal
 - Display during data conversion (spinner and estimated time in seconds)
 - Preview display when importing data
 - Preview function for created data. When vector tiles are created, it allows you to check how they will appear at each zoom level. The following message should appear: "This tile does not exist at the current zoom level (data exists only at Z5 to Z10)."
-- If the character encoding of the input data is not UTF-8, convert it to UTF-8.
 - Enable conversion of GTFS/GBFS to GeoJSON
 - Compatible with PMTiles
 - Automatically detect the coordinate system and perform conversion
