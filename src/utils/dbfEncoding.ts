@@ -7,29 +7,7 @@ import JSZip from "jszip";
 import iconv from "iconv-lite";
 // @ts-ignore - buffer polyfill
 import { Buffer } from "buffer";
-
-/**
- * Normalize encoding name to iconv-lite compatible format
- */
-function normalizeEncoding(encoding: string): string {
-  const normalized = encoding.trim().toUpperCase();
-  
-  // Map common encoding names to iconv-lite format
-  const encodingMap: Record<string, string> = {
-    'SHIFT_JIS': 'CP932',
-    'SHIFT-JIS': 'CP932',
-    'SJIS': 'CP932',
-    'WINDOWS-31J': 'CP932',
-    'EUC-JP': 'EUC-JP',
-    'EUCJP': 'EUC-JP',
-    'UTF-8': 'UTF-8',
-    'UTF8': 'UTF-8',
-    'ISO-8859-1': 'ISO-8859-1',
-    'LATIN1': 'ISO-8859-1',
-  };
-  
-  return encodingMap[normalized] || normalized;
-}
+import { normalizeEncodingForIconv } from "./conversions/encodingUtils";
 
 /**
  * Read encoding from .cpg file
@@ -47,7 +25,7 @@ export async function readEncodingFromCpg(
   
   try {
     const cpgContent = await cpgFile.async('string');
-    const encoding = normalizeEncoding(cpgContent);
+    const encoding = normalizeEncodingForIconv(cpgContent);
     return encoding;
   } catch (error) {
     return null;

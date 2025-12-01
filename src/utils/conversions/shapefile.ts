@@ -12,21 +12,8 @@ import JSZip from "jszip";
 import { 
   detectEncodingFromDbf
 } from "../dbfEncoding";
-
-function normalizeEncodingForParsedbf(encoding: string): string {
-  const normalized = encoding.trim().toUpperCase();
-  const encodingMap: Record<string, string> = {
-    'CP932': 'Shift_JIS',
-    'SHIFT_JIS': 'Shift_JIS',
-    'SJIS': 'Shift_JIS',
-    'WINDOWS-31J': 'Shift_JIS',
-    'UTF-8': 'UTF-8',
-    'UTF8': 'UTF-8',
-    'ISO-8859-1': 'ISO-8859-1',
-    'LATIN1': 'ISO-8859-1',
-  };
-  return encodingMap[normalized] || normalized;
-}
+import { readPrjFileWithEncoding } from "./prjEncoding";
+import { normalizeEncodingForParsedbf } from "./encodingUtils";
 
 /**
  * Convert Shapefile (ZIP) to GeoJSON
@@ -54,40 +41,58 @@ export async function shapefileToGeoJSON(
     // Get individual files
     const shpFile = zip.file(`${baseName}.shp`);
     const dbfFile = zip.file(`${baseName}.dbf`);
-    const prjFile = zip.file(`${baseName}.prj`);
     const cpgFile = zip.file(`${baseName}.cpg`);
     
     if (!shpFile) {
       throw new Error(`Could not find ${baseName}.shp in ZIP`);
     }
     
+    // DBF file is required in Shapefile
+    if (!dbfFile) {
+      throw new Error(`Could not find ${baseName}.dbf in ZIP`);
+    }
+    
     // Prepare object for shpjs
     const shapefileObject: any = {
-      shp: await shpFile.async('arraybuffer')
+      shp: await shpFile.async('arraybuffer'),
+      dbf: await dbfFile.async('arraybuffer') // DBF is required
     };
     
-    // Add DBF file if exists (no conversion, shpjs will handle it)
-    if (dbfFile) {
-      shapefileObject.dbf = await dbfFile.async('arraybuffer');
+    // Add PRJ file if exists (optional)
+    // PRJ files are typically ASCII-only WKT format, so read as UTF-8
+    const prjText = await readPrjFileWithEncoding(zip, baseName);
+    if (prjText) {
+      shapefileObject.prj = prjText;
     }
     
-    // Add PRJ file if exists
-    if (prjFile) {
-      shapefileObject.prj = await prjFile.async('arraybuffer');
-    }
-    
+    // Set CPG encoding for parsedbf
     if (cpgFile) {
       let cpgEncoding = await cpgFile.async('string');
       cpgEncoding = normalizeEncodingForParsedbf(cpgEncoding);
       shapefileObject.cpg = cpgEncoding;
-    } else if (dbfFile) {
+    } else {
+      // CPG doesn't exist, detect from DBF (DBF is required)
       const dbfBuffer = await dbfFile.async('arraybuffer');
       let encoding = detectEncodingFromDbf(dbfBuffer);
       encoding = normalizeEncodingForParsedbf(encoding);
       shapefileObject.cpg = encoding;
     }
     
-    const geojson = await shpjs(shapefileObject);
+    // Try conversion with PRJ, if it fails, retry without PRJ
+    let geojson;
+    try {
+      geojson = await shpjs(shapefileObject);
+    } catch (error) {
+      // If conversion fails and PRJ file exists, try without PRJ
+      if (prjText) {
+        const shapefileObjectWithoutPrj = { ...shapefileObject };
+        delete shapefileObjectWithoutPrj.prj;
+        geojson = await shpjs(shapefileObjectWithoutPrj);
+      } else {
+        // Re-throw error if PRJ wasn't the issue
+        throw error;
+      }
+    }
     const featureCollection: GeoJSON.FeatureCollection = Array.isArray(geojson)
       ? geojson[0]
       : geojson;
