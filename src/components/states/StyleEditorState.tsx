@@ -340,10 +340,7 @@ const StyleEditorState: React.FC<StyleEditorStateProps> = ({
 
               const popupHTML = `
                 <div style="max-width: 300px; max-height: 400px; overflow-y: auto;">
-                  <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;">
-                    <h3 style="font-size: 18px; font-weight: 600; color: #2A3A28; margin: 0;">${t.featureProperties || 'Feature Properties'}</h3>
-                  </div>
-                  <div style="max-height: 350px; overflow-y: auto;">
+                  <div style="max-height: 400px; overflow-y: auto;">
                     ${propertiesHTML}
                   </div>
                 </div>
