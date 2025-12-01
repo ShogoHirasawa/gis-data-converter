@@ -597,12 +597,12 @@ const StyleEditorState: React.FC<StyleEditorStateProps> = ({
         {/* Map Preview */}
         <div
           ref={mapContainerRef}
-          className="flex-1 rounded-[32px] relative"
+          className="rounded-[32px] relative"
           style={{
             backgroundColor: '#F0F5EE',
             boxShadow: '0 2px 12px rgba(127, 173, 111, 0.08)',
-            aspectRatio: '16 / 9',
-            minHeight: '500px',
+            height: '650px',
+            width: '100%',
             overflow: 'hidden',
           }}
         >
