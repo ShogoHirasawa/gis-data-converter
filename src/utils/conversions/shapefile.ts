@@ -58,38 +58,31 @@ export async function shapefileToGeoJSON(
       dbf: await dbfFile.async('arraybuffer') // DBF is required
     };
     
-    // Add PRJ file if exists (optional)
-    // PRJ files are typically ASCII-only WKT format, so read as UTF-8
     const prjText = await readPrjFileWithEncoding(zip, baseName);
     if (prjText) {
       shapefileObject.prj = prjText;
     }
     
-    // Set CPG encoding for parsedbf
     if (cpgFile) {
       let cpgEncoding = await cpgFile.async('string');
       cpgEncoding = normalizeEncodingForParsedbf(cpgEncoding);
       shapefileObject.cpg = cpgEncoding;
     } else {
-      // CPG doesn't exist, detect from DBF (DBF is required)
       const dbfBuffer = await dbfFile.async('arraybuffer');
       let encoding = detectEncodingFromDbf(dbfBuffer);
       encoding = normalizeEncodingForParsedbf(encoding);
       shapefileObject.cpg = encoding;
     }
     
-    // Try conversion with PRJ, if it fails, retry without PRJ
     let geojson;
     try {
       geojson = await shpjs(shapefileObject);
     } catch (error) {
-      // If conversion fails and PRJ file exists, try without PRJ
       if (prjText) {
         const shapefileObjectWithoutPrj = { ...shapefileObject };
         delete shapefileObjectWithoutPrj.prj;
         geojson = await shpjs(shapefileObjectWithoutPrj);
       } else {
-        // Re-throw error if PRJ wasn't the issue
         throw error;
       }
     }
