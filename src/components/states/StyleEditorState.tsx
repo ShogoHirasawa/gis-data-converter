@@ -18,8 +18,9 @@ const StyleEditorState: React.FC<StyleEditorStateProps> = ({
 }) => {
   const { t } = useLanguage();
 
-  // Dummy data
-  const [selectedProperty, setSelectedProperty] = useState<string>('city_name');
+  // Use first available property or empty string
+  const initialProperty = result.featureInfo?.properties?.[0] || '';
+  const [selectedProperty, setSelectedProperty] = useState<string>(initialProperty);
   const [colorMode, setColorMode] = useState<ColorMode>('categorical');
   const [categories, setCategories] = useState<CategoricalCategory[]>([
     { value: '東京都', color: '#7FAD6F', label: '東京都' },
@@ -34,9 +35,12 @@ const StyleEditorState: React.FC<StyleEditorStateProps> = ({
     gradientColors: ['#7FAD6F', '#A3C595', '#D9B88F'],
   });
 
-  const dummyProperties = ['city_name', 'population', 'area', 'prefecture'];
-  const dummyFeatureCount = 1234;
   const geometryType = uploadedFile?.geometryType || 'point';
+  
+  // Use actual feature info if available, otherwise use empty data
+  const featureCount = result.featureInfo?.featureCount ?? 0;
+  const properties = result.featureInfo?.properties ?? [];
+  const featureInfoError = result.featureInfoError;
 
   const handleCategoryColorChange = (index: number, color: string) => {
     const newCategories = [...categories];
@@ -139,12 +143,21 @@ const StyleEditorState: React.FC<StyleEditorStateProps> = ({
               >
                 {t.featureCount || 'Feature Count'}
               </div>
-              <div
-                className="text-base"
-                style={{ color: '#2A3A28' }}
-              >
-                {dummyFeatureCount.toLocaleString()} {t.other === 'その他' ? '件' : 'features'}
-              </div>
+              {featureInfoError ? (
+                <div
+                  className="text-sm"
+                  style={{ color: '#D32F2F' }}
+                >
+                  {t.featureInfoError || 'Failed to load feature count'}
+                </div>
+              ) : (
+                <div
+                  className="text-base"
+                  style={{ color: '#2A3A28' }}
+                >
+                  {featureCount.toLocaleString()} {t.other === 'その他' ? '件' : 'features'}
+                </div>
+              )}
             </div>
 
             {/* Available Properties */}
@@ -155,20 +168,36 @@ const StyleEditorState: React.FC<StyleEditorStateProps> = ({
               >
                 {t.availableProperties || 'Available Properties'}
               </div>
-              <div className="flex flex-wrap gap-2">
-                {dummyProperties.map((prop) => (
-                  <div
-                    key={prop}
-                    className="px-3 py-1 rounded-full text-sm"
-                    style={{
-                      backgroundColor: '#F8FAF7',
-                      color: '#2A3A28',
-                    }}
-                  >
-                    {prop}
-                  </div>
-                ))}
-              </div>
+              {featureInfoError ? (
+                <div
+                  className="text-sm"
+                  style={{ color: '#D32F2F' }}
+                >
+                  {featureInfoError}
+                </div>
+              ) : properties.length > 0 ? (
+                <div className="flex flex-wrap gap-2">
+                  {properties.map((prop) => (
+                    <div
+                      key={prop}
+                      className="px-3 py-1 rounded-full text-sm"
+                      style={{
+                        backgroundColor: '#F8FAF7',
+                        color: '#2A3A28',
+                      }}
+                    >
+                      {prop}
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div
+                  className="text-sm"
+                  style={{ color: '#5A6A58' }}
+                >
+                  {t.noProperties || 'No properties available'}
+                </div>
+              )}
             </div>
           </div>
         </div>
@@ -242,12 +271,17 @@ const StyleEditorState: React.FC<StyleEditorStateProps> = ({
                 onChange={(e) => setSelectedProperty(e.target.value)}
                 className="flex-1 appearance-none bg-transparent border-none outline-none cursor-pointer"
                 style={{ color: '#2A3A28' }}
+                disabled={properties.length === 0}
               >
-                {dummyProperties.map((prop) => (
-                  <option key={prop} value={prop}>
-                    {prop}
-                  </option>
-                ))}
+                {properties.length > 0 ? (
+                  properties.map((prop) => (
+                    <option key={prop} value={prop}>
+                      {prop}
+                    </option>
+                  ))
+                ) : (
+                  <option value="">{t.noProperties || 'No properties available'}</option>
+                )}
               </select>
               <ChevronDown size={16} style={{ color: '#8A9A88' }} />
             </div>

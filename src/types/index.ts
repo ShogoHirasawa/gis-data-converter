@@ -29,11 +29,18 @@ export interface ConversionFormat {
   recommended?: boolean;
 }
 
+export interface FeatureInfo {
+  featureCount: number;
+  properties: string[];
+}
+
 export interface ConversionResult {
   fileName: string;
   format: FileFormat;
   size: number;
   blob: Blob | null;
+  featureInfo?: FeatureInfo;
+  featureInfoError?: string; // Error message if feature info extraction failed
 }
 
 // Style Editor types

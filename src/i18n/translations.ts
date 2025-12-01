@@ -144,6 +144,8 @@ export interface Translations {
   maxValue: string;
   selectGradient: string;
   other: string;
+  noProperties: string;
+  featureInfoError: string;
 }
 
 // English translations
@@ -291,6 +293,8 @@ const enTranslations: Translations = {
     maxValue: 'Max Value',
     selectGradient: 'Select Gradient',
     other: 'Other',
+    noProperties: 'No properties available',
+    featureInfoError: 'Failed to load feature information',
 
   };
 
@@ -438,7 +442,9 @@ const jaTranslations: Translations = {
     maxValue: '最大値',
     selectGradient: 'グラデーションを選択',
     other: 'その他',
-};
+    noProperties: '利用可能な属性がありません',
+    featureInfoError: 'データ情報の読み込みに失敗しました',
+  };
 
 const zhHantTranslations: Translations = {
     title: 'GIS Converter',
@@ -584,6 +590,8 @@ const zhHantTranslations: Translations = {
     maxValue: 'Max Value',
     selectGradient: 'Select Gradient',
     other: 'Other',
+    noProperties: 'No properties available',
+    featureInfoError: 'Failed to load feature information',
 
   };
 
@@ -731,6 +739,8 @@ const zhHansTranslations: Translations = {
     maxValue: 'Max Value',
     selectGradient: 'Select Gradient',
     other: 'Other',
+    noProperties: 'No properties available',
+    featureInfoError: 'Failed to load feature information',
 
   };
 
@@ -879,6 +889,8 @@ const plTranslations: Translations = {
     maxValue: 'Max Value',
     selectGradient: 'Select Gradient',
     other: 'Other',
+    noProperties: 'No properties available',
+    featureInfoError: 'Failed to load feature information',
 
   };
 
@@ -1027,6 +1039,8 @@ const esTranslations: Translations = {
     maxValue: 'Max Value',
     selectGradient: 'Select Gradient',
     other: 'Other',
+    noProperties: 'No properties available',
+    featureInfoError: 'Failed to load feature information',
 
   };
 
@@ -1175,6 +1189,8 @@ const arTranslations: Translations = {
     maxValue: 'Max Value',
     selectGradient: 'Select Gradient',
     other: 'Other',
+    noProperties: 'No properties available',
+    featureInfoError: 'Failed to load feature information',
 
   };
 
@@ -1323,6 +1339,8 @@ const svTranslations: Translations = {
     maxValue: 'Max Value',
     selectGradient: 'Select Gradient',
     other: 'Other',
+    noProperties: 'No properties available',
+    featureInfoError: 'Failed to load feature information',
 
   };
 
@@ -1471,6 +1489,8 @@ const frTranslations: Translations = {
     maxValue: 'Max Value',
     selectGradient: 'Select Gradient',
     other: 'Other',
+    noProperties: 'No properties available',
+    featureInfoError: 'Failed to load feature information',
 
   };
 
@@ -1619,6 +1639,8 @@ const bgTranslations: Translations = {
     maxValue: 'Max Value',
     selectGradient: 'Select Gradient',
     other: 'Other',
+    noProperties: 'No properties available',
+    featureInfoError: 'Failed to load feature information',
 
   };
 
@@ -1767,6 +1789,8 @@ const thTranslations: Translations = {
     maxValue: 'Max Value',
     selectGradient: 'Select Gradient',
     other: 'Other',
+    noProperties: 'No properties available',
+    featureInfoError: 'Failed to load feature information',
 
   };
 
@@ -1915,6 +1939,8 @@ const deTranslations: Translations = {
     maxValue: 'Max Value',
     selectGradient: 'Select Gradient',
     other: 'Other',
+    noProperties: 'No properties available',
+    featureInfoError: 'Failed to load feature information',
 
   };
 
@@ -2063,6 +2089,8 @@ const caTranslations: Translations = {
     maxValue: 'Max Value',
     selectGradient: 'Select Gradient',
     other: 'Other',
+    noProperties: 'No properties available',
+    featureInfoError: 'Failed to load feature information',
 
   };
 
@@ -2211,6 +2239,8 @@ const trTranslations: Translations = {
     maxValue: 'Max Value',
     selectGradient: 'Select Gradient',
     other: 'Other',
+    noProperties: 'No properties available',
+    featureInfoError: 'Failed to load feature information',
 
   };
 
@@ -2359,6 +2389,8 @@ const itTranslations: Translations = {
     maxValue: 'Max Value',
     selectGradient: 'Select Gradient',
     other: 'Other',
+    noProperties: 'No properties available',
+    featureInfoError: 'Failed to load feature information',
 
   };
 
@@ -2507,6 +2539,8 @@ const nlTranslations: Translations = {
     maxValue: 'Max Value',
     selectGradient: 'Select Gradient',
     other: 'Other',
+    noProperties: 'No properties available',
+    featureInfoError: 'Failed to load feature information',
 
   };
 
@@ -2655,6 +2689,8 @@ const ukTranslations: Translations = {
     maxValue: 'Max Value',
     selectGradient: 'Select Gradient',
     other: 'Other',
+    noProperties: 'No properties available',
+    featureInfoError: 'Failed to load feature information',
 
   };
 
@@ -2803,6 +2839,8 @@ const ptTranslations: Translations = {
     maxValue: 'Max Value',
     selectGradient: 'Select Gradient',
     other: 'Other',
+    noProperties: 'No properties available',
+    featureInfoError: 'Failed to load feature information',
 
   };
 
@@ -2951,6 +2989,8 @@ const elTranslations: Translations = {
     maxValue: 'Max Value',
     selectGradient: 'Select Gradient',
     other: 'Other',
+    noProperties: 'No properties available',
+    featureInfoError: 'Failed to load feature information',
 
   };
 
@@ -3099,6 +3139,8 @@ const viTranslations: Translations = {
     maxValue: 'Max Value',
     selectGradient: 'Select Gradient',
     other: 'Other',
+    noProperties: 'No properties available',
+    featureInfoError: 'Failed to load feature information',
 
   };
 
@@ -3247,6 +3289,8 @@ const hiTranslations: Translations = {
     maxValue: 'Max Value',
     selectGradient: 'Select Gradient',
     other: 'Other',
+    noProperties: 'No properties available',
+    featureInfoError: 'Failed to load feature information',
 
   };
 
@@ -3395,6 +3439,8 @@ const ruTranslations: Translations = {
     maxValue: 'Max Value',
     selectGradient: 'Select Gradient',
     other: 'Other',
+    noProperties: 'No properties available',
+    featureInfoError: 'Failed to load feature information',
 
   };
 
@@ -3543,6 +3589,8 @@ const koTranslations: Translations = {
     maxValue: 'Max Value',
     selectGradient: 'Select Gradient',
     other: 'Other',
+    noProperties: 'No properties available',
+    featureInfoError: 'Failed to load feature information',
 
   };
 
@@ -3691,6 +3739,8 @@ const idTranslations: Translations = {
     maxValue: 'Max Value',
     selectGradient: 'Select Gradient',
     other: 'Other',
+    noProperties: 'No properties available',
+    featureInfoError: 'Failed to load feature information',
 
   };
 
@@ -3839,6 +3889,8 @@ const msTranslations: Translations = {
     maxValue: 'Max Value',
     selectGradient: 'Select Gradient',
     other: 'Other',
+    noProperties: 'No properties available',
+    featureInfoError: 'Failed to load feature information',
 
   };
 
