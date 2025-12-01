@@ -1040,7 +1040,7 @@ const StyleEditorState: React.FC<StyleEditorStateProps> = ({
                   className="text-base"
                   style={{ color: '#2A3A28' }}
                 >
-                  {t.categoricalMode || 'Color by category (categorical)'}
+                  {t.categoricalMode || 'Color by category'}
                 </span>
               </label>
               <label className="flex items-center gap-3 cursor-pointer">
@@ -1069,7 +1069,7 @@ const StyleEditorState: React.FC<StyleEditorStateProps> = ({
                   className="text-base"
                   style={{ color: '#2A3A28' }}
                 >
-                  {t.continuousMode || 'Gradient by value (continuous)'}
+                  {t.continuousMode || 'Gradient by value'}
                 </span>
               </label>
             </div>
