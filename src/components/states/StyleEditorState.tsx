@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useLanguage } from '../../i18n/LanguageContext';
 import { ConversionResult, UploadedFile, ColorMode, CategoricalCategory, ContinuousStyle } from '../../types';
-import { MapPin, ChevronDown, Download, ArrowLeft, RefreshCw } from 'lucide-react';
+import { ChevronDown, Download, ArrowLeft, RefreshCw } from 'lucide-react';
 
 interface StyleEditorStateProps {
   result: ConversionResult;
@@ -103,88 +103,27 @@ const StyleEditorState: React.FC<StyleEditorStateProps> = ({
     URL.revokeObjectURL(url);
   };
 
-  const getGeometryTypeLabel = (type: string) => {
-    switch (type) {
-      case 'point':
-        return 'Point';
-      case 'line':
-        return 'Line';
-      case 'polygon':
-        return 'Polygon';
-      default:
-        return 'Point';
-    }
-  };
-
   return (
     <div className="w-full flex" style={{ minHeight: '900px' }}>
-      {/* Left Panel: Data Information */}
-      <aside
-        className="flex-shrink-0"
+      {/* Left Panel: Map Preview with Data Info */}
+      <main
+        className="flex-1 flex flex-col"
         style={{
-          width: '20rem',
-          backgroundColor: '#FCFDF9',
-          padding: '1.5rem',
+          padding: '0 2rem',
         }}
       >
         {/* Back Button */}
         <button
           onClick={onBack}
-          className="flex items-center gap-2 mb-6 text-base font-medium transition hover:opacity-70"
+          className="flex items-center gap-2 mb-6 text-base font-medium transition hover:opacity-70 self-start"
           style={{ color: '#7FAD6F' }}
         >
           <ArrowLeft size={20} />
           <span>{t.back || 'Back'}</span>
         </button>
 
-        <h2
-          className="mb-6 text-xl font-semibold"
-          style={{ color: '#2A3A28' }}
-        >
-          {t.dataInfo || 'Data Information'}
-        </h2>
-
-        {/* Uploaded Data */}
-        <div className="mb-8">
-          <h3
-            className="mb-4 text-lg font-semibold"
-            style={{ color: '#2A3A28' }}
-          >
-            {t.uploadedData || 'Uploaded Data'}
-          </h3>
-          <div
-            className="p-4 rounded-[24px]"
-            style={{
-              backgroundColor: '#FFFFFF',
-              boxShadow: '0 2px 12px rgba(127, 173, 111, 0.08)',
-            }}
-          >
-            <div className="flex items-center gap-3 mb-3">
-              <MapPin size={18} style={{ color: '#7FAD6F' }} />
-              <span
-                className="text-base font-medium"
-                style={{ color: '#2A3A28' }}
-              >
-                {getGeometryTypeLabel(geometryType)}
-              </span>
-            </div>
-            <div
-              className="text-sm"
-              style={{ color: '#5A6A58' }}
-            >
-              {result.fileName}
-            </div>
-          </div>
-        </div>
-
-        {/* Data Information */}
-        <div>
-          <h3
-            className="mb-4 text-lg font-semibold"
-            style={{ color: '#2A3A28' }}
-          >
-            {t.dataInfo || 'Data Information'}
-          </h3>
+        {/* Data Information Card */}
+        <div className="mb-4">
           <div
             className="p-4 rounded-[24px]"
             style={{
@@ -233,22 +172,15 @@ const StyleEditorState: React.FC<StyleEditorStateProps> = ({
             </div>
           </div>
         </div>
-      </aside>
 
-      {/* Center Panel: Map Preview */}
-      <main
-        className="flex-1 flex flex-col"
-        style={{
-          padding: '0 2rem',
-        }}
-      >
+        {/* Map Preview */}
         <div
           className="flex-1 flex items-center justify-center rounded-[32px]"
           style={{
             backgroundColor: '#F0F5EE',
             boxShadow: '0 2px 12px rgba(127, 173, 111, 0.08)',
             aspectRatio: '16 / 9',
-            marginTop: '1.5rem',
+            minHeight: '500px',
           }}
         >
           <div className="text-center">
@@ -417,30 +349,72 @@ const StyleEditorState: React.FC<StyleEditorStateProps> = ({
             </h3>
 
             {colorMode === 'categorical' ? (
-              <div className="space-y-3">
-                {categories.map((category, index) => (
+              <div className="space-y-4">
+                <div>
                   <div
-                    key={index}
-                    className="flex items-center justify-between px-3 py-3 rounded-2xl"
-                    style={{ backgroundColor: '#F8FAF7' }}
+                    className="mb-2 text-sm font-medium"
+                    style={{ color: '#5A6A58' }}
                   >
-                    <span
-                      className="text-sm"
-                      style={{ color: '#2A3A28' }}
-                    >
-                      {category.label}
-                    </span>
-                    <div className="flex items-center gap-2">
-                      <input
-                        type="color"
-                        value={category.color}
-                        onChange={(e) => handleCategoryColorChange(index, e.target.value)}
-                        className="w-6 h-6 rounded border cursor-pointer"
-                        style={{ borderColor: '#C8D8C5' }}
-                      />
-                    </div>
+                    {t.selectGradient || 'Select Gradient'}
                   </div>
-                ))}
+                  <div className="flex gap-2">
+                    <button
+                      className="px-4 py-2 rounded-full text-sm border"
+                      style={{
+                        backgroundColor: '#F8FAF7',
+                        borderColor: '#C8D8C5',
+                        color: '#2A3A28',
+                      }}
+                    >
+                      Green
+                    </button>
+                    <button
+                      className="px-4 py-2 rounded-full text-sm border"
+                      style={{
+                        backgroundColor: '#F8FAF7',
+                        borderColor: '#C8D8C5',
+                        color: '#2A3A28',
+                      }}
+                    >
+                      Blue
+                    </button>
+                    <button
+                      className="px-4 py-2 rounded-full text-sm border"
+                      style={{
+                        backgroundColor: '#F8FAF7',
+                        borderColor: '#C8D8C5',
+                        color: '#2A3A28',
+                      }}
+                    >
+                      Red
+                    </button>
+                  </div>
+                </div>
+                <div className="space-y-3">
+                  {categories.map((category, index) => (
+                    <div
+                      key={index}
+                      className="flex items-center justify-between px-3 py-3 rounded-2xl"
+                      style={{ backgroundColor: '#F8FAF7' }}
+                    >
+                      <span
+                        className="text-sm"
+                        style={{ color: '#2A3A28' }}
+                      >
+                        {category.label}
+                      </span>
+                      <div className="flex items-center gap-2">
+                        <input
+                          type="color"
+                          value={category.color}
+                          onChange={(e) => handleCategoryColorChange(index, e.target.value)}
+                          className="w-6 h-6 rounded border cursor-pointer"
+                          style={{ borderColor: '#C8D8C5' }}
+                        />
+                      </div>
+                    </div>
+                  ))}
+                </div>
               </div>
             ) : (
               <div className="space-y-4">
