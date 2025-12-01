@@ -1,7 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useLanguage } from '../../i18n/LanguageContext';
 import { ConversionResult, UploadedFile, ColorMode, CategoricalCategory, ContinuousStyle } from '../../types';
 import { ChevronDown, Download, ArrowLeft, RefreshCw } from 'lucide-react';
+import maplibregl from 'maplibre-gl';
+import 'maplibre-gl/dist/maplibre-gl.css';
 
 interface StyleEditorStateProps {
   result: ConversionResult;
@@ -41,6 +43,396 @@ const StyleEditorState: React.FC<StyleEditorStateProps> = ({
   const featureCount = result.featureInfo?.featureCount ?? 0;
   const properties = result.featureInfo?.properties ?? [];
   const featureInfoError = result.featureInfoError;
+
+  // Map container ref
+  const mapContainerRef = useRef<HTMLDivElement>(null);
+  const mapRef = useRef<maplibregl.Map | null>(null);
+  const popupRef = useRef<maplibregl.Popup | null>(null);
+
+  // Calculate bounding box from GeoJSON
+  const calculateBounds = (geojson: GeoJSON.FeatureCollection): maplibregl.LngLatBounds | null => {
+    try {
+      const coordinates: number[][] = [];
+      
+      const collectCoordinates = (coords: any) => {
+        if (Array.isArray(coords[0])) {
+          coords.forEach((coord: any) => collectCoordinates(coord));
+        } else if (typeof coords[0] === 'number' && typeof coords[1] === 'number') {
+          coordinates.push([coords[0], coords[1]]);
+        }
+      };
+
+      geojson.features.forEach((feature) => {
+        if (feature.geometry) {
+          if (feature.geometry.type === 'Point') {
+            const point = feature.geometry as GeoJSON.Point;
+            coordinates.push(point.coordinates as [number, number]);
+          } else if (feature.geometry.type === 'LineString') {
+            const line = feature.geometry as GeoJSON.LineString;
+            collectCoordinates(line.coordinates);
+          } else if (feature.geometry.type === 'Polygon') {
+            const polygon = feature.geometry as GeoJSON.Polygon;
+            collectCoordinates(polygon.coordinates);
+          } else if (feature.geometry.type === 'MultiPoint') {
+            const multiPoint = feature.geometry as GeoJSON.MultiPoint;
+            collectCoordinates(multiPoint.coordinates);
+          } else if (feature.geometry.type === 'MultiLineString') {
+            const multiLine = feature.geometry as GeoJSON.MultiLineString;
+            collectCoordinates(multiLine.coordinates);
+          } else if (feature.geometry.type === 'MultiPolygon') {
+            const multiPolygon = feature.geometry as GeoJSON.MultiPolygon;
+            collectCoordinates(multiPolygon.coordinates);
+          }
+        }
+      });
+
+      if (coordinates.length === 0) {
+        return null;
+      }
+
+      const lngs = coordinates.map((c) => c[0]);
+      const lats = coordinates.map((c) => c[1]);
+      const minLng = Math.min(...lngs);
+      const maxLng = Math.max(...lngs);
+      const minLat = Math.min(...lats);
+      const maxLat = Math.max(...lats);
+
+      return new maplibregl.LngLatBounds(
+        [minLng, minLat],
+        [maxLng, maxLat]
+      );
+    } catch (error) {
+      console.error('Error calculating bounds:', error);
+      return null;
+    }
+  };
+
+  // Initialize map
+  useEffect(() => {
+    if (!mapContainerRef.current || !uploadedFile?.cachedGeoJSON) {
+      return;
+    }
+
+    try {
+      let geojson: GeoJSON.FeatureCollection;
+      try {
+        geojson = JSON.parse(uploadedFile.cachedGeoJSON) as GeoJSON.FeatureCollection;
+      } catch (parseError) {
+        console.error('Error parsing GeoJSON:', parseError);
+        return;
+      }
+
+      if (!geojson || !geojson.features || geojson.features.length === 0) {
+        console.error('Invalid or empty GeoJSON');
+        return;
+      }
+      
+      // Calculate initial center and zoom from bounds
+      const bounds = calculateBounds(geojson);
+      let center: [number, number] = [0, 0];
+      let zoom = 2;
+
+      if (bounds) {
+        const sw = bounds.getSouthWest();
+        const ne = bounds.getNorthEast();
+        center = [
+          (sw.lng + ne.lng) / 2,
+          (sw.lat + ne.lat) / 2,
+        ];
+      }
+
+      // OSM-based style definition
+      const osmStyle: maplibregl.StyleSpecification = {
+        version: 8,
+        sources: {
+          'osm': {
+            type: 'raster',
+            tiles: ['https://tile.openstreetmap.org/{z}/{x}/{y}.png'],
+            tileSize: 256,
+            attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+          },
+        },
+        layers: [
+          {
+            id: 'osm-layer',
+            type: 'raster',
+            source: 'osm',
+          },
+        ],
+      };
+
+      // Initialize map
+      const map = new maplibregl.Map({
+        container: mapContainerRef.current,
+        style: osmStyle,
+        center: center,
+        zoom: zoom,
+      });
+
+      mapRef.current = map;
+
+      map.on('load', () => {
+        // Add GeoJSON source
+        map.addSource('geojson-source', {
+          type: 'geojson',
+          data: geojson,
+        });
+
+        // Add layer based on geometry type
+        if (geometryType === 'point' || geometryType === 'mixed') {
+          map.addLayer({
+            id: 'geojson-layer',
+            type: 'circle',
+            source: 'geojson-source',
+            paint: {
+              'circle-radius': 6,
+              'circle-color': '#7FAD6F',
+              'circle-stroke-width': 1,
+              'circle-stroke-color': '#FFFFFF',
+            },
+          });
+        }
+
+        if (geometryType === 'line' || geometryType === 'mixed') {
+          map.addLayer({
+            id: 'geojson-line-layer',
+            type: 'line',
+            source: 'geojson-source',
+            paint: {
+              'line-color': '#7FAD6F',
+              'line-width': 2,
+            },
+          });
+        }
+
+        if (geometryType === 'polygon' || geometryType === 'mixed') {
+          map.addLayer({
+            id: 'geojson-fill-layer',
+            type: 'fill',
+            source: 'geojson-source',
+            paint: {
+              'fill-color': '#7FAD6F',
+              'fill-opacity': 0.6,
+            },
+          });
+          map.addLayer({
+            id: 'geojson-outline-layer',
+            type: 'line',
+            source: 'geojson-source',
+            paint: {
+              'line-color': '#7FAD6F',
+              'line-width': 1,
+            },
+          });
+        }
+
+        // Fit bounds if available
+        if (bounds) {
+          map.fitBounds(bounds, {
+            padding: 50,
+            maxZoom: 15,
+          });
+        }
+
+        // Add click event to show feature properties
+        map.on('click', (e) => {
+          // Build list of existing layers based on geometry type
+          const availableLayers: string[] = [];
+          if (geometryType === 'point' || geometryType === 'mixed') {
+            availableLayers.push('geojson-layer');
+          }
+          if (geometryType === 'line' || geometryType === 'mixed') {
+            availableLayers.push('geojson-line-layer');
+          }
+          if (geometryType === 'polygon' || geometryType === 'mixed') {
+            availableLayers.push('geojson-fill-layer', 'geojson-outline-layer');
+          }
+
+          // Only query if there are available layers
+          if (availableLayers.length === 0) {
+            return;
+          }
+
+          const features = map.queryRenderedFeatures(e.point, {
+            layers: availableLayers,
+          });
+
+          if (features.length > 0) {
+            const feature = features[0];
+            if (feature.properties) {
+              const coordinates = (feature.geometry.type === 'Point'
+                ? (feature.geometry as GeoJSON.Point).coordinates
+                : e.lngLat.toArray()) as [number, number];
+
+              // Ensure that if the map is zoomed out such that multiple
+              // copies of the feature are visible, the popup appears
+              // over the copy being pointed to.
+              const lngLat = e.lngLat;
+              while (Math.abs(lngLat.lng - coordinates[0]) > 180) {
+                coordinates[0] += lngLat.lng > coordinates[0] ? 360 : -360;
+              }
+
+              // Create HTML content for popup
+              const propertiesHTML = Object.entries(feature.properties)
+                .map(([key, value]) => {
+                  const displayValue = value !== null && value !== undefined ? String(value) : '-';
+                  return `
+                    <div style="padding: 8px 0; border-bottom: 1px solid #E2EBE0;">
+                      <div style="font-weight: 600; color: #5A6A58; font-size: 12px; margin-bottom: 4px;">${key}</div>
+                      <div style="color: #2A3A28; font-size: 14px;">${displayValue}</div>
+                    </div>
+                  `;
+                })
+                .join('');
+
+              const popupHTML = `
+                <div style="max-width: 300px; max-height: 400px; overflow-y: auto;">
+                  <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;">
+                    <h3 style="font-size: 18px; font-weight: 600; color: #2A3A28; margin: 0;">${t.featureProperties || 'Feature Properties'}</h3>
+                  </div>
+                  <div style="max-height: 350px; overflow-y: auto;">
+                    ${propertiesHTML}
+                  </div>
+                </div>
+              `;
+
+              // Remove existing popup if any
+              if (popupRef.current) {
+                popupRef.current.remove();
+              }
+
+              // Create and show popup
+              const popup = new maplibregl.Popup({
+                closeButton: true,
+                closeOnClick: false,
+                className: 'custom-popup',
+              })
+                .setLngLat(coordinates)
+                .setHTML(popupHTML)
+                .addTo(map);
+
+              popupRef.current = popup;
+            }
+          }
+        });
+
+        // Change cursor on hover (only for existing layers)
+        if (geometryType === 'point' || geometryType === 'mixed') {
+          map.on('mouseenter', 'geojson-layer', () => {
+            map.getCanvas().style.cursor = 'pointer';
+          });
+          map.on('mouseleave', 'geojson-layer', () => {
+            map.getCanvas().style.cursor = '';
+          });
+        }
+        if (geometryType === 'line' || geometryType === 'mixed') {
+          map.on('mouseenter', 'geojson-line-layer', () => {
+            map.getCanvas().style.cursor = 'pointer';
+          });
+          map.on('mouseleave', 'geojson-line-layer', () => {
+            map.getCanvas().style.cursor = '';
+          });
+        }
+        if (geometryType === 'polygon' || geometryType === 'mixed') {
+          map.on('mouseenter', 'geojson-fill-layer', () => {
+            map.getCanvas().style.cursor = 'pointer';
+          });
+          map.on('mouseleave', 'geojson-fill-layer', () => {
+            map.getCanvas().style.cursor = '';
+          });
+        }
+      });
+
+      map.on('error', (e) => {
+        console.error('Map error:', e);
+      });
+
+      return () => {
+        if (popupRef.current) {
+          popupRef.current.remove();
+          popupRef.current = null;
+        }
+        if (mapRef.current) {
+          mapRef.current.remove();
+          mapRef.current = null;
+        }
+      };
+    } catch (error) {
+      console.error('Error initializing map:', error);
+    }
+  }, [uploadedFile?.cachedGeoJSON, geometryType]);
+
+  // Update map style based on selected property and color mode
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!map || !selectedProperty || !map.getSource('geojson-source')) {
+      return;
+    }
+
+    try {
+      const getColorExpression = (): any => {
+        if (colorMode === 'categorical') {
+          // Build match expression for categorical colors
+          const cases: any[] = [];
+          categories.forEach((category) => {
+            cases.push(category.value);
+            cases.push(category.color);
+          });
+          cases.push('#CCCCCC'); // Default color
+          
+          return [
+            'match',
+            ['get', selectedProperty],
+            ...cases,
+          ];
+        } else {
+          // Build interpolate expression for continuous colors
+          const stops: any[] = [];
+          const numColors = continuousStyle.gradientColors.length;
+          const range = continuousStyle.maxValue - continuousStyle.minValue;
+          
+          continuousStyle.gradientColors.forEach((color, index) => {
+            const value = continuousStyle.minValue + (range * index) / (numColors - 1);
+            stops.push(value);
+            stops.push(color);
+          });
+
+          return [
+            'interpolate',
+            ['linear'],
+            ['get', selectedProperty],
+            ...stops,
+          ];
+        }
+      };
+
+      const colorExpression = getColorExpression();
+
+      // Update layer styles based on geometry type
+      if (geometryType === 'point' || geometryType === 'mixed') {
+        if (map.getLayer('geojson-layer')) {
+          map.setPaintProperty('geojson-layer', 'circle-color', colorExpression);
+        }
+      }
+
+      if (geometryType === 'line' || geometryType === 'mixed') {
+        if (map.getLayer('geojson-line-layer')) {
+          map.setPaintProperty('geojson-line-layer', 'line-color', colorExpression);
+        }
+      }
+
+      if (geometryType === 'polygon' || geometryType === 'mixed') {
+        if (map.getLayer('geojson-fill-layer')) {
+          map.setPaintProperty('geojson-fill-layer', 'fill-color', colorExpression);
+        }
+        if (map.getLayer('geojson-outline-layer')) {
+          map.setPaintProperty('geojson-outline-layer', 'line-color', colorExpression);
+        }
+      }
+    } catch (error) {
+      console.error('Error updating map style:', error);
+    }
+  }, [selectedProperty, colorMode, categories, continuousStyle, geometryType]);
 
   const handleCategoryColorChange = (index: number, color: string) => {
     const newCategories = [...categories];
@@ -204,28 +596,34 @@ const StyleEditorState: React.FC<StyleEditorStateProps> = ({
 
         {/* Map Preview */}
         <div
-          className="flex-1 flex items-center justify-center rounded-[32px]"
+          ref={mapContainerRef}
+          className="flex-1 rounded-[32px] relative"
           style={{
             backgroundColor: '#F0F5EE',
             boxShadow: '0 2px 12px rgba(127, 173, 111, 0.08)',
             aspectRatio: '16 / 9',
             minHeight: '500px',
+            overflow: 'hidden',
           }}
         >
-          <div className="text-center">
-            <div
-              className="text-lg font-medium mb-2"
-              style={{ color: '#5A6A58' }}
-            >
-              {t.mapPreviewArea || 'Map preview area'}
+          {!uploadedFile?.cachedGeoJSON && (
+            <div className="flex items-center justify-center h-full">
+              <div className="text-center">
+                <div
+                  className="text-lg font-medium mb-2"
+                  style={{ color: '#5A6A58' }}
+                >
+                  {t.mapPreviewArea || 'Map preview area'}
+                </div>
+                <div
+                  className="text-sm"
+                  style={{ color: '#8A9A88' }}
+                >
+                  {t.noProperties || 'No data available'}
+                </div>
+              </div>
             </div>
-            <div
-              className="text-sm"
-              style={{ color: '#8A9A88' }}
-            >
-              property: {selectedProperty} / mode: {colorMode}
-            </div>
-          </div>
+          )}
         </div>
       </main>
 

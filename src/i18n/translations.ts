@@ -146,6 +146,7 @@ export interface Translations {
   other: string;
   noProperties: string;
   featureInfoError: string;
+  featureProperties: string;
 }
 
 // English translations
@@ -295,6 +296,7 @@ const enTranslations: Translations = {
     other: 'Other',
     noProperties: 'No properties available',
     featureInfoError: 'Failed to load feature information',
+    featureProperties: 'Feature Properties',
 
   };
 
@@ -444,6 +446,7 @@ const jaTranslations: Translations = {
     other: 'その他',
     noProperties: '利用可能な属性がありません',
     featureInfoError: 'データ情報の読み込みに失敗しました',
+    featureProperties: 'フィーチャの属性',
   };
 
 const zhHantTranslations: Translations = {
@@ -592,6 +595,7 @@ const zhHantTranslations: Translations = {
     other: 'Other',
     noProperties: 'No properties available',
     featureInfoError: 'Failed to load feature information',
+    featureProperties: 'Feature Properties',
 
   };
 
@@ -741,6 +745,7 @@ const zhHansTranslations: Translations = {
     other: 'Other',
     noProperties: 'No properties available',
     featureInfoError: 'Failed to load feature information',
+    featureProperties: 'Feature Properties',
 
   };
 
@@ -891,6 +896,7 @@ const plTranslations: Translations = {
     other: 'Other',
     noProperties: 'No properties available',
     featureInfoError: 'Failed to load feature information',
+    featureProperties: 'Feature Properties',
 
   };
 
@@ -1041,6 +1047,7 @@ const esTranslations: Translations = {
     other: 'Other',
     noProperties: 'No properties available',
     featureInfoError: 'Failed to load feature information',
+    featureProperties: 'Feature Properties',
 
   };
 
@@ -1191,6 +1198,7 @@ const arTranslations: Translations = {
     other: 'Other',
     noProperties: 'No properties available',
     featureInfoError: 'Failed to load feature information',
+    featureProperties: 'Feature Properties',
 
   };
 
@@ -1341,6 +1349,7 @@ const svTranslations: Translations = {
     other: 'Other',
     noProperties: 'No properties available',
     featureInfoError: 'Failed to load feature information',
+    featureProperties: 'Feature Properties',
 
   };
 
@@ -1491,6 +1500,7 @@ const frTranslations: Translations = {
     other: 'Other',
     noProperties: 'No properties available',
     featureInfoError: 'Failed to load feature information',
+    featureProperties: 'Feature Properties',
 
   };
 
@@ -1641,6 +1651,7 @@ const bgTranslations: Translations = {
     other: 'Other',
     noProperties: 'No properties available',
     featureInfoError: 'Failed to load feature information',
+    featureProperties: 'Feature Properties',
 
   };
 
@@ -1791,6 +1802,7 @@ const thTranslations: Translations = {
     other: 'Other',
     noProperties: 'No properties available',
     featureInfoError: 'Failed to load feature information',
+    featureProperties: 'Feature Properties',
 
   };
 
@@ -1941,6 +1953,7 @@ const deTranslations: Translations = {
     other: 'Other',
     noProperties: 'No properties available',
     featureInfoError: 'Failed to load feature information',
+    featureProperties: 'Feature Properties',
 
   };
 
@@ -2091,6 +2104,7 @@ const caTranslations: Translations = {
     other: 'Other',
     noProperties: 'No properties available',
     featureInfoError: 'Failed to load feature information',
+    featureProperties: 'Feature Properties',
 
   };
 
@@ -2241,6 +2255,7 @@ const trTranslations: Translations = {
     other: 'Other',
     noProperties: 'No properties available',
     featureInfoError: 'Failed to load feature information',
+    featureProperties: 'Feature Properties',
 
   };
 
@@ -2391,6 +2406,7 @@ const itTranslations: Translations = {
     other: 'Other',
     noProperties: 'No properties available',
     featureInfoError: 'Failed to load feature information',
+    featureProperties: 'Feature Properties',
 
   };
 
@@ -2541,6 +2557,7 @@ const nlTranslations: Translations = {
     other: 'Other',
     noProperties: 'No properties available',
     featureInfoError: 'Failed to load feature information',
+    featureProperties: 'Feature Properties',
 
   };
 
@@ -2691,6 +2708,7 @@ const ukTranslations: Translations = {
     other: 'Other',
     noProperties: 'No properties available',
     featureInfoError: 'Failed to load feature information',
+    featureProperties: 'Feature Properties',
 
   };
 
@@ -2841,6 +2859,7 @@ const ptTranslations: Translations = {
     other: 'Other',
     noProperties: 'No properties available',
     featureInfoError: 'Failed to load feature information',
+    featureProperties: 'Feature Properties',
 
   };
 
@@ -2991,6 +3010,7 @@ const elTranslations: Translations = {
     other: 'Other',
     noProperties: 'No properties available',
     featureInfoError: 'Failed to load feature information',
+    featureProperties: 'Feature Properties',
 
   };
 
@@ -3141,6 +3161,7 @@ const viTranslations: Translations = {
     other: 'Other',
     noProperties: 'No properties available',
     featureInfoError: 'Failed to load feature information',
+    featureProperties: 'Feature Properties',
 
   };
 
@@ -3291,6 +3312,7 @@ const hiTranslations: Translations = {
     other: 'Other',
     noProperties: 'No properties available',
     featureInfoError: 'Failed to load feature information',
+    featureProperties: 'Feature Properties',
 
   };
 
@@ -3441,6 +3463,7 @@ const ruTranslations: Translations = {
     other: 'Other',
     noProperties: 'No properties available',
     featureInfoError: 'Failed to load feature information',
+    featureProperties: 'Feature Properties',
 
   };
 
@@ -3591,6 +3614,7 @@ const koTranslations: Translations = {
     other: 'Other',
     noProperties: 'No properties available',
     featureInfoError: 'Failed to load feature information',
+    featureProperties: 'Feature Properties',
 
   };
 
@@ -3741,6 +3765,7 @@ const idTranslations: Translations = {
     other: 'Other',
     noProperties: 'No properties available',
     featureInfoError: 'Failed to load feature information',
+    featureProperties: 'Feature Properties',
 
   };
 
@@ -3891,6 +3916,7 @@ const msTranslations: Translations = {
     other: 'Other',
     noProperties: 'No properties available',
     featureInfoError: 'Failed to load feature information',
+    featureProperties: 'Feature Properties',
 
   };
 

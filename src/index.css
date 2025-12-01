@@ -35,3 +35,24 @@ body {
   animation: spin 1s linear infinite;
 }
 
+/* MapLibre Popup custom styles */
+.maplibregl-popup-content {
+  border-radius: 24px !important;
+  padding: 16px !important;
+  max-width: 300px !important;
+  max-height: 400px !important;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15) !important;
+}
+
+.maplibregl-popup-close-button {
+  font-size: 20px !important;
+  color: #5A6A58 !important;
+  padding: 4px 8px !important;
+  border-radius: 50% !important;
+  transition: background-color 0.2s !important;
+}
+
+.maplibregl-popup-close-button:hover {
+  background-color: #F8FAF7 !important;
+}
+
