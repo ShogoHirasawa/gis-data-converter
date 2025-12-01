@@ -1327,7 +1327,9 @@ const StyleEditorState: React.FC<StyleEditorStateProps> = ({
             >
               {t.legendPreview || 'Legend Preview'}
             </h3>
-            <div className="space-y-2">
+            <div 
+              className={`space-y-2 ${colorMode === 'categorical' && categories.length > 10 ? 'max-h-64 overflow-y-auto' : ''}`}
+            >
               {colorMode === 'categorical' ? (
                 categories.map((category, index) => (
                   <div key={index} className="flex items-center gap-3">
