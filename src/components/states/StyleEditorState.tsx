@@ -415,6 +415,67 @@ const StyleEditorState: React.FC<StyleEditorStateProps> = ({
     }
   }, [uploadedFile?.cachedGeoJSON, geometryType]);
 
+  // Helper function to check if a value can be converted to a number
+  const isNumericValue = (value: any): boolean => {
+    if (typeof value === 'number') {
+      return isFinite(value);
+    }
+    if (typeof value === 'string') {
+      // Check if string can be converted to a number
+      const num = Number(value);
+      return !isNaN(num) && isFinite(num) && value.trim() !== '';
+    }
+    return false;
+  };
+
+  // Check if property values are all numeric (including string representations of numbers)
+  const isNumericProperty = useCallback((property: string, geojson: GeoJSON.FeatureCollection): boolean => {
+    if (!property) return false;
+    
+    let hasValues = false;
+    for (const feature of geojson.features) {
+      if (feature.properties && feature.properties[property] !== undefined && feature.properties[property] !== null) {
+        hasValues = true;
+        const value = feature.properties[property];
+        // Check if value can be converted to a number (number type or string representation)
+        if (!isNumericValue(value)) {
+          return false;
+        }
+      }
+    }
+    return hasValues;
+  }, []);
+
+  // Extract min and max values from numeric property (including string representations of numbers)
+  const extractMinMaxValues = useCallback((property: string, geojson: GeoJSON.FeatureCollection): { min: number, max: number } | null => {
+    if (!property) return null;
+    
+    const numericValues: number[] = [];
+    for (const feature of geojson.features) {
+      if (feature.properties && feature.properties[property] !== undefined && feature.properties[property] !== null) {
+        const value = feature.properties[property];
+        // Convert to number if possible (handles both number type and string representation)
+        if (typeof value === 'number' && isFinite(value)) {
+          numericValues.push(value);
+        } else if (typeof value === 'string') {
+          const num = Number(value);
+          if (!isNaN(num) && isFinite(num) && value.trim() !== '') {
+            numericValues.push(num);
+          }
+        }
+      }
+    }
+    
+    if (numericValues.length === 0) {
+      return null;
+    }
+    
+    return {
+      min: Math.min(...numericValues),
+      max: Math.max(...numericValues),
+    };
+  }, []);
+
   // Extract unique values from GeoJSON for selected property
   const extractCategories = useCallback((property: string): CategoricalCategory[] => {
     if (!uploadedFile?.cachedGeoJSON || !property) {
@@ -472,6 +533,36 @@ const StyleEditorState: React.FC<StyleEditorStateProps> = ({
     }
   }, [selectedProperty, selectedGradient, colorMode, uploadedFile?.cachedGeoJSON, extractCategories]);
 
+  // Update continuous style min/max values when property changes (only for continuous mode)
+  useEffect(() => {
+    if (colorMode === 'continuous' && selectedProperty && uploadedFile?.cachedGeoJSON) {
+      try {
+        const geojson = JSON.parse(uploadedFile.cachedGeoJSON) as GeoJSON.FeatureCollection;
+        const isNumeric = isNumericProperty(selectedProperty, geojson);
+        
+        if (isNumeric) {
+          const minMax = extractMinMaxValues(selectedProperty, geojson);
+          if (minMax) {
+            setContinuousStyle((prev) => ({
+              ...prev,
+              minValue: minMax.min,
+              maxValue: minMax.max,
+            }));
+          }
+        } else {
+          // For non-numeric properties, set to null values (will display as "-")
+          setContinuousStyle((prev) => ({
+            ...prev,
+            minValue: NaN,
+            maxValue: NaN,
+          }));
+        }
+      } catch (error) {
+        console.error('Error updating continuous style:', error);
+      }
+    }
+  }, [selectedProperty, colorMode, uploadedFile?.cachedGeoJSON, isNumericProperty, extractMinMaxValues]);
+
   // Update continuous style when gradient changes (only for continuous mode)
   useEffect(() => {
     if (colorMode === 'continuous') {
@@ -514,9 +605,20 @@ const StyleEditorState: React.FC<StyleEditorStateProps> = ({
           ];
         } else {
           // Build interpolate expression for continuous colors
+          // Check if min/max values are valid (not NaN)
+          if (isNaN(continuousStyle.minValue) || isNaN(continuousStyle.maxValue)) {
+            // For non-numeric properties, return a default color
+            return '#CCCCCC';
+          }
+          
           const stops: any[] = [];
           const numColors = continuousStyle.gradientColors.length;
           const range = continuousStyle.maxValue - continuousStyle.minValue;
+          
+          if (range === 0) {
+            // If min and max are the same, use the first color
+            return continuousStyle.gradientColors[0] || '#CCCCCC';
+          }
           
           continuousStyle.gradientColors.forEach((color, index) => {
             const value = continuousStyle.minValue + (range * index) / (numColors - 1);
@@ -1097,13 +1199,13 @@ const StyleEditorState: React.FC<StyleEditorStateProps> = ({
                     className="mb-2 text-sm font-medium"
                     style={{ color: '#5A6A58' }}
                   >
-                    {t.minValue || 'Min Value'}: {continuousStyle.minValue.toLocaleString()}
+                    {t.minValue || 'Min Value'}: {!isNaN(continuousStyle.minValue) ? continuousStyle.minValue.toLocaleString() : '-'}
                   </div>
                   <div
                     className="text-sm font-medium"
                     style={{ color: '#5A6A58' }}
                   >
-                    {t.maxValue || 'Max Value'}: {continuousStyle.maxValue.toLocaleString()}
+                    {t.maxValue || 'Max Value'}: {!isNaN(continuousStyle.maxValue) ? continuousStyle.maxValue.toLocaleString() : '-'}
                   </div>
                 </div>
                 <div>
@@ -1356,8 +1458,8 @@ const StyleEditorState: React.FC<StyleEditorStateProps> = ({
                     />
                   </div>
                   <div className="flex justify-between text-xs" style={{ color: '#5A6A58' }}>
-                    <span>{continuousStyle.minValue.toLocaleString()}</span>
-                    <span>{continuousStyle.maxValue.toLocaleString()}</span>
+                    <span>{!isNaN(continuousStyle.minValue) ? continuousStyle.minValue.toLocaleString() : '-'}</span>
+                    <span>{!isNaN(continuousStyle.maxValue) ? continuousStyle.maxValue.toLocaleString() : '-'}</span>
                   </div>
                 </div>
               )}
