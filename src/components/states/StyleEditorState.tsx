@@ -1325,7 +1325,7 @@ const StyleEditorState: React.FC<StyleEditorStateProps> = ({
               className="mb-4 text-lg font-semibold"
               style={{ color: '#2A3A28' }}
             >
-              {t.legendPreview || 'Legend Preview'}
+              {t.legendPreview || 'Legend'}
             </h3>
             <div 
               className={`space-y-2 ${colorMode === 'categorical' && categories.length > 10 ? 'max-h-64 overflow-y-auto' : ''}`}
