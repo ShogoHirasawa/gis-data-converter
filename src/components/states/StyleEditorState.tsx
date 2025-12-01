@@ -52,50 +52,94 @@ const StyleEditorState: React.FC<StyleEditorStateProps> = ({
   // Calculate bounding box from GeoJSON
   const calculateBounds = (geojson: GeoJSON.FeatureCollection): maplibregl.LngLatBounds | null => {
     try {
-      const coordinates: number[][] = [];
-      
-      const collectCoordinates = (coords: any) => {
-        if (Array.isArray(coords[0])) {
-          coords.forEach((coord: any) => collectCoordinates(coord));
-        } else if (typeof coords[0] === 'number' && typeof coords[1] === 'number') {
-          coordinates.push([coords[0], coords[1]]);
+      let minLng = Infinity;
+      let minLat = Infinity;
+      let maxLng = -Infinity;
+      let maxLat = -Infinity;
+      let hasCoordinates = false;
+
+      // Iterative coordinate extraction to avoid stack overflow
+      const extractCoordinates = (coords: any): void => {
+        const stack: any[] = [coords];
+        
+        while (stack.length > 0) {
+          const current = stack.pop();
+          
+          if (!Array.isArray(current)) {
+            continue;
+          }
+          
+          // Check if this is a coordinate pair [lng, lat]
+          if (current.length >= 2 && 
+              typeof current[0] === 'number' && 
+              typeof current[1] === 'number') {
+            const lng = current[0];
+            const lat = current[1];
+            
+            // Validate coordinates
+            if (isFinite(lng) && isFinite(lat) && 
+                lng >= -180 && lng <= 180 && 
+                lat >= -90 && lat <= 90) {
+              minLng = Math.min(minLng, lng);
+              minLat = Math.min(minLat, lat);
+              maxLng = Math.max(maxLng, lng);
+              maxLat = Math.max(maxLat, lat);
+              hasCoordinates = true;
+            }
+          } else {
+            // Push nested arrays to stack (in reverse order to maintain order)
+            for (let i = current.length - 1; i >= 0; i--) {
+              stack.push(current[i]);
+            }
+          }
         }
       };
 
-      geojson.features.forEach((feature) => {
-        if (feature.geometry) {
-          if (feature.geometry.type === 'Point') {
-            const point = feature.geometry as GeoJSON.Point;
-            coordinates.push(point.coordinates as [number, number]);
-          } else if (feature.geometry.type === 'LineString') {
-            const line = feature.geometry as GeoJSON.LineString;
-            collectCoordinates(line.coordinates);
-          } else if (feature.geometry.type === 'Polygon') {
-            const polygon = feature.geometry as GeoJSON.Polygon;
-            collectCoordinates(polygon.coordinates);
-          } else if (feature.geometry.type === 'MultiPoint') {
-            const multiPoint = feature.geometry as GeoJSON.MultiPoint;
-            collectCoordinates(multiPoint.coordinates);
-          } else if (feature.geometry.type === 'MultiLineString') {
-            const multiLine = feature.geometry as GeoJSON.MultiLineString;
-            collectCoordinates(multiLine.coordinates);
-          } else if (feature.geometry.type === 'MultiPolygon') {
-            const multiPolygon = feature.geometry as GeoJSON.MultiPolygon;
-            collectCoordinates(multiPolygon.coordinates);
-          }
+      // Process each feature
+      for (const feature of geojson.features) {
+        if (!feature.geometry) {
+          continue;
         }
-      });
 
-      if (coordinates.length === 0) {
-        return null;
+        const geometry = feature.geometry;
+        
+        switch (geometry.type) {
+          case 'Point':
+            const point = geometry as GeoJSON.Point;
+            if (point.coordinates && point.coordinates.length >= 2) {
+              const [lng, lat] = point.coordinates;
+              if (isFinite(lng) && isFinite(lat)) {
+                minLng = Math.min(minLng, lng);
+                minLat = Math.min(minLat, lat);
+                maxLng = Math.max(maxLng, lng);
+                maxLat = Math.max(maxLat, lat);
+                hasCoordinates = true;
+              }
+            }
+            break;
+            
+          case 'LineString':
+          case 'MultiPoint':
+            const coords1 = (geometry as GeoJSON.LineString | GeoJSON.MultiPoint).coordinates;
+            extractCoordinates(coords1);
+            break;
+            
+          case 'Polygon':
+          case 'MultiLineString':
+            const coords2 = (geometry as GeoJSON.Polygon | GeoJSON.MultiLineString).coordinates;
+            extractCoordinates(coords2);
+            break;
+            
+          case 'MultiPolygon':
+            const coords3 = (geometry as GeoJSON.MultiPolygon).coordinates;
+            extractCoordinates(coords3);
+            break;
+        }
       }
 
-      const lngs = coordinates.map((c) => c[0]);
-      const lats = coordinates.map((c) => c[1]);
-      const minLng = Math.min(...lngs);
-      const maxLng = Math.max(...lngs);
-      const minLat = Math.min(...lats);
-      const maxLat = Math.max(...lats);
+      if (!hasCoordinates) {
+        return null;
+      }
 
       return new maplibregl.LngLatBounds(
         [minLng, minLat],
@@ -591,6 +635,16 @@ const StyleEditorState: React.FC<StyleEditorStateProps> = ({
                 </div>
               )}
             </div>
+          </div>
+        </div>
+
+        {/* Map Preview Notice */}
+        <div className="mb-2">
+          <div
+            className="text-xs"
+            style={{ color: '#8A9A88' }}
+          >
+            {t.mapPreviewNotice || 'Large data files may take time to display'}
           </div>
         </div>
 

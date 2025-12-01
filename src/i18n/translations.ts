@@ -147,6 +147,7 @@ export interface Translations {
   noProperties: string;
   featureInfoError: string;
   featureProperties: string;
+  mapPreviewNotice: string;
 }
 
 // English translations
@@ -297,6 +298,7 @@ const enTranslations: Translations = {
     noProperties: 'No properties available',
     featureInfoError: 'Failed to load feature information',
     featureProperties: 'Feature Properties',
+    mapPreviewNotice: 'Large data files may take time to display',
 
   };
 
@@ -447,6 +449,7 @@ const jaTranslations: Translations = {
     noProperties: '利用可能な属性がありません',
     featureInfoError: 'データ情報の読み込みに失敗しました',
     featureProperties: 'フィーチャの属性',
+    mapPreviewNotice: 'データ容量が大きいと表示に時間がかかることがあります',
   };
 
 const zhHantTranslations: Translations = {
@@ -596,6 +599,7 @@ const zhHantTranslations: Translations = {
     noProperties: 'No properties available',
     featureInfoError: 'Failed to load feature information',
     featureProperties: 'Feature Properties',
+    mapPreviewNotice: 'Large data files may take time to display',
 
   };
 
@@ -746,6 +750,7 @@ const zhHansTranslations: Translations = {
     noProperties: 'No properties available',
     featureInfoError: 'Failed to load feature information',
     featureProperties: 'Feature Properties',
+    mapPreviewNotice: 'Large data files may take time to display',
 
   };
 
@@ -897,6 +902,7 @@ const plTranslations: Translations = {
     noProperties: 'No properties available',
     featureInfoError: 'Failed to load feature information',
     featureProperties: 'Feature Properties',
+    mapPreviewNotice: 'Large data files may take time to display',
 
   };
 
@@ -1048,6 +1054,7 @@ const esTranslations: Translations = {
     noProperties: 'No properties available',
     featureInfoError: 'Failed to load feature information',
     featureProperties: 'Feature Properties',
+    mapPreviewNotice: 'Large data files may take time to display',
 
   };
 
@@ -1199,6 +1206,7 @@ const arTranslations: Translations = {
     noProperties: 'No properties available',
     featureInfoError: 'Failed to load feature information',
     featureProperties: 'Feature Properties',
+    mapPreviewNotice: 'Large data files may take time to display',
 
   };
 
@@ -1350,6 +1358,7 @@ const svTranslations: Translations = {
     noProperties: 'No properties available',
     featureInfoError: 'Failed to load feature information',
     featureProperties: 'Feature Properties',
+    mapPreviewNotice: 'Large data files may take time to display',
 
   };
 
@@ -1501,6 +1510,7 @@ const frTranslations: Translations = {
     noProperties: 'No properties available',
     featureInfoError: 'Failed to load feature information',
     featureProperties: 'Feature Properties',
+    mapPreviewNotice: 'Large data files may take time to display',
 
   };
 
@@ -1652,6 +1662,7 @@ const bgTranslations: Translations = {
     noProperties: 'No properties available',
     featureInfoError: 'Failed to load feature information',
     featureProperties: 'Feature Properties',
+    mapPreviewNotice: 'Large data files may take time to display',
 
   };
 
@@ -1803,6 +1814,7 @@ const thTranslations: Translations = {
     noProperties: 'No properties available',
     featureInfoError: 'Failed to load feature information',
     featureProperties: 'Feature Properties',
+    mapPreviewNotice: 'Large data files may take time to display',
 
   };
 
@@ -1954,6 +1966,7 @@ const deTranslations: Translations = {
     noProperties: 'No properties available',
     featureInfoError: 'Failed to load feature information',
     featureProperties: 'Feature Properties',
+    mapPreviewNotice: 'Large data files may take time to display',
 
   };
 
@@ -2105,6 +2118,7 @@ const caTranslations: Translations = {
     noProperties: 'No properties available',
     featureInfoError: 'Failed to load feature information',
     featureProperties: 'Feature Properties',
+    mapPreviewNotice: 'Large data files may take time to display',
 
   };
 
@@ -2256,6 +2270,7 @@ const trTranslations: Translations = {
     noProperties: 'No properties available',
     featureInfoError: 'Failed to load feature information',
     featureProperties: 'Feature Properties',
+    mapPreviewNotice: 'Large data files may take time to display',
 
   };
 
@@ -2407,6 +2422,7 @@ const itTranslations: Translations = {
     noProperties: 'No properties available',
     featureInfoError: 'Failed to load feature information',
     featureProperties: 'Feature Properties',
+    mapPreviewNotice: 'Large data files may take time to display',
 
   };
 
@@ -2558,6 +2574,7 @@ const nlTranslations: Translations = {
     noProperties: 'No properties available',
     featureInfoError: 'Failed to load feature information',
     featureProperties: 'Feature Properties',
+    mapPreviewNotice: 'Large data files may take time to display',
 
   };
 
@@ -2709,6 +2726,7 @@ const ukTranslations: Translations = {
     noProperties: 'No properties available',
     featureInfoError: 'Failed to load feature information',
     featureProperties: 'Feature Properties',
+    mapPreviewNotice: 'Large data files may take time to display',
 
   };
 
@@ -2860,6 +2878,7 @@ const ptTranslations: Translations = {
     noProperties: 'No properties available',
     featureInfoError: 'Failed to load feature information',
     featureProperties: 'Feature Properties',
+    mapPreviewNotice: 'Large data files may take time to display',
 
   };
 
@@ -3011,6 +3030,7 @@ const elTranslations: Translations = {
     noProperties: 'No properties available',
     featureInfoError: 'Failed to load feature information',
     featureProperties: 'Feature Properties',
+    mapPreviewNotice: 'Large data files may take time to display',
 
   };
 
@@ -3162,6 +3182,7 @@ const viTranslations: Translations = {
     noProperties: 'No properties available',
     featureInfoError: 'Failed to load feature information',
     featureProperties: 'Feature Properties',
+    mapPreviewNotice: 'Large data files may take time to display',
 
   };
 
@@ -3313,6 +3334,7 @@ const hiTranslations: Translations = {
     noProperties: 'No properties available',
     featureInfoError: 'Failed to load feature information',
     featureProperties: 'Feature Properties',
+    mapPreviewNotice: 'Large data files may take time to display',
 
   };
 
@@ -3464,6 +3486,7 @@ const ruTranslations: Translations = {
     noProperties: 'No properties available',
     featureInfoError: 'Failed to load feature information',
     featureProperties: 'Feature Properties',
+    mapPreviewNotice: 'Large data files may take time to display',
 
   };
 
@@ -3615,6 +3638,7 @@ const koTranslations: Translations = {
     noProperties: 'No properties available',
     featureInfoError: 'Failed to load feature information',
     featureProperties: 'Feature Properties',
+    mapPreviewNotice: 'Large data files may take time to display',
 
   };
 
@@ -3766,6 +3790,7 @@ const idTranslations: Translations = {
     noProperties: 'No properties available',
     featureInfoError: 'Failed to load feature information',
     featureProperties: 'Feature Properties',
+    mapPreviewNotice: 'Large data files may take time to display',
 
   };
 
@@ -3917,6 +3942,7 @@ const msTranslations: Translations = {
     noProperties: 'No properties available',
     featureInfoError: 'Failed to load feature information',
     featureProperties: 'Feature Properties',
+    mapPreviewNotice: 'Large data files may take time to display',
 
   };
 
