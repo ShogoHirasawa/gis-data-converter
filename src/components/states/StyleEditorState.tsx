@@ -772,30 +772,176 @@ const StyleEditorState: React.FC<StyleEditorStateProps> = ({
     URL.revokeObjectURL(url);
   };
 
-  const handleExportReEarth = () => {
-    const dummyStyle = {
-      type: 'reearth-style',
-      version: '1.0.0',
-      layers: [
-        {
-          id: 'custom-layer',
-          type: geometryType,
-          style: {
-            color: colorMode === 'categorical' ? '#7FAD6F' : '#7FAD6F',
-          },
-        },
-      ],
+  // Convert color to Re:Earth format (hex with alpha channel)
+  const convertColorToReEarth = (color: string): string => {
+    // Handle rgba(0, 0, 0, 0) format
+    if (color === 'rgba(0, 0, 0, 0)') {
+      return '#00000000';
+    }
+    
+    // Handle rgba format
+    const rgbaMatch = color.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)(?:,\s*([\d.]+))?\)/);
+    if (rgbaMatch) {
+      const r = parseInt(rgbaMatch[1]).toString(16).padStart(2, '0');
+      const g = parseInt(rgbaMatch[2]).toString(16).padStart(2, '0');
+      const b = parseInt(rgbaMatch[3]).toString(16).padStart(2, '0');
+      const a = rgbaMatch[4] ? Math.round(parseFloat(rgbaMatch[4]) * 255).toString(16).padStart(2, '0') : 'ff';
+      return `#${r}${g}${b}${a}`;
+    }
+    
+    // Handle hex format (3 or 6 digits)
+    if (color.startsWith('#')) {
+      const hex = color.slice(1);
+      if (hex.length === 3) {
+        // Expand #RGB to #RRGGBB
+        const r = hex[0].repeat(2);
+        const g = hex[1].repeat(2);
+        const b = hex[2].repeat(2);
+        return `#${r}${g}${b}ff`;
+      } else if (hex.length === 6) {
+        // Add alpha channel if not present
+        return `#${hex}ff`;
+      } else if (hex.length === 8) {
+        // Already has alpha channel
+        return color;
+      }
+    }
+    
+    // Default: return as is (shouldn't happen)
+    return color;
+  };
+
+  // Generate Re:Earth style.json
+  const generateReEarthStyle = (): any => {
+    const style: any = {};
+
+    // Helper function to create color expression
+    const createColorExpression = (): any => {
+      if (!selectedProperty) {
+        return convertColorToReEarth('#CCCCCC');
+      }
+
+      if (colorMode === 'categorical') {
+        if (categories.length === 0) {
+          return convertColorToReEarth('#CCCCCC');
+        }
+
+        const conditions: any[] = [];
+        categories.forEach((category) => {
+          // Determine if value is numeric or string
+          const isNumeric = !isNaN(Number(category.value)) && category.value !== '';
+          const conditionValue = isNumeric 
+            ? category.value 
+            : `'${category.value}'`;
+          const color = convertColorToReEarth(category.color);
+          conditions.push([
+            `\${${selectedProperty}} === ${conditionValue}`,
+            `color('${color}')`
+          ]);
+        });
+        
+        // Add default color
+        conditions.push(['true', `color('${convertColorToReEarth('#CCCCCC')}')`]);
+
+        return {
+          expression: {
+            conditions
+          }
+        };
+      } else {
+        // Continuous mode
+        if (isNaN(continuousStyle.minValue) || isNaN(continuousStyle.maxValue)) {
+          return convertColorToReEarth('#CCCCCC');
+        }
+
+        const conditions: any[] = [];
+        const numColors = continuousStyle.gradientColors.length;
+        const range = continuousStyle.maxValue - continuousStyle.minValue;
+
+        if (range === 0) {
+          // If min and max are the same, use the first color
+          return convertColorToReEarth(continuousStyle.gradientColors[0] || '#CCCCCC');
+        }
+
+        // Create conditions from highest to lowest value
+        for (let i = numColors - 1; i >= 0; i--) {
+          const value = continuousStyle.minValue + (range * i) / (numColors - 1);
+          const color = convertColorToReEarth(continuousStyle.gradientColors[i]);
+          conditions.push([
+            `\${${selectedProperty}} >= ${value}`,
+            `color('${color}')`
+          ]);
+        }
+
+        // Add default color for values below minimum
+        conditions.push(['true', `color('${convertColorToReEarth('#CCCCCC')}')`]);
+
+        return {
+          expression: {
+            conditions
+          }
+        };
+      }
     };
 
-    const blob = new Blob([JSON.stringify(dummyStyle, null, 2)], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'style-reearth.json';
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
+    const colorExpression = createColorExpression();
+    const strokeColor = convertColorToReEarth(
+      geometryType === 'point' ? circleStrokeColor : fillOutlineColor
+    );
+
+    // Generate style based on geometry type
+    if (geometryType === 'point' || geometryType === 'mixed') {
+      style.marker = {
+        pointColor: colorExpression,
+        pointOutlineColor: strokeColor === '#00000000' ? '#FFFFFF' : strokeColor,
+        pointOutlineWidth: strokeWidth,
+        pointSize: 12,
+        style: 'point',
+        heightReference: 'relative',
+        hideIndicator: true,
+      };
+    }
+
+    if (geometryType === 'line' || geometryType === 'mixed') {
+      style.polyline = {
+        strokeColor: colorExpression,
+        strokeWidth: strokeWidth,
+        clampToGround: true,
+        hideIndicator: true,
+      };
+    }
+
+    if (geometryType === 'polygon' || geometryType === 'mixed') {
+      style.polygon = {
+        fillColor: colorExpression,
+        fill: true,
+        stroke: strokeWidth > 0 && strokeColor !== '#00000000',
+        strokeColor: strokeColor === '#00000000' ? '#CCCCCC' : strokeColor,
+        strokeWidth: strokeWidth,
+        heightReference: 'clamp',
+        hideIndicator: true,
+      };
+    }
+
+    return style;
+  };
+
+  const handleExportReEarth = () => {
+    try {
+      const reearthStyle = generateReEarthStyle();
+      const blob = new Blob([JSON.stringify(reearthStyle, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'style.json';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error('Error exporting Re:Earth style:', error);
+      alert('Failed to export Re:Earth style.json');
+    }
   };
 
   return (
