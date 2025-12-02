@@ -740,36 +740,163 @@ const StyleEditorState: React.FC<StyleEditorStateProps> = ({
   };
 
   const handleExportMapLibre = () => {
-    const dummyStyle = {
-      version: 8,
-      name: 'Custom Style',
-      sources: {
-        'custom-source': {
-          type: 'geojson',
-          data: result.fileName,
-        },
-      },
-      layers: [
-        {
-          id: 'custom-layer',
-          type: geometryType === 'point' ? 'circle' : geometryType === 'line' ? 'line' : 'fill',
-          source: 'custom-source',
+    try {
+      // Generate color expression (same logic as map preview)
+      const getColorExpression = (): any => {
+        if (!selectedProperty) {
+          return '#CCCCCC';
+        }
+
+        if (colorMode === 'categorical') {
+          if (categories.length === 0) {
+            return '#CCCCCC';
+          }
+
+          // Build match expression for categorical colors
+          const cases: any[] = [];
+          categories.forEach((category) => {
+            // Determine if value is numeric or string
+            const isNumeric = !isNaN(Number(category.value)) && category.value !== '';
+            const value = isNumeric ? Number(category.value) : category.value;
+            cases.push(value);
+            cases.push(category.color);
+          });
+          cases.push('#CCCCCC'); // Default color
+          
+          return [
+            'match',
+            ['get', selectedProperty],
+            ...cases,
+          ];
+        } else {
+          // Build interpolate expression for continuous colors
+          // Check if min/max values are valid (not NaN)
+          if (isNaN(continuousStyle.minValue) || isNaN(continuousStyle.maxValue)) {
+            // For non-numeric properties, return a default color
+            return '#CCCCCC';
+          }
+          
+          const stops: any[] = [];
+          const numColors = continuousStyle.gradientColors.length;
+          const range = continuousStyle.maxValue - continuousStyle.minValue;
+          
+          if (range === 0) {
+            // If min and max are the same, use the first color
+            return continuousStyle.gradientColors[0] || '#CCCCCC';
+          }
+          
+          continuousStyle.gradientColors.forEach((color, index) => {
+            const value = continuousStyle.minValue + (range * index) / (numColors - 1);
+            stops.push(value);
+            stops.push(color);
+          });
+
+          return [
+            'interpolate',
+            ['linear'],
+            ['get', selectedProperty],
+            ...stops,
+          ];
+        }
+      };
+
+      const colorExpression = getColorExpression();
+      const layers: any[] = [];
+
+      // Point layer
+      if (geometryType === 'point' || geometryType === 'mixed') {
+        layers.push({
+          id: 'point-layer',
+          type: 'circle',
+          source: 'geojson-source',
           paint: {
-            'circle-color': colorMode === 'categorical' ? '#7FAD6F' : '#7FAD6F',
+            'circle-color': colorExpression,
+            'circle-radius': 6,
+            'circle-stroke-color': circleStrokeColor,
+            'circle-stroke-width': strokeWidth,
+          },
+        });
+      }
+
+      // Line layer
+      if (geometryType === 'line' || geometryType === 'mixed') {
+        layers.push({
+          id: 'line-layer',
+          type: 'line',
+          source: 'geojson-source',
+          paint: {
+            'line-color': colorExpression,
+            'line-width': 2,
+          },
+        });
+      }
+
+      // Polygon layer
+      if (geometryType === 'polygon' || geometryType === 'mixed') {
+        layers.push({
+          id: 'fill-layer',
+          type: 'fill',
+          source: 'geojson-source',
+          paint: {
+            'fill-color': colorExpression,
+            'fill-opacity': 0.6,
+          },
+        });
+        
+        // 枠線用のlineレイヤーを追加
+        if (strokeWidth > 0 && fillOutlineColor !== 'rgba(0, 0, 0, 0)') {
+          layers.push({
+            id: 'outline-layer',
+            type: 'line',
+            source: 'geojson-source',
+            paint: {
+              'line-color': fillOutlineColor,
+              'line-width': strokeWidth,
+            },
+          });
+        }
+      }
+
+      const style = {
+        version: 8,
+        name: 'Custom Style',
+        sources: {
+          'osm-tiles': {
+            type: 'raster',
+            tiles: [
+              'https://tile.openstreetmap.org/{z}/{x}/{y}.png'
+            ],
+            tileSize: 256,
+            attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+          },
+          'geojson-source': {
+            type: 'geojson',
+            data: uploadedFile?.cachedGeoJSON ? JSON.parse(uploadedFile.cachedGeoJSON) : {},
           },
         },
-      ],
-    };
+        layers: [
+          {
+            id: 'osm-tiles-layer',
+            type: 'raster',
+            source: 'osm-tiles',
+          },
+          ...layers,
+        ],
+      };
 
-    const blob = new Blob([JSON.stringify(dummyStyle, null, 2)], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'style-maplibre.json';
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
+      const blob = new Blob([JSON.stringify(style, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'style.json';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error('Error exporting MapLibre style:', error);
+      alert('Failed to export MapLibre / Mapbox style.json');
+    }
   };
 
   // Convert color to Re:Earth format (hex with alpha channel)
