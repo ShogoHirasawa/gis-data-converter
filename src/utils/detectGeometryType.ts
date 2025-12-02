@@ -7,6 +7,7 @@ import { InputFormat } from './detectFormat';
 import { GeometryType } from '../types';
 import { shapefileToGeoJSON } from './conversions/shapefile';
 import { kmlToGeoJSON } from './conversions/kml';
+import { csvToGeoJSON } from './conversions/csv';
 
 /**
  * Result of geometry type detection
@@ -42,7 +43,7 @@ export async function detectGeometryType(
       case 'kml':
         return await detectGeometryTypeFromKML(buffer);
       case 'csv':
-        return { geometryType: 'point' }; // CSV always contains point data
+        return await detectGeometryTypeFromCSV(buffer);
       case 'shapefile':
         return await detectGeometryTypeFromShapefile(buffer);
       case 'gpx':
@@ -87,6 +88,25 @@ async function detectGeometryTypeFromKML(buffer: ArrayBuffer): Promise<GeometryD
     };
   } catch (error) {
     return { geometryType: 'unknown' };
+  }
+}
+
+/**
+ * Detect geometry type from CSV (via GeoJSON conversion)
+ */
+async function detectGeometryTypeFromCSV(buffer: ArrayBuffer): Promise<GeometryDetectionResult> {
+  try {
+    const text = new TextDecoder('utf-8', { fatal: false }).decode(buffer);
+    const geojsonText = await csvToGeoJSON(text);
+    const geojson = JSON.parse(geojsonText);
+    
+    return {
+      geometryType: analyzeGeoJSONGeometry(geojson),
+      cachedGeoJSON: geojsonText,
+    };
+  } catch (error) {
+    // CSV変換に失敗した場合でも、pointとして返す（CSVは常にpointデータ）
+    return { geometryType: 'point' };
   }
 }
 

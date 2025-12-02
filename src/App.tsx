@@ -11,6 +11,7 @@ import { ConversionState, UploadedFile, ConversionResult } from './types';
 import { detectInputFormat } from './utils/detectFormat';
 import { detectGeometryType } from './utils/detectGeometryType';
 import { convertFile, getOutputFilename, getOutputMimeType, OutputFormat } from './utils/converter';
+import { extractFeatureInfo } from './utils/extractFeatureInfo';
 import { trackPageView, trackEvent } from './utils/analytics';
 import './App.css';
 
@@ -189,6 +190,16 @@ function App() {
             blob,
           };
 
+          // Extract feature information
+          try {
+            const featureInfo = await extractFeatureInfo(result, uploadedFile);
+            result.featureInfo = featureInfo;
+          } catch (error) {
+            // Store error message but don't fail the conversion
+            result.featureInfoError = error instanceof Error ? error.message : String(error);
+            console.warn('Failed to extract feature info:', error);
+          }
+
           setTimeout(() => {
             setConversionResult(result);
             setState('completed');
@@ -307,6 +318,13 @@ function App() {
             onFileUpload={handleFileUpload}
             onFormatSelect={handleFormatSelect}
             onReset={handleReset}
+            onStyleEditor={() => setState('style-editor')}
+            onBackToFormatSelection={() => {
+              // Reset conversion result and go back to format selection
+              setConversionResult(null);
+              setSelectedFormat(null);
+              setState('format-detection');
+            }}
           />
         )}
         <Footer onPageChange={handlePageChange} />

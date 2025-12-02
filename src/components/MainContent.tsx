@@ -4,6 +4,7 @@ import UploadState from './states/UploadState';
 import FormatDetectionState from './states/FormatDetectionState';
 import ConvertingState from './states/ConvertingState';
 import CompletedState from './states/CompletedState';
+import StyleEditorState from './states/StyleEditorState';
 import ErrorState from './states/ErrorState';
 import UploadErrorState from './states/UploadErrorState';
 
@@ -16,6 +17,8 @@ interface MainContentProps {
   onFileUpload: (file: File) => void;
   onFormatSelect: (formatId: string) => void;
   onReset: () => void;
+  onStyleEditor?: () => void;
+  onBackToFormatSelection?: () => void;
 }
 
 const MainContent: React.FC<MainContentProps> = ({
@@ -27,6 +30,8 @@ const MainContent: React.FC<MainContentProps> = ({
   onFileUpload,
   onFormatSelect,
   onReset,
+  onStyleEditor,
+  onBackToFormatSelection,
 }) => {
   return (
     <main className="flex-1 overflow-x-hidden flex flex-col px-8 py-12">
@@ -46,6 +51,15 @@ const MainContent: React.FC<MainContentProps> = ({
       {state === 'completed' && conversionResult && (
         <CompletedState
           result={conversionResult}
+          onReset={onReset}
+          onStyleEditor={onStyleEditor}
+        />
+      )}
+      {state === 'style-editor' && conversionResult && uploadedFile && (
+        <StyleEditorState
+          result={conversionResult}
+          uploadedFile={uploadedFile}
+          onBack={onBackToFormatSelection || onReset}
           onReset={onReset}
         />
       )}
