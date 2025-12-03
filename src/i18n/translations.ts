@@ -280,7 +280,7 @@ const enTranslations: Translations = {
     contactDescription: 'If you have any questions, comments, or requests regarding this service, please feel free to contact us.',
     contactEmailTitle: 'Email Address',
     // Style Editor
-    styleEditor: 'Style Editor',
+    styleEditor: 'Style Editor (In Development)',
     dataInfo: 'Data Information',
     uploadedData: 'Uploaded Data',
     featureCount: 'Feature Count',
@@ -440,7 +440,7 @@ const jaTranslations: Translations = {
     contactDescription: '本サービスに関するご質問、ご意見、ご要望がございましたら、お気軽にお問い合わせください。',
     contactEmailTitle: 'メールアドレス',
     // Style Editor
-    styleEditor: 'スタイルを編集',
+    styleEditor: 'スタイルを編集（開発中）',
     dataInfo: 'データ情報',
     uploadedData: 'アップロード済みデータ',
     featureCount: 'フィーチャ数',
@@ -599,7 +599,7 @@ const zhHantTranslations: Translations = {
     contactDescription: '如果您對本服務有任何問題、意見或建議，歡迎隨時與我們聯繫。',
     contactEmailTitle: '電子郵件地址',
     // Style Editor
-    styleEditor: 'Style Editor',
+    styleEditor: 'Style Editor (In Development)',
     dataInfo: 'Data Information',
     uploadedData: 'Uploaded Data',
     featureCount: 'Feature Count',
@@ -759,7 +759,7 @@ const zhHansTranslations: Translations = {
     contactDescription: '如果您对本服务有任何问题、意见或建议，欢迎随时与我们联系。',
     contactEmailTitle: '电子邮件地址',
     // Style Editor
-    styleEditor: 'Style Editor',
+    styleEditor: 'Style Editor (In Development)',
     dataInfo: 'Data Information',
     uploadedData: 'Uploaded Data',
     featureCount: 'Feature Count',
@@ -920,7 +920,7 @@ const plTranslations: Translations = {
     contactDescription: 'Jeśli masz pytania, uwagi lub prośby dotyczące tej usługi, prosimy o kontakt.',
     contactEmailTitle: 'Adres e-mail',
     // Style Editor
-    styleEditor: 'Style Editor',
+    styleEditor: 'Style Editor (In Development)',
     dataInfo: 'Data Information',
     uploadedData: 'Uploaded Data',
     featureCount: 'Feature Count',
@@ -1081,7 +1081,7 @@ const esTranslations: Translations = {
     contactDescription: 'Si tiene alguna pregunta, comentario o solicitud sobre este servicio, no dude en contactarnos.',
     contactEmailTitle: 'Dirección de correo electrónico',
     // Style Editor
-    styleEditor: 'Style Editor',
+    styleEditor: 'Style Editor (In Development)',
     dataInfo: 'Data Information',
     uploadedData: 'Uploaded Data',
     featureCount: 'Feature Count',
@@ -1242,7 +1242,7 @@ const arTranslations: Translations = {
     contactDescription: 'إذا كان لديك أي أسئلة أو تعليقات أو طلبات بخصوص هذه الخدمة، يرجى عدم التردد في الاتصال بنا.',
     contactEmailTitle: 'عنوان البريد الإلكتروني',
     // Style Editor
-    styleEditor: 'Style Editor',
+    styleEditor: 'Style Editor (In Development)',
     dataInfo: 'Data Information',
     uploadedData: 'Uploaded Data',
     featureCount: 'Feature Count',
@@ -1403,7 +1403,7 @@ const svTranslations: Translations = {
     contactDescription: 'Om du har några frågor, kommentarer eller önskemål angående denna tjänst, tveka inte att kontakta oss.',
     contactEmailTitle: 'E-postadress',
     // Style Editor
-    styleEditor: 'Style Editor',
+    styleEditor: 'Style Editor (In Development)',
     dataInfo: 'Data Information',
     uploadedData: 'Uploaded Data',
     featureCount: 'Feature Count',
@@ -1564,7 +1564,7 @@ const frTranslations: Translations = {
     contactDescription: 'Om du har några frågor, kommentarer eller önskemål angående denna tjänst, tveka inte att kontakta oss.',
     contactEmailTitle: 'E-postadress',
     // Style Editor
-    styleEditor: 'Style Editor',
+    styleEditor: 'Style Editor (In Development)',
     dataInfo: 'Data Information',
     uploadedData: 'Uploaded Data',
     featureCount: 'Feature Count',
@@ -1725,7 +1725,7 @@ const bgTranslations: Translations = {
     contactDescription: 'Ако имате въпроси, коментари или заявки относно тази услуга, моля не се колебайте да се свържете с нас.',
     contactEmailTitle: 'Имейл адрес',
     // Style Editor
-    styleEditor: 'Style Editor',
+    styleEditor: 'Style Editor (In Development)',
     dataInfo: 'Data Information',
     uploadedData: 'Uploaded Data',
     featureCount: 'Feature Count',
@@ -1886,7 +1886,7 @@ const thTranslations: Translations = {
     contactDescription: 'หากคุณมีคำถาม ข้อคิดเห็น หรือคำขอเกี่ยวกับบริการนี้ กรุณาติดต่อเราได้ตามสะดวก',
     contactEmailTitle: 'ที่อยู่อีเมล',
     // Style Editor
-    styleEditor: 'Style Editor',
+    styleEditor: 'Style Editor (In Development)',
     dataInfo: 'Data Information',
     uploadedData: 'Uploaded Data',
     featureCount: 'Feature Count',
@@ -2047,7 +2047,7 @@ const deTranslations: Translations = {
     contactDescription: 'Wenn Sie Fragen, Kommentare oder Anfragen zu diesem Service haben, zögern Sie bitte nicht, uns zu kontaktieren.',
     contactEmailTitle: 'E-Mail-Adresse',
     // Style Editor
-    styleEditor: 'Style Editor',
+    styleEditor: 'Style Editor (In Development)',
     dataInfo: 'Data Information',
     uploadedData: 'Uploaded Data',
     featureCount: 'Feature Count',
@@ -2208,7 +2208,7 @@ const caTranslations: Translations = {
     contactDescription: 'Si teniu preguntes, comentaris o sol·licituds sobre aquest servei, no dubteu a contactar-nos.',
     contactEmailTitle: 'Adreça de correu electrònic',
     // Style Editor
-    styleEditor: 'Style Editor',
+    styleEditor: 'Style Editor (In Development)',
     dataInfo: 'Data Information',
     uploadedData: 'Uploaded Data',
     featureCount: 'Feature Count',
@@ -2369,7 +2369,7 @@ const trTranslations: Translations = {
     contactDescription: 'Bu hizmet hakkında sorularınız, yorumlarınız veya istekleriniz varsa, lütfen bizimle iletişime geçmekten çekinmeyin.',
     contactEmailTitle: 'E-posta adresi',
     // Style Editor
-    styleEditor: 'Style Editor',
+    styleEditor: 'Style Editor (In Development)',
     dataInfo: 'Data Information',
     uploadedData: 'Uploaded Data',
     featureCount: 'Feature Count',
@@ -2530,7 +2530,7 @@ const itTranslations: Translations = {
     contactDescription: 'If you have any questions, comments, or requests regarding this service, please feel free to contact us.',
     contactEmailTitle: 'Email Address',
     // Style Editor
-    styleEditor: 'Style Editor',
+    styleEditor: 'Style Editor (In Development)',
     dataInfo: 'Data Information',
     uploadedData: 'Uploaded Data',
     featureCount: 'Feature Count',
@@ -2691,7 +2691,7 @@ const nlTranslations: Translations = {
     contactDescription: 'Als u vragen, opmerkingen of verzoeken heeft met betrekking tot deze service, aarzel dan niet om contact met ons op te nemen.',
     contactEmailTitle: 'E-mailadres',
     // Style Editor
-    styleEditor: 'Style Editor',
+    styleEditor: 'Style Editor (In Development)',
     dataInfo: 'Data Information',
     uploadedData: 'Uploaded Data',
     featureCount: 'Feature Count',
@@ -2852,7 +2852,7 @@ const ukTranslations: Translations = {
     contactDescription: 'If you have any questions, comments, or requests regarding this service, please feel free to contact us.',
     contactEmailTitle: 'Email Address',
     // Style Editor
-    styleEditor: 'Style Editor',
+    styleEditor: 'Style Editor (In Development)',
     dataInfo: 'Data Information',
     uploadedData: 'Uploaded Data',
     featureCount: 'Feature Count',
@@ -3013,7 +3013,7 @@ const ptTranslations: Translations = {
     contactDescription: 'If you have any questions, comments, or requests regarding this service, please feel free to contact us.',
     contactEmailTitle: 'Email Address',
     // Style Editor
-    styleEditor: 'Style Editor',
+    styleEditor: 'Style Editor (In Development)',
     dataInfo: 'Data Information',
     uploadedData: 'Uploaded Data',
     featureCount: 'Feature Count',
@@ -3174,7 +3174,7 @@ const elTranslations: Translations = {
     contactDescription: 'If you have any questions, comments, or requests regarding this service, please feel free to contact us.',
     contactEmailTitle: 'Email Address',
     // Style Editor
-    styleEditor: 'Style Editor',
+    styleEditor: 'Style Editor (In Development)',
     dataInfo: 'Data Information',
     uploadedData: 'Uploaded Data',
     featureCount: 'Feature Count',
@@ -3335,7 +3335,7 @@ const viTranslations: Translations = {
     contactDescription: 'Nếu bạn có bất kỳ câu hỏi, ý kiến hoặc yêu cầu nào về dịch vụ này, vui lòng liên hệ với chúng tôi.',
     contactEmailTitle: 'Địa chỉ email',
     // Style Editor
-    styleEditor: 'Style Editor',
+    styleEditor: 'Style Editor (In Development)',
     dataInfo: 'Data Information',
     uploadedData: 'Uploaded Data',
     featureCount: 'Feature Count',
@@ -3496,7 +3496,7 @@ const hiTranslations: Translations = {
     contactDescription: 'If you have any questions, comments, or requests regarding this service, please feel free to contact us.',
     contactEmailTitle: 'Email Address',
     // Style Editor
-    styleEditor: 'Style Editor',
+    styleEditor: 'Style Editor (In Development)',
     dataInfo: 'Data Information',
     uploadedData: 'Uploaded Data',
     featureCount: 'Feature Count',
@@ -3657,7 +3657,7 @@ const ruTranslations: Translations = {
     contactDescription: 'If you have any questions, comments, or requests regarding this service, please feel free to contact us.',
     contactEmailTitle: 'Email Address',
     // Style Editor
-    styleEditor: 'Style Editor',
+    styleEditor: 'Style Editor (In Development)',
     dataInfo: 'Data Information',
     uploadedData: 'Uploaded Data',
     featureCount: 'Feature Count',
@@ -3818,7 +3818,7 @@ const koTranslations: Translations = {
     contactDescription: 'If you have any questions, comments, or requests regarding this service, please feel free to contact us.',
     contactEmailTitle: 'Email Address',
     // Style Editor
-    styleEditor: 'Style Editor',
+    styleEditor: 'Style Editor (In Development)',
     dataInfo: 'Data Information',
     uploadedData: 'Uploaded Data',
     featureCount: 'Feature Count',
@@ -3979,7 +3979,7 @@ const idTranslations: Translations = {
     contactDescription: 'Jika Anda memiliki pertanyaan, komentar, atau permintaan terkait layanan ini, jangan ragu untuk menghubungi kami.',
     contactEmailTitle: 'Alamat email',
     // Style Editor
-    styleEditor: 'Style Editor',
+    styleEditor: 'Style Editor (In Development)',
     dataInfo: 'Data Information',
     uploadedData: 'Uploaded Data',
     featureCount: 'Feature Count',
@@ -4140,7 +4140,7 @@ const msTranslations: Translations = {
     contactDescription: 'If you have any questions, comments, or requests regarding this service, please feel free to contact us.',
     contactEmailTitle: 'Email Address',
     // Style Editor
-    styleEditor: 'Style Editor',
+    styleEditor: 'Style Editor (In Development)',
     dataInfo: 'Data Information',
     uploadedData: 'Uploaded Data',
     featureCount: 'Feature Count',
