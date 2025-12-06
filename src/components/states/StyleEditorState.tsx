@@ -7,10 +7,18 @@ import maplibregl from 'maplibre-gl';
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore - Vite worker import
 import MapLibreWorker from 'maplibre-gl/dist/maplibre-gl-csp-worker?worker';
+// Also expose worker URL for environments that ignore workerClass.
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore - Vite worker url import
+import MapLibreWorkerUrl from 'maplibre-gl/dist/maplibre-gl-csp-worker?url';
+
 // Force MapLibre to use the bundled worker (typings may not expose setWorkerClass).
 const MLWorker = (MapLibreWorker as any).default ?? MapLibreWorker;
 (maplibregl as any).setWorkerClass?.(MLWorker);
 (maplibregl as any).workerClass = MLWorker;
+
+// Fallback: set worker URL explicitly (MapLibre will fetch this if workerClass is ignored)
+(maplibregl as any).setWorkerUrl?.(MapLibreWorkerUrl as string);
 import 'maplibre-gl/dist/maplibre-gl.css';
 
 interface StyleEditorStateProps {
