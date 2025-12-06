@@ -60,54 +60,12 @@ pub fn encode_tile(features: &[TileFeature], layer_name: &str) -> Result<Vec<u8>
         // Encode geometry
         let (geom_type, geometry) = encode_geometry(&tile_feature.geometry)?;
         
-        // Debug: Check if ClosePath (15) is in geometry vector
-        #[cfg(target_arch = "wasm32")]
-        if idx < 5 {
-            let has_closepath = geometry.iter().any(|&v| v == 15);
-            let geom_type_str = match geom_type {
-                GeomType::Point => "Point",
-                GeomType::Linestring => "LineString",
-                GeomType::Polygon => "Polygon",
-                GeomType::Unknown => "Unknown",
-            };
-            crate::wasm_api::debug_log(&format!(
-                "[Rust] Feature {}: type={}, geometry.len()={}, has ClosePath (15)={}",
-                idx, geom_type_str, geometry.len(), has_closepath
-            ));
-            if !has_closepath && geometry.len() > 0 {
-                let last_5: Vec<String> = geometry.iter().rev().take(5).map(|v| v.to_string()).collect();
-                crate::wasm_api::debug_log(&format!(
-                    "[Rust] Feature {}: last 5 geometry values: {:?}",
-                    idx, last_5
-                ));
-            }
-        }
-        
         encoded_features.push(Feature {
             id: Some(idx as u64),
             tags,
             r#type: Some(geom_type as i32),
             geometry,
         });
-    }
-    
-    // Debug: Check if ClosePath is in features before encoding
-    #[cfg(target_arch = "wasm32")]
-    {
-        for (idx, feat) in encoded_features.iter().take(5).enumerate() {
-            let has_closepath = feat.geometry.iter().any(|&v| v == 15);
-            crate::wasm_api::debug_log(&format!(
-                "[Rust] Before encode: Feature {}: geometry.len()={}, has ClosePath (15)={}",
-                idx, feat.geometry.len(), has_closepath
-            ));
-            if feat.geometry.len() > 0 {
-                let last_5: Vec<String> = feat.geometry.iter().rev().take(5).map(|v| v.to_string()).collect();
-                crate::wasm_api::debug_log(&format!(
-                    "[Rust] Before encode: Feature {}: last 5 values: {:?}",
-                    idx, last_5
-                ));
-            }
-        }
     }
     
     // Build layer
@@ -129,16 +87,6 @@ pub fn encode_tile(features: &[TileFeature], layer_name: &str) -> Result<Vec<u8>
     let mut buf = Vec::new();
     tile.encode(&mut buf)
         .map_err(|e| format!("Encode error: {}", e))?;
-    
-    // Debug: Check if ClosePath is in encoded binary
-    #[cfg(target_arch = "wasm32")]
-    {
-        let count_15 = buf.iter().filter(|&&b| b == 15).count();
-        crate::wasm_api::debug_log(&format!(
-            "[Rust] After encode: buffer size={}, count of byte 15 (ClosePath)={}",
-            buf.len(), count_15
-        ));
-    }
     
     Ok(buf)
 }
@@ -191,7 +139,7 @@ fn encode_geometry(geometry: &TileGeometry) -> Result<(GeomType, Vec<u32>), Stri
             
             let mut commands = Vec::new();
             
-            for (ring_idx, ring) in rings.iter().enumerate() {
+            for (_ring_idx, ring) in rings.iter().enumerate() {
                 if ring.len() < 4 {
                     // Polygon requires at least 4 points (first and last are the same)
                     continue;
@@ -221,27 +169,6 @@ fn encode_geometry(geometry: &TileGeometry) -> Result<(GeomType, Vec<u32>), Stri
                 // command_integer(7, 1) = (7 & 0x7) | (1 << 3) = 7 | 8 = 15
                 let closepath_cmd = command_integer(7, 1);
                 commands.push(closepath_cmd);
-                
-                // Debug: Log first ring's ClosePath command
-                #[cfg(target_arch = "wasm32")]
-                if ring_idx == 0 {
-                    crate::wasm_api::debug_log(&format!(
-                        "[Rust] Polygon ring 0: ClosePath command = {} (expected 15)",
-                        closepath_cmd
-                    ));
-                }
-            }
-            
-            // Debug: Log total commands count and last few commands
-            #[cfg(target_arch = "wasm32")]
-            {
-                let last_commands: Vec<String> = commands.iter().rev().take(5).map(|c| c.to_string()).collect();
-                crate::wasm_api::debug_log(&format!(
-                    "[Rust] Polygon geometry: {} total commands, {} rings, last 5: {:?}",
-                    commands.len(),
-                    rings.len(),
-                    last_commands
-                ));
             }
             
             Ok((GeomType::Polygon, commands))

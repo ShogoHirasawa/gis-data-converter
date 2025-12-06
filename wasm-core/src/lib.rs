@@ -49,17 +49,6 @@ pub struct TileMetadata {
     pub attributes: Vec<serde_json::Value>, // Attribute statistics
 }
 
-// Debug logging helper
-#[cfg(target_arch = "wasm32")]
-fn debug_log(msg: &str) {
-    wasm_api::debug_log(msg);
-}
-
-#[cfg(not(target_arch = "wasm32"))]
-fn debug_log(msg: &str) {
-    eprintln!("{}", msg);
-}
-
 /// Analyze properties from features to extract fields and attributes
 fn analyze_properties(features: &[geojson_parser::Feature]) -> (std::collections::HashMap<String, String>, Vec<serde_json::Value>) {
     use std::collections::{HashMap, HashSet};
@@ -154,8 +143,6 @@ pub fn generate_tiles_with_metadata(
     // 1. Parse GeoJSON
     let features = geojson_parser::parse_geojson(geojson_bytes)?;
     
-    debug_log(&format!("[Rust] Parsed {} features from GeoJSON", features.len()));
-    
     // 2. Calculate metadata
     let bounds = geojson_parser::calculate_bounds(&features)?;
     let center = geojson_parser::calculate_center(bounds);
@@ -181,15 +168,8 @@ pub fn generate_tiles_with_metadata(
         "Point".to_string()
     };
     
-    debug_log(&format!("[Rust] Bounds: [{}, {}, {}, {}]", bounds.0, bounds.1, bounds.2, bounds.3));
-    debug_log(&format!("[Rust] Center: [{}, {}]", center.0, center.1));
-    debug_log(&format!("[Rust] Geometry type: {} (Point: {}, LineString: {}, Polygon: {})", 
-        geometry_type, point_count, linestring_count, polygon_count));
-    
     // Analyze properties to extract fields and attributes
     let (fields, attributes) = analyze_properties(&features);
-    
-    debug_log(&format!("[Rust] Found {} fields: {:?}", fields.len(), fields.keys().collect::<Vec<_>>()));
     
     let metadata = TileMetadata {
         min_zoom,
@@ -209,15 +189,6 @@ pub fn generate_tiles_with_metadata(
     for zoom in min_zoom..=max_zoom {
         // 4. Assign features to tiles
         let tiles = tiler::tile_features(&features, zoom)?;
-        
-        debug_log(&format!("[Rust] Zoom {}: generated {} tiles", zoom, tiles.len()));
-        
-        // Log first few tile coordinates for debugging
-        if tiles.len() <= 10 {
-            for (coord, _) in &tiles {
-                debug_log(&format!("[Rust]   Tile: {}/{}/{}", coord.z, coord.x, coord.y));
-            }
-        }
         
         // 5. Encode each tile in MVT format
         for (coord, features) in tiles {

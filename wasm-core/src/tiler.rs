@@ -32,25 +32,7 @@ pub fn tile_features(
 ) -> Result<HashMap<TileCoord, Vec<TileFeature>>, String> {
     let mut tiles: HashMap<TileCoord, Vec<TileFeature>> = HashMap::new();
     
-    for (idx, feature) in features.iter().enumerate() {
-        // Debug first few features at zoom 2 and 5
-        if idx < 10 && (zoom == 2 || zoom == 5) {
-            match &feature.geometry {
-                GeometryType::Polygon(polygon) => {
-                    let (min_lon, min_lat, max_lon, max_lat) = polygon_bounds(polygon);
-                    let (tx_min, ty_max) = lonlat_to_tile(min_lon, min_lat, zoom);
-                    let (tx_max, ty_min) = lonlat_to_tile(max_lon, max_lat, zoom);
-                    
-                    #[cfg(target_arch = "wasm32")]
-                    crate::wasm_api::debug_log(&format!(
-                        "[Rust]   Feature {}: bounds=[{:.4}, {:.4}, {:.4}, {:.4}] tiles=[{}-{}, {}-{}]",
-                        idx, min_lon, min_lat, max_lon, max_lat, tx_min, tx_max, ty_min, ty_max
-                    ));
-                }
-                _ => {}
-            }
-        }
-        
+    for (_idx, feature) in features.iter().enumerate() {
         match &feature.geometry {
             GeometryType::Point(point) => {
                 tile_point(point, &feature.properties, zoom, &mut tiles)?;
@@ -61,20 +43,6 @@ pub fn tile_features(
             GeometryType::Polygon(polygon) => {
                 tile_polygon(polygon, &feature.properties, zoom, &mut tiles)?;
             }
-        }
-    }
-    
-    // Debug: Show tile feature counts
-    if zoom == 2 || zoom == 5 {
-        #[cfg(target_arch = "wasm32")]
-        crate::wasm_api::debug_log(&format!("[Rust]   Total unique tiles at zoom {}: {}", zoom, tiles.len()));
-        
-        for (coord, feats) in tiles.iter().take(10) {
-            #[cfg(target_arch = "wasm32")]
-            crate::wasm_api::debug_log(&format!(
-                "[Rust]   Tile {}/{}/{} has {} features",
-                coord.z, coord.x, coord.y, feats.len()
-            ));
         }
     }
     
