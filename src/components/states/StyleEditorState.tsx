@@ -7,8 +7,8 @@ import maplibregl from 'maplibre-gl';
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore - Vite worker import
 import MapLibreWorker from 'maplibre-gl/dist/maplibre-gl-csp-worker?worker';
-// Some versions of maplibre-gl typings do not export setWorkerClass; use runtime assignment.
-(maplibregl as unknown as { setWorkerClass?: (w: typeof Worker) => void }).setWorkerClass?.(MapLibreWorker as unknown as typeof Worker);
+// Force MapLibre to use the bundled worker (typings may not expose setWorkerClass).
+(maplibregl as unknown as { workerClass?: unknown }).workerClass = MapLibreWorker as unknown as typeof Worker;
 import 'maplibre-gl/dist/maplibre-gl.css';
 
 interface StyleEditorStateProps {
