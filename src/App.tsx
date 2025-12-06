@@ -34,25 +34,20 @@ function App() {
       return;
     }
 
+    setUploadedFile({
+      file,
+      format: null,
+      size: file.size,
+      name: file.name,
+    });
+    setState('analyzing');
+
     try {
       const format = await detectInputFormat(file);
       
       if (format === 'unknown') {
         setState('upload-error');
         return;
-      }
-
-      // Show analyzing state for formats that require conversion (Shapefile, KML)
-      // This provides user feedback during geometry type detection
-      const needsAnalysis = format === 'shapefile' || format === 'kml';
-      if (needsAnalysis) {
-        setUploadedFile({
-          file,
-          format,
-          size: file.size,
-          name: file.name,
-        });
-        setState('analyzing');
       }
       
       // Detect geometry type if format is known
