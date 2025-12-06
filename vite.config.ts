@@ -4,6 +4,11 @@ import wasm from 'vite-plugin-wasm'
 import { nodePolyfills } from 'vite-plugin-node-polyfills'
 
 // https://vitejs.dev/config/
+const base =
+  process.env.VITE_BASE_PATH ||
+  process.env.BASE_PATH ||
+  '/gis-data-converter/';
+
 export default defineConfig({
   plugins: [
     react(), 
@@ -12,7 +17,7 @@ export default defineConfig({
       include: ['util', 'events', 'stream', 'buffer'],
     }),
   ],
-  base: '/',
+  base,
   worker: {
     format: 'es',
     plugins: () => [wasm()],
