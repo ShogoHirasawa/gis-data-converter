@@ -31,6 +31,11 @@ const StyleEditorState: React.FC<StyleEditorStateProps> = ({
   type GradientSelection = GradientPresetKey | 'transparent';
 
   // Use first available property or empty string
+  // GeoJSON text for preview (prefer cached; fallback to conversion result)
+  const [geojsonText, setGeojsonText] = useState<string | null>(
+    uploadedFile?.cachedGeoJSON || null
+  );
+  // Use first available property or empty string
   const initialProperty = result.featureInfo?.properties?.[0] || '';
   const [selectedProperty, setSelectedProperty] = useState<string>(initialProperty);
   const [colorMode, setColorMode] = useState<ColorMode>('categorical');
@@ -46,7 +51,7 @@ const StyleEditorState: React.FC<StyleEditorStateProps> = ({
   const [strokeWidth, setStrokeWidth] = useState<number>(1);
 
   // Infer geometry type if detection failed (fallback prevents polygons/lines from being treated as points)
-  const inferGeometryTypeFromGeoJSON = useCallback((cachedGeoJSON?: string) => {
+  const inferGeometryTypeFromGeoJSON = useCallback((cachedGeoJSON?: string | null) => {
     if (!cachedGeoJSON) return 'unknown' as const;
     try {
       const geojson = JSON.parse(cachedGeoJSON);
@@ -88,10 +93,33 @@ const StyleEditorState: React.FC<StyleEditorStateProps> = ({
       return uploadedFile.geometryType;
     }
 
-    const inferred = inferGeometryTypeFromGeoJSON(uploadedFile?.cachedGeoJSON);
+    const inferred = inferGeometryTypeFromGeoJSON(geojsonText);
     if (inferred === 'unknown') return 'mixed';
     return inferred;
-  }, [uploadedFile?.geometryType, uploadedFile?.cachedGeoJSON, inferGeometryTypeFromGeoJSON]);
+  }, [uploadedFile?.geometryType, geojsonText, inferGeometryTypeFromGeoJSON]);
+  
+  // Load geojson text (fallback to conversion result blob when cached is missing)
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      if (geojsonText) return;
+      if (uploadedFile?.cachedGeoJSON) {
+        setGeojsonText(uploadedFile.cachedGeoJSON);
+        return;
+      }
+      if (result.format === 'geojson' && result.blob) {
+        try {
+          const text = await result.blob.text();
+          if (!cancelled) setGeojsonText(text);
+        } catch (e) {
+          console.warn('Failed to read geojson from blob:', e);
+        }
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [geojsonText, uploadedFile?.cachedGeoJSON, result.format, result.blob]);
   
   // Use actual feature info if available, otherwise use empty data
   const featureCount = result.featureInfo?.featureCount ?? 0;
@@ -213,9 +241,13 @@ const StyleEditorState: React.FC<StyleEditorStateProps> = ({
     }
 
     try {
+      if (!geojsonText) {
+        console.error('GeoJSON not available for preview');
+        return;
+      }
       let geojson: GeoJSON.FeatureCollection;
       try {
-        geojson = JSON.parse(uploadedFile.cachedGeoJSON) as GeoJSON.FeatureCollection;
+        geojson = JSON.parse(geojsonText) as GeoJSON.FeatureCollection;
       } catch (parseError) {
         console.error('Error parsing GeoJSON:', parseError);
         return;
