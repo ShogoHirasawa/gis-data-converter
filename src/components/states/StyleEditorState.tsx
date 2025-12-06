@@ -838,6 +838,12 @@ const StyleEditorState: React.FC<StyleEditorStateProps> = ({
 
   const handleExportMapLibre = () => {
     try {
+      const isVectorTiles = result.format === 'pbf';
+      const dataSourceId = isVectorTiles ? 'vector-tiles' : 'geojson-source';
+      const sourceLayerName = isVectorTiles ? (result.pbfOptions?.layerName || 'layer') : undefined;
+      // Default vector tile URL template (replace your_url with actual host)
+      const tilesUrlTemplate = 'https://your_url/tiles_pbf/tiles/{z}/{x}/{y}.pbf';
+
       // Generate color expression (same logic as map preview)
       const getColorExpression = (): any => {
         if (!selectedProperty) {
@@ -902,55 +908,71 @@ const StyleEditorState: React.FC<StyleEditorStateProps> = ({
 
       // Point layer
       if (geometryType === 'point' || geometryType === 'mixed') {
-        layers.push({
+        const pointLayer: any = {
           id: 'point-layer',
           type: 'circle',
-          source: 'geojson-source',
+          source: dataSourceId,
           paint: {
             'circle-color': colorExpression,
             'circle-radius': 6,
             'circle-stroke-color': circleStrokeColor,
             'circle-stroke-width': strokeWidth,
           },
-        });
+        };
+        if (isVectorTiles && sourceLayerName) {
+          pointLayer['source-layer'] = sourceLayerName;
+        }
+        layers.push(pointLayer);
       }
 
       // Line layer
       if (geometryType === 'line' || geometryType === 'mixed') {
-        layers.push({
+        const lineLayer: any = {
           id: 'line-layer',
           type: 'line',
-          source: 'geojson-source',
+          source: dataSourceId,
           paint: {
             'line-color': colorExpression,
             'line-width': 2,
           },
-        });
+        };
+        if (isVectorTiles && sourceLayerName) {
+          lineLayer['source-layer'] = sourceLayerName;
+        }
+        layers.push(lineLayer);
       }
 
       // Polygon layer
       if (geometryType === 'polygon' || geometryType === 'mixed') {
-        layers.push({
+        const fillLayer: any = {
           id: 'fill-layer',
           type: 'fill',
-          source: 'geojson-source',
+          source: dataSourceId,
           paint: {
             'fill-color': colorExpression,
             'fill-opacity': 0.6,
           },
-        });
+        };
+        if (isVectorTiles && sourceLayerName) {
+          fillLayer['source-layer'] = sourceLayerName;
+        }
+        layers.push(fillLayer);
         
         // 枠線用のlineレイヤーを追加
         if (strokeWidth > 0 && fillOutlineColor !== 'rgba(0, 0, 0, 0)') {
-          layers.push({
+          const outlineLayer: any = {
             id: 'outline-layer',
             type: 'line',
-            source: 'geojson-source',
+            source: dataSourceId,
             paint: {
               'line-color': fillOutlineColor,
               'line-width': strokeWidth,
             },
-          });
+          };
+          if (isVectorTiles && sourceLayerName) {
+            outlineLayer['source-layer'] = sourceLayerName;
+          }
+          layers.push(outlineLayer);
         }
       }
 
@@ -966,10 +988,17 @@ const StyleEditorState: React.FC<StyleEditorStateProps> = ({
             tileSize: 256,
             attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
           },
-          'geojson-source': {
-            type: 'geojson',
-            data: uploadedFile?.cachedGeoJSON ? JSON.parse(uploadedFile.cachedGeoJSON) : {},
-          },
+          [dataSourceId]: isVectorTiles
+            ? {
+                type: 'vector',
+                tiles: [tilesUrlTemplate],
+                minzoom: result.pbfOptions?.minZoom ?? 0,
+                maxzoom: result.pbfOptions?.maxZoom ?? 14,
+              }
+            : {
+                type: 'geojson',
+                data: uploadedFile?.cachedGeoJSON ? JSON.parse(uploadedFile.cachedGeoJSON) : {},
+              },
         },
         layers: [
           {

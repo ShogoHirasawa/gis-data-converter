@@ -12,6 +12,13 @@ export type FileFormat = 'shapefile' | 'geojson' | 'kml' | 'csv' | 'gpx' | 'pbf'
 
 export type GeometryType = 'point' | 'line' | 'polygon' | 'mixed' | 'unknown';
 
+// Options used when exporting vector tiles (PBF)
+export interface PbfOptions {
+  minZoom: number;
+  maxZoom: number;
+  layerName: string;
+}
+
 export interface UploadedFile {
   file: File;
   format: FileFormat | null;
@@ -39,6 +46,7 @@ export interface ConversionResult {
   format: FileFormat;
   size: number;
   blob: Blob | null;
+  pbfOptions?: PbfOptions;
   featureInfo?: FeatureInfo;
   featureInfoError?: string; // Error message if feature info extraction failed
 }

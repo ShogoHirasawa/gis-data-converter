@@ -5,12 +5,7 @@
 
 import React, { useState } from 'react';
 import { X } from 'lucide-react';
-
-export interface PbfOptions {
-  minZoom: number;
-  maxZoom: number;
-  layerName: string;
-}
+import { PbfOptions } from '../types';
 
 interface PbfOptionsDialogProps {
   isOpen: boolean;
