@@ -89,7 +89,7 @@ const CompletedState: React.FC<CompletedStateProps> = ({
                 <Palette size={20} />
               </div>
               <span className="text-lg whitespace-nowrap font-semibold">
-                {t.styleEditor || 'Style Editor'}
+                {t.styleEditor || 'スタイルを編集'}
               </span>
             </button>
           )}
