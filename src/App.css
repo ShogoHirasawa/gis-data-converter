@@ -21,3 +21,34 @@ body {
   animation: spin 1s linear infinite;
 }
 
+@keyframes loadingShimmer {
+  0% {
+    transform: translateX(-120%);
+  }
+  50% {
+    transform: translateX(120%);
+  }
+  100% {
+    transform: translateX(-120%);
+  }
+}
+
+.loading-progress {
+  position: relative;
+  overflow: hidden;
+}
+
+.loading-progress__bar {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 45%;
+  background: linear-gradient(
+    90deg,
+    rgba(127, 173, 111, 0) 0%,
+    rgba(127, 173, 111, 0.45) 50%,
+    rgba(127, 173, 111, 0) 100%
+  );
+  animation: loadingShimmer 1.4s ease-in-out infinite;
+}
+
