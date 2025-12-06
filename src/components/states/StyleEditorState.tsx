@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { useLanguage } from '../../i18n/LanguageContext';
 import { ConversionResult, UploadedFile, ColorMode, CategoricalCategory, ContinuousStyle } from '../../types';
 import { ChevronDown, Download, ArrowLeft, RefreshCw, Check } from 'lucide-react';
@@ -45,7 +45,53 @@ const StyleEditorState: React.FC<StyleEditorStateProps> = ({
   const [fillOutlineColor, setFillOutlineColor] = useState<string>('#7FAD6F');
   const [strokeWidth, setStrokeWidth] = useState<number>(1);
 
-  const geometryType = uploadedFile?.geometryType || 'point';
+  // Infer geometry type if detection failed (fallback prevents polygons/lines from being treated as points)
+  const inferGeometryTypeFromGeoJSON = useCallback((cachedGeoJSON?: string) => {
+    if (!cachedGeoJSON) return 'unknown' as const;
+    try {
+      const geojson = JSON.parse(cachedGeoJSON);
+      const types = new Set<string>();
+
+      const normalize = (type: string) => {
+        const normalized = type.toLowerCase();
+        if (normalized === 'point' || normalized === 'multipoint') return 'point';
+        if (normalized === 'linestring' || normalized === 'multilinestring') return 'line';
+        if (normalized === 'polygon' || normalized === 'multipolygon') return 'polygon';
+        return null;
+      };
+
+      const addType = (t: string | null) => {
+        if (t) types.add(t);
+      };
+
+      if (geojson.type === 'FeatureCollection' && Array.isArray(geojson.features)) {
+        for (const feature of geojson.features) {
+          if (feature?.geometry?.type) addType(normalize(feature.geometry.type));
+        }
+      } else if (geojson.type === 'Feature' && geojson.geometry?.type) {
+        addType(normalize(geojson.geometry.type));
+      } else if (geojson.type && geojson.coordinates) {
+        addType(normalize(geojson.type));
+      }
+
+      if (types.size === 0) return 'unknown' as const;
+      if (types.size > 1) return 'mixed' as const;
+      return Array.from(types)[0] as 'point' | 'line' | 'polygon';
+    } catch (error) {
+      console.warn('Failed to infer geometry type from cached GeoJSON:', error);
+      return 'unknown' as const;
+    }
+  }, []);
+
+  const geometryType = useMemo(() => {
+    if (uploadedFile?.geometryType && uploadedFile.geometryType !== 'unknown') {
+      return uploadedFile.geometryType;
+    }
+
+    const inferred = inferGeometryTypeFromGeoJSON(uploadedFile?.cachedGeoJSON);
+    if (inferred === 'unknown') return 'mixed';
+    return inferred;
+  }, [uploadedFile?.geometryType, uploadedFile?.cachedGeoJSON, inferGeometryTypeFromGeoJSON]);
   
   // Use actual feature info if available, otherwise use empty data
   const featureCount = result.featureInfo?.featureCount ?? 0;
