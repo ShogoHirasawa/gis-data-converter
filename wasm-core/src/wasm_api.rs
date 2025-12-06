@@ -99,24 +99,6 @@ pub fn generate_pbf_tiles(
     })
 }
 
-/// Log output (for debugging)
-#[wasm_bindgen]
-extern "C" {
-    #[wasm_bindgen(js_namespace = console)]
-    fn log(s: &str);
-}
-
-/// Output debug log (public for use within crate)
-pub fn debug_log(message: &str) {
-    log(message);
-}
-
-/// Output debug log (for Wasm bindgen)
-#[wasm_bindgen]
-pub fn wasm_debug_log(message: &str) {
-    log(message);
-}
-
 /// Generate PMTiles archive from GeoJSON (for Wasm)
 /// 
 /// # Arguments
@@ -134,13 +116,9 @@ pub fn generate_pmtiles_archive(
     max_zoom: u8,
     layer_name: &str,
 ) -> Result<Vec<u8>, JsValue> {
-    debug_log(&format!("[Rust] Starting PMTiles generation: zoom {}-{}", min_zoom, max_zoom));
-    
     // Generate tiles first to check count
     let (tile_files, metadata) = generate_tiles_with_metadata(geojson_bytes, min_zoom, max_zoom, layer_name)
         .map_err(|e| JsValue::from_str(&format!("Tile generation error: {}", e)))?;
-    
-    debug_log(&format!("[Rust] Generated {} tiles", tile_files.len()));
     
     // Convert to PMTiles format
     let tiles: Vec<(crate::TileCoord, Vec<u8>)> = tile_files
@@ -159,13 +137,9 @@ pub fn generate_pmtiles_archive(
         })
         .collect();
     
-    debug_log(&format!("[Rust] Encoding {} tiles into PMTiles format", tiles.len()));
-    
     // Encode as PMTiles
     let pmtiles_data = crate::pmtiles_encoder::encode_pmtiles(tiles, &metadata)
         .map_err(|e| JsValue::from_str(&format!("PMTiles encoding error: {}", e)))?;
-    
-    debug_log(&format!("[Rust] PMTiles encoded: {} bytes", pmtiles_data.len()));
     
     Ok(pmtiles_data)
 }

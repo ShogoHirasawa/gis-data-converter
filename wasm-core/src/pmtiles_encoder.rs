@@ -69,37 +69,9 @@ pub fn encode_pmtiles(
     }
     let tile_entries = compressed_tile_entries;
     
-    // Debug: Log tile IDs and offsets
-    #[cfg(target_arch = "wasm32")]
-    {
-        for (idx, entry) in tile_entries.iter().enumerate().take(5) {
-            crate::wasm_api::debug_log(&format!(
-                "[Rust] PMTiles tile {}: id={}, length={}, offset={}",
-                idx, entry.tile_id, entry.length, entry.offset
-            ));
-        }
-    }
-    
-    // Debug: Verify offsets before encoding directory
-    #[cfg(target_arch = "wasm32")]
-    {
-        for (idx, entry) in tile_entries.iter().enumerate().take(6) {
-            crate::wasm_api::debug_log(&format!(
-                "[Rust] Before encode_directory: entry {}: offset={}",
-                idx, entry.offset
-            ));
-        }
-    }
-    
     // Encode directory (now with correct offsets)
     let directory_data = encode_directory(&tile_entries)?;
     let directory_length = directory_data.len();
-    
-    #[cfg(target_arch = "wasm32")]
-    crate::wasm_api::debug_log(&format!(
-        "[Rust] Directory encoded: {} bytes (compressed), {} entries",
-        directory_length, tile_entries.len()
-    ));
     
     // Generate JSON metadata
     let json_metadata = generate_json_metadata(metadata)?;
@@ -361,17 +333,9 @@ fn encode_directory(entries: &[TileEntry]) -> Result<Vec<u8>, String> {
     
     // Section 3: lengths (delta encoded)
     let mut last_length = 0u32;
-    for (idx, entry) in entries.iter().enumerate() {
+    for (_idx, entry) in entries.iter().enumerate() {
         let delta = (entry.length as i64) - (last_length as i64);
         let zigzag_delta = zigzag_encode(delta);
-        
-        #[cfg(target_arch = "wasm32")]
-        if idx < 5 {
-            crate::wasm_api::debug_log(&format!(
-                "[Rust] Directory length {}: entry.length={}, last_length={}, delta={}, zigzag={}",
-                idx, entry.length, last_length, delta, zigzag_delta
-            ));
-        }
         
         write_varint(&mut dir_buffer, zigzag_delta);
         last_length = entry.length;
@@ -379,17 +343,9 @@ fn encode_directory(entries: &[TileEntry]) -> Result<Vec<u8>, String> {
     
     // Section 4: offsets (delta encoded)
     let mut last_offset = 0usize;
-    for (idx, entry) in entries.iter().enumerate() {
+    for (_idx, entry) in entries.iter().enumerate() {
         let delta = (entry.offset as i64) - (last_offset as i64);
         let zigzag_delta = zigzag_encode(delta);
-        
-        #[cfg(target_arch = "wasm32")]
-        if idx < 6 {
-            crate::wasm_api::debug_log(&format!(
-                "[Rust] Directory offset {}: entry.offset={}, last_offset={}, delta={}, zigzag={}",
-                idx, entry.offset, last_offset, delta, zigzag_delta
-            ));
-        }
         
         write_varint(&mut dir_buffer, zigzag_delta);
         last_offset = entry.offset;

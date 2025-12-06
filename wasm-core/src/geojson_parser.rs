@@ -41,7 +41,9 @@ fn parse_feature_collection(fc: FeatureCollection) -> Result<Vec<Feature>, Strin
     for feature in fc.features {
         match parse_feature(feature) {
             Ok(f) => features.push(f),
-            Err(e) => eprintln!("Feature parse warning: {}", e),
+            Err(_e) => {
+                // Skip invalid features silently
+            },
         }
     }
     
