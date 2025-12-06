@@ -2,12 +2,13 @@ import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react'
 import { useLanguage } from '../../i18n/LanguageContext';
 import { ConversionResult, UploadedFile, ColorMode, CategoricalCategory, ContinuousStyle } from '../../types';
 import { ChevronDown, Download, ArrowLeft, RefreshCw, Check } from 'lucide-react';
-import maplibregl, { setWorkerClass } from 'maplibre-gl';
+import maplibregl from 'maplibre-gl';
 // Explicitly bundle the MapLibre worker to avoid runtime ReferenceError in production.
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore - Vite worker import
 import MapLibreWorker from 'maplibre-gl/dist/maplibre-gl-csp-worker?worker';
-setWorkerClass(MapLibreWorker as unknown as typeof Worker);
+// Some versions of maplibre-gl typings do not export setWorkerClass; use runtime assignment.
+(maplibregl as unknown as { setWorkerClass?: (w: typeof Worker) => void }).setWorkerClass?.(MapLibreWorker as unknown as typeof Worker);
 import 'maplibre-gl/dist/maplibre-gl.css';
 
 interface StyleEditorStateProps {
