@@ -6,8 +6,8 @@ import Footer from './components/Footer';
 import HowToUsePage from './components/pages/HowToUsePage';
 import SupportedFormatsPage from './components/pages/SupportedFormatsPage';
 import ContactPage from './components/pages/ContactPage';
-import PbfOptionsDialog, { PbfOptions } from './components/PbfOptionsDialog';
-import { ConversionState, UploadedFile, ConversionResult } from './types';
+import PbfOptionsDialog from './components/PbfOptionsDialog';
+import { ConversionState, UploadedFile, ConversionResult, PbfOptions } from './types';
 import { detectInputFormat } from './utils/detectFormat';
 import { detectGeometryType } from './utils/detectGeometryType';
 import { convertFile, getOutputFilename, getOutputMimeType, OutputFormat } from './utils/converter';
@@ -183,6 +183,7 @@ function App() {
             format: formatId as ConversionResult['format'],
             size: blob.size,
             blob,
+            pbfOptions: formatId === 'pbf' ? pbfOptions : undefined,
           };
 
           // Extract feature information
