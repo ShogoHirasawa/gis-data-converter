@@ -7,7 +7,7 @@ import { nodePolyfills } from 'vite-plugin-node-polyfills'
 const base =
   process.env.VITE_BASE_PATH ||
   process.env.BASE_PATH ||
-  '/gis-data-converter/';
+  '/';
 
 export default defineConfig({
   plugins: [

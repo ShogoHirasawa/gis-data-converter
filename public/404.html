@@ -5,14 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>GIS Converter</title>
     <script>
-      // Redirect all 404 requests to index.html for SPA routing
-      const path = window.location.pathname;
-      const base = '/gis-data-converter/';
-      if (path.startsWith(base)) {
-        window.location.replace(base);
-      } else {
-        window.location.replace('/gis-data-converter/');
-      }
+      // Redirect all 404 requests to root for SPA routing
+      window.location.replace('/');
     </script>
   </head>
   <body>
