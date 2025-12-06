@@ -138,10 +138,6 @@ The hosted web app can use Google Analytics (GA4). By default (no env set), anal
 - Automatically detect the coordinate system and perform conversion
 - When input data is large, it recommens using vector tiles as the output format
 
-## Limitations
-
-- Maximum file size: 50MB
-- CSV conversion only supports point geometries
 - Shapefile must be uploaded as a ZIP file
 - Some complex data structures may not be fully supported
 
