@@ -110,7 +110,7 @@ test.describe('GeoJSON Conversion E2E', () => {
 
         const filePath = await getFixtureFile(geometry, `${geometry}s.geojson`);
         await uploadFile(page, filePath);
-        await selectFormat(page, 'PBF');
+        await selectFormat(page, 'Vector Tiles (Directory Format)');
         await waitForConversion(page);
 
         const downloadedPath = await downloadFile(page);

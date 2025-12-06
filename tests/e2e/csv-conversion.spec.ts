@@ -103,7 +103,7 @@ test.describe('CSV Conversion E2E', () => {
 
     const filePath = await getFixtureFile('point', 'points.csv');
     await uploadFile(page, filePath);
-    await selectFormat(page, 'PBF');
+    await selectFormat(page, 'Vector Tiles (Directory Format)');
     await waitForConversion(page);
 
     const downloadedPath = await downloadFile(page);
