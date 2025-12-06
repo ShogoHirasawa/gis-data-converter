@@ -114,10 +114,14 @@ async function checkZipContents(buffer: ArrayBuffer): Promise<InputFormat> {
       return "shapefile";
     }
     
-    // If ZIP doesn't contain .shp, it's not a Shapefile
-    // Return unknown so other detection methods can try
-    return "unknown";
+    // If ZIP doesn't contain .shp, throw an error
+    // This provides a clear error message to the user
+    throw new Error('ZIP file does not contain a .shp file. Only Shapefile ZIP archives are supported.');
   } catch (error) {
+    // If it's already an Error with our message, re-throw it
+    if (error instanceof Error && error.message.includes('does not contain a .shp file')) {
+      throw error;
+    }
     // If ZIP parsing fails, it might not be a valid ZIP
     // Return unknown to try other detection methods
     return "unknown";
@@ -222,7 +226,9 @@ function detectByMimeType(mimeType: string): InputFormat {
     return "geojson";
   }
 
-  if (mime.includes("zip") || mime.includes("x-shp")) {
+  // For ZIP files, we should rely on content checking (checkZipContents)
+  // rather than assuming it's a shapefile based on MIME type alone
+  if (mime.includes("x-shp")) {
     return "shapefile";
   }
 
