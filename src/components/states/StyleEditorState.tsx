@@ -8,7 +8,9 @@ import maplibregl from 'maplibre-gl';
 // @ts-ignore - Vite worker import
 import MapLibreWorker from 'maplibre-gl/dist/maplibre-gl-csp-worker?worker';
 // Force MapLibre to use the bundled worker (typings may not expose setWorkerClass).
-(maplibregl as unknown as { workerClass?: unknown }).workerClass = MapLibreWorker as unknown as typeof Worker;
+const MLWorker = (MapLibreWorker as any).default ?? MapLibreWorker;
+(maplibregl as any).setWorkerClass?.(MLWorker);
+(maplibregl as any).workerClass = MLWorker;
 import 'maplibre-gl/dist/maplibre-gl.css';
 
 interface StyleEditorStateProps {
