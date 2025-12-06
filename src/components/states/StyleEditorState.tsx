@@ -102,6 +102,7 @@ const StyleEditorState: React.FC<StyleEditorStateProps> = ({
   const mapContainerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<maplibregl.Map | null>(null);
   const popupRef = useRef<maplibregl.Popup | null>(null);
+  const [mapReady, setMapReady] = useState(false);
 
   // Calculate bounding box from GeoJSON
   const calculateBounds = (geojson: GeoJSON.FeatureCollection): maplibregl.LngLatBounds | null => {
@@ -270,6 +271,7 @@ const StyleEditorState: React.FC<StyleEditorStateProps> = ({
       mapRef.current = map;
 
       map.on('load', () => {
+        setMapReady(true);
         // Add GeoJSON source
         map.addSource('geojson-source', {
           type: 'geojson',
@@ -452,6 +454,7 @@ const StyleEditorState: React.FC<StyleEditorStateProps> = ({
           mapRef.current.remove();
           mapRef.current = null;
         }
+        setMapReady(false);
       };
     } catch (error) {
       console.error('Error initializing map:', error);
@@ -626,7 +629,7 @@ const StyleEditorState: React.FC<StyleEditorStateProps> = ({
   // Update map style based on selected property and color mode
   useEffect(() => {
     const map = mapRef.current;
-    if (!map || !selectedProperty || !map.getSource('geojson-source')) {
+    if (!map || !mapReady || !selectedProperty || !map.getSource('geojson-source')) {
       return;
     }
 
@@ -701,11 +704,11 @@ const StyleEditorState: React.FC<StyleEditorStateProps> = ({
     } catch (error) {
       console.error('Error updating map style:', error);
     }
-  }, [selectedProperty, colorMode, categories, continuousStyle, geometryType]);
+  }, [selectedProperty, colorMode, categories, continuousStyle, geometryType, mapReady]);
 
   // Update stroke colors and width when they change
   useEffect(() => {
-    if (!mapRef.current) return;
+    if (!mapRef.current || !mapReady) return;
 
     const map = mapRef.current;
     if (!map.loaded()) return;
@@ -727,7 +730,7 @@ const StyleEditorState: React.FC<StyleEditorStateProps> = ({
     } catch (error) {
       console.error('Error updating stroke colors and width:', error);
     }
-  }, [circleStrokeColor, fillOutlineColor, strokeWidth, geometryType]);
+  }, [circleStrokeColor, fillOutlineColor, strokeWidth, geometryType, mapReady]);
 
   // Generate colors from gradient
   const generateColorsFromGradient = (gradient: string[], count: number): string[] => {
